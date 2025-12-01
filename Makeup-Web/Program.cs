@@ -1,3 +1,5 @@
+
+using Infastructure_Layer.Persistence.DependencyInjection;
 namespace Makeup_Web
 {
     public class Program
@@ -8,6 +10,7 @@ namespace Makeup_Web
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+            builder.Services.AddInfrastructure(builder.Configuration);
 
             var app = builder.Build();
 
