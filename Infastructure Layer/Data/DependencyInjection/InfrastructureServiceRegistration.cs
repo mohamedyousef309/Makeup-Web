@@ -6,8 +6,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Domain_Layer.Interfaces.ServiceInterfaces;
 
-namespace Infastructure_Layer.Persistence.DependencyInjection
+namespace Infastructure_Layer.Data.DependencyInjection
 {
     public static class InfrastructureServiceRegistration
     {
@@ -15,7 +16,9 @@ namespace Infastructure_Layer.Persistence.DependencyInjection
         {
             services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(
-                    config.GetConnectionString("DefaultConnection")));
+                    config.GetConnectionString("DefaultConnection")).UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
+
+            services.AddScoped<IunitofWork, UnitofWork>();
 
             return services;
         }

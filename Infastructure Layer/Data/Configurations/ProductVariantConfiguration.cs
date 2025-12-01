@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Infastructure_Layer.Persistence.Configurations
+namespace Infastructure_Layer.Data.Configurations
 {
     public class ProductVariantConfiguration : IEntityTypeConfiguration<ProductVariant>
     {
