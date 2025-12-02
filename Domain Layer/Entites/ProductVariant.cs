@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Domain_Layer.Entites
 {
-    public class ProductVariant
+    public class ProductVariant : BaseEntity
     {
-        public int Id { get; set; }
+
 
         // FK to Product
         public int ProductId { get; set; }

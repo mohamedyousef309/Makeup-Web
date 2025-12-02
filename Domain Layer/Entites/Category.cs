@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Domain_Layer.Entites
 {
-    public class Category
+    public class Category : BaseEntity
     {
-        public int Id { get; set; }
+       
         public string Name { get; set; } = default!;
         public string? Description { get; set; }
 
