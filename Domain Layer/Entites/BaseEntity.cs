@@ -8,6 +8,8 @@ namespace Domain_Layer.Entites
 {
     public class BaseEntity
     {
-        public Guid id { get; set;  }=Guid.NewGuid();
+        public Guid Id { get; set; }
     }
+
+
 }

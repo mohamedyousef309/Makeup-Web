@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Domain_Layer.Entites
 {
-    public class Order
+    public class Order : BaseEntity
     {
-        public int Id { get; set; }
+        
 
         
 

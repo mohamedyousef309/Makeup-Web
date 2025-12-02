@@ -21,7 +21,6 @@ namespace Infastructure_Layer
         {
             this.appDbContext = appDbContext;
             _dbSet = appDbContext.Set<T>();
-
         }
 
         public IQueryable<T> GetAll()
@@ -31,26 +30,22 @@ namespace Infastructure_Layer
 
         public IQueryable<T> GetByIdQueryable(Guid id)
         {
-            return appDbContext.Set<T>().Where(x=>x.id==id);
-
+            return appDbContext.Set<T>().Where(x => x.Id == id);
         }
-
 
         public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> expression)
         {
             return await appDbContext.Set<T>().Where(expression).ToListAsync();
         }
 
-
         public async Task<T> GetByCriteriaAsync(Expression<Func<T, bool>> expression)
         {
             return await appDbContext.Set<T>().Where(expression).FirstAsync();
-
         }
 
         public async Task addAsync(T item)
         {
-            await appDbContext.Set<T>().AddAsync(item); 
+            await appDbContext.Set<T>().AddAsync(item);
         }
 
         public async Task AddRangeAsync(IEnumerable<T> entities)
@@ -58,27 +53,23 @@ namespace Infastructure_Layer
             await appDbContext.Set<T>().AddRangeAsync(entities);
         }
 
-        public  void Delete(T item)
+        public void Delete(T item)
         {
-             appDbContext.Set<T>().Remove(item);
+            appDbContext.Set<T>().Remove(item);
         }
 
-       
         public void SaveInclude(T entity)
         {
-            var existingEntity = _dbSet.Local.FirstOrDefault(e => e.id == entity.id);
+            var existingEntity = _dbSet.Local.FirstOrDefault(e => e.Id == entity.Id);
 
-            if (existingEntity==null)
+            if (existingEntity == null)
             {
-                existingEntity = _dbSet.AsNoTracking().FirstOrDefault(e => e.id == entity.id);
-                if (existingEntity==null)
+                existingEntity = _dbSet.AsNoTracking().FirstOrDefault(e => e.Id == entity.Id);
+                if (existingEntity == null)
                 {
-                    throw new Exception($"Entity of type {typeof(T).Name} with Id {entity.id} not found.");
-
-
+                    throw new Exception($"Entity of type {typeof(T).Name} with Id {entity.Id} not found.");
                 }
                 _dbSet.Attach(existingEntity);
-
             }
 
             var entry = appDbContext.Entry(existingEntity);
@@ -98,11 +89,10 @@ namespace Infastructure_Layer
             foreach (var property in typeof(T).GetProperties())
             {
                 if (entry.Metadata.FindProperty(property.Name) == null)
-                    continue; 
-                             
+                    continue;
 
                 if (keyNames.Contains(property.Name))
-                    continue; 
+                    continue;
 
                 var oldvalue = property.GetValue(existingEntity);
                 var newvale = property.GetValue(entity);
@@ -116,24 +106,17 @@ namespace Infastructure_Layer
                 {
                     entry.Property(property.Name).IsModified = false;
                 }
-
             }
-
         }
 
-        public  void Update(T item)
+        public void Update(T item)
         {
-             appDbContext.Set<T>().Update(item);
+            appDbContext.Set<T>().Update(item);
         }
-
 
         public async Task<int> SaveChanges()
         {
-
-          return await appDbContext.SaveChangesAsync();
+            return await appDbContext.SaveChangesAsync();
         }
-
-
-
     }
 }
