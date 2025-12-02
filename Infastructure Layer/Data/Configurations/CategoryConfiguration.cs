@@ -22,6 +22,7 @@ namespace Infastructure_Layer.Data.Configurations
                    .IsRequired()
                    .HasMaxLength(100);
 
+            builder.HasIndex(x => x.Name); 
 
 
             builder.HasMany(x => x.Products)

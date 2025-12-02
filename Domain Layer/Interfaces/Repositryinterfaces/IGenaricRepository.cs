@@ -12,7 +12,7 @@ namespace Domain_Layer.Interfaces.Repositryinterfaces
     {
         IQueryable<T> GetAll();
 
-        IQueryable<T> GetByIdQueryable(Guid id);
+        IQueryable<T> GetByIdQueryable(int id);
 
         Task<T> GetByCriteriaAsync(Expression<Func<T, bool>> expression);
 

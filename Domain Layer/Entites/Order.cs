@@ -20,7 +20,7 @@ namespace Domain_Layer.Entites
         public decimal TotalPrice { get; set; }
 
         // One-to-Many: Order → Items
-        public ICollection<OrderItem> Items { get; set; } = new List<OrderItem>();
+        public IEnumerable<OrderItem> Items { get; set; } = new HashSet<OrderItem>();
     }
 
 }
