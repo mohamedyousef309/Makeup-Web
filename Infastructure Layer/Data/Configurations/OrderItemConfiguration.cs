@@ -26,7 +26,7 @@ namespace Infastructure_Layer.Data.Configurations
 
             builder.HasOne(x => x.Order)
                    .WithMany(x => x.Items)
-                   .HasForeignKey(x => x.OrderId);
+                   .HasForeignKey(x => x.OrderId).OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne(x => x.Variant)
                    .WithMany()

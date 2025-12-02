@@ -13,6 +13,6 @@ namespace Domain_Layer.Entites
         public string? Description { get; set; }
 
         // One-to-Many: Category → Products
-        public ICollection<Product> Products { get; set; } = new List<Product>();
+        public IEnumerable<Product> Products { get; set; } = new HashSet<Product>();
     }
 }

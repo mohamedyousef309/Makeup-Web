@@ -21,19 +21,24 @@ namespace Infastructure_Layer.Data.Configurations
                    .IsRequired()
                    .HasMaxLength(150);
 
+            builder.HasIndex(p => p.Name);
+
+
             builder.Property(x => x.Description)
                    .HasMaxLength(500);
 
-            
+            builder.HasIndex(p => p.CategoryId);
+            builder.HasIndex(p => p.Stock);
+
 
             builder.HasOne(x => x.Category)
                    .WithMany(x => x.Products)
                    .HasForeignKey(x => x.CategoryId)
-                   .OnDelete(DeleteBehavior.Cascade);
+                   .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasMany(x => x.Variants)
                    .WithOne(x => x.Product)
-                   .HasForeignKey(x => x.ProductId);
+                   .HasForeignKey(x => x.ProductId).OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

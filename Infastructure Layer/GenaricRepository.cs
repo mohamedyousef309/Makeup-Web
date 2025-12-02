@@ -28,7 +28,7 @@ namespace Infastructure_Layer
             return appDbContext.Set<T>();
         }
 
-        public IQueryable<T> GetByIdQueryable(Guid id)
+        public IQueryable<T> GetByIdQueryable(int id)
         {
             return appDbContext.Set<T>().Where(x => x.Id == id);
         }

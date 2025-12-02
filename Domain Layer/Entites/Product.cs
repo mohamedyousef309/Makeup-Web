@@ -25,6 +25,6 @@ namespace Domain_Layer.Entites
         public Category Category { get; set; } = default!;
 
         // One-to-Many: Product → Variants
-        public ICollection<ProductVariant> Variants { get; set; } = new List<ProductVariant>();
+        public IEnumerable<ProductVariant> Variants { get; set; } = new HashSet<ProductVariant>();
     }
 }
