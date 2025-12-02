@@ -1,4 +1,5 @@
 ﻿using Domain_Layer.Entites;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +18,21 @@ namespace Domain_Layer.Interfaces.Repositryinterfaces
         Task<T> GetByCriteriaAsync(Expression<Func<T, bool>> expression);
 
         Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> expression);
+
+
+        public  Task<bool> ExistsAsync(int id);
+
+
+        public  Task<bool> ExistsAsync(Expression<Func<T, bool>> predicate);
+
+
+
+        public   Task<int> CountAsync();
+
+
+        public   Task<int> CountAsync(Expression<Func<T, bool>> predicate);
+       
+
 
 
         void SaveInclude(T entity);
