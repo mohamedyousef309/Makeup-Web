@@ -33,6 +33,27 @@ namespace Infastructure_Layer
             return appDbContext.Set<T>().Where(x => x.Id == id);
         }
 
+
+        public virtual async Task<bool> ExistsAsync(int id)
+        {
+            return await _dbSet.AnyAsync(e => e.Id == id);
+        }
+        public async Task<bool> ExistsAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await _dbSet.AnyAsync(predicate);
+        }
+
+        public virtual async Task<int> CountAsync()
+        {
+            return await _dbSet.CountAsync();
+        }
+
+        public virtual async Task<int> CountAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await _dbSet.CountAsync(predicate);
+        }
+
+
         public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> expression)
         {
             return await appDbContext.Set<T>().Where(expression).ToListAsync();
