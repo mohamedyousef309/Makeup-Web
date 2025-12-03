@@ -1,8 +1,14 @@
 
+using Application_Layer.CQRS;
+using Application_Layer.CQRS.Authantication.Commads.Login;
+using Autofac.Core;
+using FluentValidation;
 using Infastructure_Layer.Data;
 using Infastructure_Layer.Data.DependencyInjection;
 using Makeup_Web.Middlewares;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 namespace Makeup_Web
 {
     public class Program
@@ -14,6 +20,17 @@ namespace Makeup_Web
             // Add services to the container.
             builder.Services.AddControllersWithViews();
             builder.Services.AddInfrastructure(builder.Configuration);
+
+            builder.Services.AddMediatR(cfg =>
+            {
+                cfg.RegisterServicesFromAssemblies(Assembly.GetExecutingAssembly());
+            });
+
+            builder.Services.AddValidatorsFromAssemblyContaining<LoginCommendValidator>();
+            builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+
+
+
             builder.Services.AddScoped<TransactionMiddleWare>();
 
 
