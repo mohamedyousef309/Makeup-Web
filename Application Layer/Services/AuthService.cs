@@ -13,22 +13,41 @@ using System.Threading.Tasks;
 
 namespace Application_Layer.Services
 {
-    public class GenerateTokensAsync : IGenerateTokensAsync
+    public class AuthService : IAuthService
     {
-        private readonly IConfiguration _config;
+        private readonly IConfiguration configuration;
 
-        public GenerateTokensAsync(IConfiguration config )
+        public AuthService(IConfiguration configuration)
         {
-            this._config = config;
+            this.configuration = configuration;
         }
-        public string GenerateTokenAsync(User user, IEnumerable<Role> UserRols, IEnumerable<Permissions> UserPermissions)
+        public Task<AuthModleDto> GenerateTokensAsync(User user, IEnumerable<Role> UserRols, IEnumerable<Permissions> UserPermissions)
+        {
+            var authModel = new AuthModleDto
+            {
+                IsAuthenticated = true
+            };
+
+            // ACCESS TOKEN =======================
+            var jwt =  CreateToken(user,UserRols,UserPermissions);
+            authModel.Token = new JwtSecurityTokenHandler().WriteToken(jwt);
+            authModel.TokenExpiresOn = jwt.ValidTo;
+        }
+
+        public Task<AuthModleDto> RefreshTokenAsync(string refreshToken)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        private JwtSecurityToken CreateToken(User user, IEnumerable<Role> UserRols, IEnumerable<Permissions> UserPermissions)
         {
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier,user.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()), //Makes every JWT unique
                 new Claim(JwtRegisteredClaimNames.Sub,user.Id.ToString()),
-                new Claim(JwtRegisteredClaimNames.Iss, _config["JWT:ValidIssuer"]), //Defines WHO issued the token
+                new Claim(JwtRegisteredClaimNames.Iss, configuration["JWT:ValidIssuer"]), //Defines WHO issued the token
                 new Claim(ClaimTypes.Name,user.Username),
                 new Claim(ClaimTypes.Email,user.Email),
             };
@@ -44,21 +63,23 @@ namespace Application_Layer.Services
                 claims.Add(new Claim("Permission", item.Name));
             }
 
-            var keyInByte = Encoding.UTF8.GetBytes(_config["JWT:Key"]!);
+            var keyInByte = Encoding.UTF8.GetBytes(configuration["JWT:Key"]!);
 
             var Key = new SymmetricSecurityKey(keyInByte);
 
             var signingCredentials = new SigningCredentials(Key, SecurityAlgorithms.HmacSha256);
 
             var jwtToken = new JwtSecurityToken(
-                issuer: _config["JWT:ValidIssuer"],
-                audience: _config["JWT:ValidAudience"],
+                issuer: configuration["JWT:ValidIssuer"],
+                audience: configuration["JWT:ValidAudience"],
                 claims: claims,
+                notBefore: DateTime.UtcNow,
                 expires: DateTime.UtcNow.AddMinutes(15),
                 signingCredentials: signingCredentials
                 );
 
-            return new JwtSecurityTokenHandler().WriteToken(jwtToken);
+            return jwtToken;
+
         }
     }
 }

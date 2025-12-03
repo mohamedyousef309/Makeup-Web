@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Domain_Layer.Entites.Authantication;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,7 +10,7 @@ namespace Domain_Layer.Interfaces.ServiceInterfaces
     public interface IPasswordHasher
     {
         string Hash(string password);
-        bool Verify(string password, string hash);
+        bool Verify(User user, string password);
 
 
     }

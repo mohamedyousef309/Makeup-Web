@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace Domain_Layer.Interfaces.ServiceInterfaces
 {
-    public interface IGenerateTokensAsync
+    public interface IAuthService
     {
-        string GenerateTokenAsync(User user,IEnumerable<Role> UserRols,IEnumerable<Permissions> UserPermissions);
-        
+        Task<AuthModleDto> GenerateTokensAsync(User user, IEnumerable<Role> UserRols, IEnumerable<Permissions> UserPermissions);
+        Task<AuthModleDto> RefreshTokenAsync(string refreshToken);
     }
 }

@@ -17,35 +17,39 @@ namespace Application_Layer.CQRS.Authantication.Commads.Login
     public class LoginCommendHandler : IRequestHandler<LoginCommend, RequestRespones<AuthModleDto>>
     {
         private readonly IPasswordHasher passwordHasher;
-        private readonly IGenaricRepository<User> _genaricRepository;
+        private readonly IGenaricRepository<Domain_Layer.Entites.Authantication.User> _genaricRepository;
 
-        public LoginCommendHandler(IPasswordHasher  passwordHasher,IGenaricRepository<User> genaricRepository)
+        public LoginCommendHandler(IPasswordHasher  passwordHasher,IGenaricRepository<Domain_Layer.Entites.Authantication.User> genaricRepository)
         {
             this.passwordHasher = passwordHasher;
             this._genaricRepository = genaricRepository;
         }
-        public async Task<RequestRespones<AuthModleDto>> Handle(LoginCommend request, CancellationToken cancellationToken)
+
+        public Task<RequestRespones<AuthModleDto>> Handle(LoginCommend request, CancellationToken cancellationToken)
         {
-            //var user = await _genaricRepository.GetByCriteriaAsync(u => u.Email == request.email);
-
-            //if (user==null)
-            //{
-            //    return RequestRespones<AuthModleDto>.Fail("email or password incorect", 401);    
-
-            //}
-
-            //var isPasswordValid = passwordHasher.Verify(request.password, user.PasswordHash);
-
-            //if (!isPasswordValid)
-            //{
-            //    return RequestRespones<AuthModleDto>.Fail("email or password incorect", 401);
-
-            //}
-
             throw new NotImplementedException();
-
-
-
         }
+        //public async Task<RequestRespones<AuthModleDto>> Handle(LoginCommend request, CancellationToken cancellationToken)
+        //{
+        //    var user = await _genaricRepository.GetByCriteriaAsync(u => u.Email == request.email);
+
+        //    if (user == null)
+        //    {
+        //        return RequestRespones<AuthModleDto>.Fail("email or password incorect", 401);
+
+        //    }
+
+        //    var isPasswordValid = passwordHasher.Verify(request.password, user.PasswordHash);
+
+        //    if (!isPasswordValid)
+        //    {
+        //        return RequestRespones<AuthModleDto>.Fail("email or password incorect", 401);
+
+        //    }
+
+
+
+
+        //}
     }
 }
