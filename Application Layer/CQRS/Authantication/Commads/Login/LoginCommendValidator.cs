@@ -11,7 +11,13 @@ namespace Application_Layer.CQRS.Authantication.Commads.Login
     {
         public LoginCommendValidator()
         {
-            
+            RuleFor(x => x.email)
+           .NotEmpty().WithMessage("Email is required.")
+           .EmailAddress().WithMessage("Invalid email format.");
+
+            RuleFor(x => x.password)
+                .NotEmpty().WithMessage("Password is required.")
+                .MinimumLength(6).WithMessage("Password must be at least 6 characters long.");
         }
     }
 }
