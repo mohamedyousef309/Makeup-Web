@@ -1,5 +1,8 @@
-﻿using Domain_Layer.Interfaces.Repositryinterfaces;
+﻿using Application_Layer.CQRS.Authantication.Commads.Login;
+using Application_Layer.Services;
+using Domain_Layer.Interfaces.Repositryinterfaces;
 using Domain_Layer.Interfaces.ServiceInterfaces;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,14 +25,16 @@ namespace Infastructure_Layer.Data.DependencyInjection
                   config.GetConnectionString("DefaultConnection")).UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
 
             services.AddScoped<IunitofWork, UnitofWork>();
-
-            services.AddMediatR(cfg =>
-            {
-                cfg.RegisterServicesFromAssemblies(Assembly.GetExecutingAssembly());
-            });
-
-
             services.AddScoped(typeof(IGenaricRepository<>), typeof(GenaricRepository<>));
+
+
+
+            services.AddScoped<IPasswordHasher,PasswordHasher>();
+
+
+
+
+
 
             return services;
 
