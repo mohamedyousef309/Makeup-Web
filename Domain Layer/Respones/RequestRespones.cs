@@ -43,7 +43,7 @@ namespace Domain_Layer.Respones
                 Message= Message
             };
         }
-        public static RequestRespones<T> Fail(string message, int statusCode,int StatusCode)
+        public static RequestRespones<T> Fail(string message, int statusCode)
         {
             return new RequestRespones<T>(message, false) 
             {
