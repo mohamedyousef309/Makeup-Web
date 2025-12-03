@@ -30,7 +30,7 @@ namespace Application_Layer.CQRS.Authantication.Quries.GetPermissionsByUserid
                 Select(x=>new UserPermissionsDTo
                 { 
                     PermissionId=x.Id,
-                    RoleName=x.Name
+                    PermissionName=x.Name
                 }
                 ).ToListAsync();
 

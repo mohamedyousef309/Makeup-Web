@@ -19,18 +19,19 @@ namespace Domain_Layer.Interfaces.Repositryinterfaces
 
         Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> expression);
 
+         IQueryable<T> GetByCriteriaQueryable(Expression<Func<T, bool>> predicate);
 
-        public  Task<bool> ExistsAsync(int id);
-
-
-        public  Task<bool> ExistsAsync(Expression<Func<T, bool>> predicate);
+         Task<bool> ExistsAsync(int id);
 
 
+          Task<bool> ExistsAsync(Expression<Func<T, bool>> predicate);
 
-        public   Task<int> CountAsync();
 
 
-        public   Task<int> CountAsync(Expression<Func<T, bool>> predicate);
+           Task<int> CountAsync();
+
+
+           Task<int> CountAsync(Expression<Func<T, bool>> predicate);
        
 
 

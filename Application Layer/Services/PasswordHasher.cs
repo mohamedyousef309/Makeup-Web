@@ -1,4 +1,5 @@
 ﻿using BCrypt.Net;
+using Domain_Layer.Entites.Authantication;
 using Domain_Layer.Interfaces.ServiceInterfaces;
 using System;
 using System.Collections.Generic;
@@ -15,9 +16,9 @@ namespace Application_Layer.Services
             return BCrypt.Net.BCrypt.HashPassword(password);
         }
 
-        public bool Verify(string password, string hash)
+        public bool Verify(User user, string password)
         {
-            return BCrypt.Net.BCrypt.Verify(password, hash);
+            return BCrypt.Net.BCrypt.Verify(password, user.PasswordHash);
         }
     }
 }

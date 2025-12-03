@@ -33,6 +33,10 @@ namespace Infastructure_Layer
             return appDbContext.Set<T>().Where(x => x.Id == id);
         }
 
+        public IQueryable<T> GetByCriteriaQueryable(Expression<Func<T, bool>> predicate)
+        {
+            return _dbSet.Where(predicate);
+        }
 
         public virtual async Task<bool> ExistsAsync(int id)
         {

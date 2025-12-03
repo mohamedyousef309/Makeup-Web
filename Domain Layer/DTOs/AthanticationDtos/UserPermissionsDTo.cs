@@ -9,6 +9,6 @@ namespace Domain_Layer.DTOs.AthanticationDtos
     public class UserPermissionsDTo
     {
         public int PermissionId { get; set; }
-        public string RoleName { get; set; } = default!;
+        public string PermissionName { get; set; } = default!;
     }
 }
