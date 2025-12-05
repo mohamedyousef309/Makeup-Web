@@ -8,13 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="CQRS\Authantication\Quries\" />
-    <Folder Include="CQRS\Category\Commands\" />
-    <Folder Include="CQRS\Category\Orchestrator\" />
-    <Folder Include="CQRS\Category\Quries\" />
-    <Folder Include="CQRS\Product\Commands\" />
-    <Folder Include="CQRS\Product\Orchestrator\" />
-    <Folder Include="CQRS\Product\Quries\" />
     <Folder Include="Exceptions\" />
   </ItemGroup>
 
