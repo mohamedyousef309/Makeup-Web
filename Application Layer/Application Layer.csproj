@@ -8,16 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Domain Layer\Domain Layer.csproj" />
+    <Compile Remove="CQRS\Category\**" />
+    <EmbeddedResource Remove="CQRS\Category\**" />
+    <None Remove="CQRS\Category\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="CQRS\Category\Commands\" />
-    <Folder Include="CQRS\Category\Orchestrator\" />
-    <Folder Include="CQRS\Category\Quries\" />
-    <Folder Include="CQRS\Product\Commands\" />
-    <Folder Include="CQRS\Product\Orchestrator\" />
-    <Folder Include="CQRS\Product\Quries\" />
+    <ProjectReference Include="..\Domain Layer\Domain Layer.csproj" />
   </ItemGroup>
 
   <ItemGroup>
