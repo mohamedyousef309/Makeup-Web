@@ -1,5 +1,6 @@
 ﻿using Domain_Layer.DTOs.ProductDtos;
 using Domain_Layer.Interfaces.ServiceInterfaces;
+using Domain_Layer.Respones;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -9,11 +10,11 @@ using System.Threading.Tasks;
 
 namespace Application_Layer.CQRS.Product.Queries
 {
-    public class GetAllProductsQuery : IRequest<IEnumerable<ProductDto>>
-    {
-        // No parameters needed
-    }
-    public class GetAllProductsQueryHandler : IRequestHandler<GetAllProductsQuery, IEnumerable<ProductDto>>
+    public record GetAllProductsQuery : IRequest<RequestRespones<IEnumerable<ProductDto>>>;
+    
+      
+    
+    public class GetAllProductsQueryHandler : IRequestHandler<GetAllProductsQuery, RequestRespones<IEnumerable<ProductDto>>>
     {
         private readonly IProductService _productService;
 
@@ -22,10 +23,15 @@ namespace Application_Layer.CQRS.Product.Queries
             _productService = productService;
         }
 
-        public async Task<IEnumerable<ProductDto>> Handle(GetAllProductsQuery request, CancellationToken cancellationToken)
+        public async Task<RequestRespones<IEnumerable<ProductDto>>> Handle(GetAllProductsQuery request, CancellationToken cancellationToken)
         {
             var products = await _productService.GetAllAsync();
-            return products;
+            if (!products.Any())
+            {
+                return RequestRespones<IEnumerable<ProductDto>>.Fail("No products found.", 404);
+
+            }
+            return RequestRespones<IEnumerable<ProductDto>>.Success(products);
         }
     }
 }
