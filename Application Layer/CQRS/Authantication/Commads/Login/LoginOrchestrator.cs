@@ -2,7 +2,7 @@
 using Application_Layer.CQRS.Authantication.Quries.GetRolesByUserid;
 using Application_Layer.CQRS.User.Quries.GetUserbyEmail;
 using Application_Layer.CQRS.User.Quries.GetUserbyid;
-using Domain_Layer.CQRS.Authantication;
+using Domain_Layer.DTOs.AthanticationDtos;
 using Domain_Layer.Entites.Authantication;
 using Domain_Layer.Interfaces.ServiceInterfaces;
 using Domain_Layer.Respones;

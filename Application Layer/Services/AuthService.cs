@@ -1,4 +1,4 @@
-﻿using Domain_Layer.CQRS.Authantication;
+﻿using Domain_Layer.DTOs.AthanticationDtos;
 using Domain_Layer.Entites.Authantication;
 using Domain_Layer.Interfaces.ServiceInterfaces;
 using Microsoft.Extensions.Configuration;
