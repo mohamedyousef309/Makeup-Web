@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace Application_Layer.CQRS.Product.Commands.Orchestrators
 {
-    public class ProductOrchestrator
+    public class ProductOrchestrator:IRequest<ProductDto?>
     {
         // Commands
-        public IRequest<ProductDto>? CreateProductCommand { get; set; }
-        public IRequest<ProductDto>? UpdateProductCommand { get; set; }
+        public ProductDto CreateProductCommand { get; set; }
+        public ProductDto UpdateProductCommand { get; set; }
         public IRequest<bool>? DeleteProductCommand { get; set; }
 
         // Queries

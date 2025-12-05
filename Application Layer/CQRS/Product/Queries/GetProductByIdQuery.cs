@@ -1,4 +1,5 @@
 ﻿using Domain_Layer.DTOs.ProductDtos;
+using Domain_Layer.Entites;
 using Domain_Layer.Interfaces.ServiceInterfaces;
 using MediatR;
 using System;
@@ -9,10 +10,9 @@ using System.Threading.Tasks;
 
 namespace Application_Layer.CQRS.Product.Queries
 {
-    public class GetProductByIdQuery : IRequest<ProductDto>
-    {
-        public int ProductId { get; set; }
-    }
+    public record GetProductByIdQuery(int ProductId) : IRequest<ProductDto>;
+    
+    
     public class GetProductByIdQueryHandler : IRequestHandler<GetProductByIdQuery, ProductDto>
     {
         private readonly IProductService _productService;

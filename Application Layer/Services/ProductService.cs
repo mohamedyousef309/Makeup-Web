@@ -73,6 +73,7 @@ namespace Application_Layer.Services
             product.Stock = dto.Stock;
             product.IsActive = dto.IsActive;
             product.CategoryId = dto.CategoryId;
+            
 
          
             if (dto.Variants != null)
