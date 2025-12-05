@@ -1,6 +1,11 @@
-﻿using Domain_Layer.DTOs.AthanticationDtos;
+﻿using Application_Layer.CQRS.Authantication.Commads.AddRefreshToken;
+using Application_Layer.CQRS.Authantication.Quries.GetRefreshToken;
+using Application_Layer.CQRS.User.Quries.GetUserbyEmail;
+using Application_Layer.CQRS.User.Quries.GetUserByRefreshToken;
+using Domain_Layer.DTOs.AthanticationDtos;
 using Domain_Layer.Entites.Authantication;
 using Domain_Layer.Interfaces.ServiceInterfaces;
+using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -8,6 +13,7 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,12 +22,14 @@ namespace Application_Layer.Services
     public class AuthService : IAuthService
     {
         private readonly IConfiguration configuration;
+        private readonly IMediator mediator;
 
-        public AuthService(IConfiguration configuration)
+        public AuthService(IConfiguration configuration,IMediator mediator)
         {
             this.configuration = configuration;
+            this.mediator = mediator;
         }
-        public Task<AuthModleDto> GenerateTokensAsync(User user, IEnumerable<Role> UserRols, IEnumerable<Permissions> UserPermissions)
+        public async Task<AuthModleDto> GenerateTokensAsync(User user, IEnumerable<Role> UserRols, IEnumerable<Permissions> UserPermissions)
         {
             var authModel = new AuthModleDto
             {
@@ -32,11 +40,80 @@ namespace Application_Layer.Services
             var jwt =  CreateToken(user,UserRols,UserPermissions);
             authModel.Token = new JwtSecurityTokenHandler().WriteToken(jwt);
             authModel.TokenExpiresOn = jwt.ValidTo;
+
+            var RefreshTokenResponse = await mediator.Send(new GetRefrshTokenByuserIdQuery(user.Id));
+
+            if (!RefreshTokenResponse.IsSuccess)
+            {
+                RefreshTokenResponse.Data = GenerateRefreshToken();
+                RefreshTokenResponse.Data.userid = user.Id;
+                await mediator.Send(new AddRefreshTokenCommand(RefreshTokenResponse.Data));
+            }
+
+            authModel.RefreshToken= RefreshTokenResponse.Data.Token;
+            authModel.RefreshTokenExpiration = RefreshTokenResponse.Data.ExpiresOn;
+            return authModel;
+
         }
 
-        public Task<AuthModleDto> RefreshTokenAsync(string refreshToken)
+        public async Task<AuthModleDto> RefreshTokenAsync(string refreshToken)
         {
-            throw new NotImplementedException();
+            var UserRespone = await mediator.Send(new GetUserByRefreshTokenQuery(refreshToken));
+            if (!UserRespone.IsSuccess)
+            {
+                return new AuthModleDto
+                {
+                    IsAuthenticated = false,
+                };
+            }
+
+            var refreshTokenRespone=await mediator.Send(new GetRefrshTokenByuserIdQuery(UserRespone.Data.Id));
+            if (!refreshTokenRespone.IsSuccess)
+            {
+                return new AuthModleDto
+                {
+                    IsAuthenticated = false,
+                };
+            }
+
+            if (refreshTokenRespone.Data is null || !refreshTokenRespone.Data.IsActive)
+                return new AuthModleDto { IsAuthenticated = false };
+
+            refreshTokenRespone.Data.IsUsed = true;
+            refreshTokenRespone.Data.RevokedOn = DateTime.UtcNow;
+
+            var roles = UserRespone.Data.UserRoles.Select(ur => ur.role);
+            var permissions = UserRespone.Data.userPermissions.Select(up => up.permission);
+            var jwt = CreateToken(UserRespone.Data, roles, permissions);
+
+            var authModel = new AuthModleDto
+            {
+                IsAuthenticated = true,
+                Token = new JwtSecurityTokenHandler().WriteToken(jwt),
+                TokenExpiresOn = jwt.ValidTo,
+                RefreshToken = refreshTokenRespone.Data.Token,
+                RefreshTokenExpiration = refreshTokenRespone.Data.ExpiresOn,
+
+            };
+            return authModel;
+
+
+        }
+
+
+        private RefreshTokens GenerateRefreshToken() 
+        {
+            var random = new byte[64];
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(random);
+
+            return new RefreshTokens
+            {
+                Token = Convert.ToBase64String(random),
+                CreatedAt = DateTime.UtcNow,
+                ExpiresOn = DateTime.UtcNow.AddDays(7)
+            };
+
         }
 
 
