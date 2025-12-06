@@ -19,15 +19,15 @@ namespace Application_Layer.CQRS.Product.Commands.Orchestrators
 
         public async Task<ProductDto?> Handle(ProductOrchestrator orchestrator, CancellationToken cancellationToken)
         {
-            if (orchestrator.CreateProductCommand != null)
-            {
-                return await _mediator.Send(orchestrator.CreateProductCommand, cancellationToken);
-            }
+            //if (orchestrator.CreateProductCommand != null)
+            //{
+            //    return await _mediator.Send(orchestrator.CreateProductCommand, cancellationToken);
+            //}
 
-            if (orchestrator.UpdateProductCommand != null)
-            {
-                return await _mediator.Send(orchestrator.UpdateProductCommand, cancellationToken);
-            }
+            //if (orchestrator.UpdateProductCommand != null)
+            //{
+            //    return await _mediator.Send(orchestrator.UpdateProductCommand, cancellationToken);
+            //}
 
             if (orchestrator.DeleteProductCommand != null)
             {

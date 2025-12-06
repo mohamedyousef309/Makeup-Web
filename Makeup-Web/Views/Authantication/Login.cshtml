@@ -1,0 +1,622 @@
+﻿@model Domain_Layer.ViewModels.AuthanticationViewModles.LoginViewModel
+
+@{
+    ViewData["Title"] = "تسجيل الدخول";
+}
+
+<div class="auth-container">
+    <!-- تصميم جانبي -->
+    <div class="auth-sidebar d-none d-lg-block">
+        <div class="sidebar-content">
+            <div class="logo">
+                <i class="bi bi-shield-lock"></i>
+                <h2>نظام المصادقة الآمن</h2>
+            </div>
+
+            <div class="features">
+                <div class="feature-item">
+                    <i class="bi bi-shield-check text-success"></i>
+                    <span>حماية متقدمة</span>
+                </div>
+                <div class="feature-item">
+                    <i class="bi bi-lightning-charge text-warning"></i>
+                    <span>سرعة عالية</span>
+                </div>
+                <div class="feature-item">
+                    <i class="bi bi-phone text-info"></i>
+                    <span>توافق مع الجوال</span>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <p>© 2024 جميع الحقوق محفوظة</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- النموذج الرئيسي -->
+    <div class="auth-form-container">
+        <div class="auth-header">
+            <div class="mobile-logo d-block d-lg-none">
+                <i class="bi bi-shield-lock"></i>
+                <h4>نظام المصادقة</h4>
+            </div>
+
+            <div class="header-content">
+                <h1 class="gradient-text">مرحباً بعودتك</h1>
+                <p class="text-muted">سجل دخولك للوصول إلى حسابك</p>
+            </div>
+        </div>
+
+        <div class="auth-card">
+            <!-- رسائل الخطأ -->
+            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <div class="alert alert-danger alert-custom" role="alert">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        <div>
+                            <strong>خطأ!</strong>
+                            <p class="mb-0">@Model.ErrorMessage</p>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            <!-- نموذج تسجيل الدخول -->
+            <form asp-action="Login" asp-controller="Account" method="post" class="needs-validation" novalidate>
+                <!-- حقل البريد الإلكتروني -->
+                <div class="form-group mb-4">
+                    <label asp-for="Email" class="form-label">
+                        <i class="bi bi-envelope me-2"></i>
+                        البريد الإلكتروني
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="bi bi-person"></i>
+                        </span>
+                        <input asp-for="Email"
+                               class="form-control form-control-lg"
+                               placeholder="أدخل بريدك الإلكتروني"
+                               required>
+                    </div>
+                    <span asp-validation-for="Email" class="validation-error"></span>
+                    <div class="invalid-feedback">
+                        يرجى إدخال بريد إلكتروني صحيح
+                    </div>
+                </div>
+
+                <!-- حقل كلمة المرور -->
+                <div class="form-group mb-4">
+                    <label asp-for="Password" class="form-label">
+                        <i class="bi bi-key me-2"></i>
+                        كلمة المرور
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="bi bi-lock"></i>
+                        </span>
+                        <input asp-for="Password"
+                               type="password"
+                               class="form-control form-control-lg password-input"
+                               placeholder="أدخل كلمة المرور"
+                               required>
+                        <button type="button" class="input-group-text toggle-password">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                    <span asp-validation-for="Password" class="validation-error"></span>
+                    <div class="invalid-feedback">
+                        يرجى إدخال كلمة المرور
+                    </div>
+                </div>
+
+                <!-- خيارات إضافية -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="rememberMe">
+                        <label class="form-check-label" for="rememberMe">
+                            تذكرني
+                        </label>
+                    </div>
+                    <a asp-action="ForgotPassword" asp-controller="Account" class="forgot-password">
+                        <i class="bi bi-question-circle me-1"></i>
+                        نسيت كلمة المرور؟
+                    </a>
+                </div>
+
+                <!-- زر تسجيل الدخول -->
+                <button type="submit" class="btn btn-primary btn-lg w-100 mb-3 login-btn">
+                    <i class="bi bi-box-arrow-in-right me-2"></i>
+                    <span class="btn-text">تسجيل الدخول</span>
+                    <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+                </button>
+
+                <!-- خط فاصل -->
+                <div class="divider">
+                    <span>أو</span>
+                </div>
+
+                <!-- روابط إضافية -->
+                <div class="auth-links text-center mt-4">
+                    <p class="mb-2">ليس لديك حساب؟</p>
+                    <a asp-action="Register" asp-controller="Account" class="btn btn-outline-primary">
+                        <i class="bi bi-person-plus me-2"></i>
+                        إنشاء حساب جديد
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- معلومات إضافية -->
+        <div class="auth-footer mt-4">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="footer-item">
+                        <i class="bi bi-headset"></i>
+                        <h6>الدعم الفني</h6>
+                        <small>support@example.com</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="footer-item">
+                        <i class="bi bi-shield-check"></i>
+                        <h6>آمن 100%</h6>
+                        <small>بياناتك محمية</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="footer-item">
+                        <i class="bi bi-clock-history"></i>
+                        <h6>متوفر دائماً</h6>
+                        <small>24/7 خدمة عملاء</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- إضافة الستايلات -->
+<style>
+    /* تنسيقات عامة */
+    .auth-container {
+        display: flex;
+        min-height: 100vh;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    /* الشريط الجانبي */
+    .auth-sidebar {
+        width: 35%;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        padding: 2rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .sidebar-content {
+        color: white;
+    }
+
+    .logo {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+        .logo i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .logo h2 {
+            font-weight: 300;
+        }
+
+    .features {
+        margin: 3rem 0;
+    }
+
+    .feature-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        font-size: 1.1rem;
+    }
+
+        .feature-item i {
+            font-size: 1.5rem;
+            margin-left: 1rem;
+        }
+
+    /* منطقة النموذج */
+    .auth-form-container {
+        flex: 1;
+        background: white;
+        padding: 3rem;
+        overflow-y: auto;
+    }
+
+    .auth-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .mobile-logo {
+        text-align: center;
+        color: #667eea;
+        margin-bottom: 1rem;
+    }
+
+        .mobile-logo i {
+            font-size: 3rem;
+        }
+
+    .gradient-text {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: bold;
+    }
+
+    /* البطاقة الرئيسية */
+    .auth-card {
+        max-width: 500px;
+        margin: 0 auto;
+        padding: 2.5rem;
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(50, 50, 93, 0.1), 0 5px 15px rgba(0, 0, 0, 0.07);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    /* تنبيه مخصص */
+    .alert-custom {
+        border: none;
+        border-radius: 12px;
+        padding: 1rem 1.5rem;
+        margin-bottom: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    /* حقول الإدخال */
+    .form-group label {
+        font-weight: 600;
+        color: #4a5568;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .input-group {
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .input-group-text {
+        background: #f7fafc;
+        border: 1px solid #e2e8f0;
+        color: #667eea;
+    }
+
+    .form-control {
+        border: 1px solid #e2e8f0;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s;
+    }
+
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+    .form-control-lg {
+        font-size: 1rem;
+    }
+
+    /* زر إظهار/إخفاء كلمة المرور */
+    .toggle-password {
+        cursor: pointer;
+        background: #f7fafc;
+        border: 1px solid #e2e8f0;
+        transition: all 0.3s;
+    }
+
+        .toggle-password:hover {
+            background: #edf2f7;
+        }
+
+    /* زر نسيت كلمة المرور */
+    .forgot-password {
+        color: #667eea;
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: color 0.3s;
+    }
+
+        .forgot-password:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
+    /* زر تسجيل الدخول */
+    .login-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        padding: 1rem;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.3s;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 14px rgba(102, 126, 234, 0.3);
+        }
+
+        .login-btn:active {
+            transform: translateY(0);
+        }
+
+        .login-btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.5);
+            opacity: 0;
+            border-radius: 100%;
+            transform: scale(1, 1) translate(-50%);
+            transform-origin: 50% 50%;
+        }
+
+        .login-btn:focus:not(:active)::after {
+            animation: ripple 1s ease-out;
+        }
+
+    @keyframes ripple {
+        0%
+
+    {
+        transform: scale(0, 0);
+        opacity: 0.5;
+    }
+
+    100% {
+        transform: scale(40, 40);
+        opacity: 0;
+    }
+
+    }
+
+    /* الخط الفاصل */
+    .divider {
+        display: flex;
+        align-items: center;
+        margin: 2rem 0;
+    }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .divider span {
+            padding: 0 1rem;
+            color: #a0aec0;
+            font-size: 0.875rem;
+        }
+
+    /* روابط إضافية */
+    .auth-links .btn-outline-primary {
+        border: 2px solid #667eea;
+        color: #667eea;
+        font-weight: 600;
+        padding: 0.75rem 2rem;
+        border-radius: 10px;
+        transition: all 0.3s;
+    }
+
+        .auth-links .btn-outline-primary:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+    /* التذييل */
+    .auth-footer {
+        max-width: 500px;
+        margin: 0 auto;
+        padding-top: 2rem;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .footer-item {
+        text-align: center;
+        padding: 1rem;
+        transition: all 0.3s;
+        border-radius: 10px;
+    }
+
+        .footer-item:hover {
+            background: #f7fafc;
+            transform: translateY(-5px);
+        }
+
+        .footer-item i {
+            font-size: 2rem;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-item h6 {
+            font-weight: 600;
+            color: #4a5568;
+            margin: 0.5rem 0;
+        }
+
+        .footer-item small {
+            color: #a0aec0;
+        }
+
+    /* رسائل التحقق */
+    .validation-error {
+        display: block;
+        margin-top: 0.25rem;
+        font-size: 0.875rem;
+        color: #f56565;
+    }
+
+    .invalid-feedback {
+        display: none;
+    }
+
+    .was-validated .form-control:invalid {
+        border-color: #f56565;
+    }
+
+    .was-validated .invalid-feedback {
+        display: block;
+    }
+
+    /* تصميم متجاوب */
+    @@media (max-width: 992px) {
+        .auth-container {
+            flex-direction: column;
+        }
+
+        .auth-sidebar {
+            width: 100%;
+            padding: 1rem;
+            display: none;
+        }
+
+        .auth-form-container {
+            padding: 2rem 1rem;
+        }
+
+        .auth-card {
+            padding: 1.5rem;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .auth-footer .row {
+            flex-direction: column;
+        }
+
+        .footer-item {
+            margin-bottom: 1rem;
+        }
+    }
+
+    /* تحسينات إضافية */
+    .needs-validation .form-control:valid {
+        border-color: #48bb78;
+    }
+
+        .needs-validation .form-control:valid:focus {
+            box-shadow: 0 0 0 3px rgba(72, 187, 120, 0.1);
+        }
+
+    /* تأثيرات الكلمات */
+    .btn-text {
+        transition: all 0.3s;
+    }
+
+    .login-btn.loading .btn-text {
+        opacity: 0;
+    }
+
+    .login-btn.loading .spinner-border {
+        display: inline-block !important;
+    }
+</style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        // تحسينات JavaScript
+        $(document).ready(function () {
+            // إظهار/إخفاء كلمة المرور
+            $('.toggle-password').click(function () {
+                const input = $(this).closest('.input-group').find('input');
+                const icon = $(this).find('i');
+
+                if (input.attr('type') === 'password') {
+                    input.attr('type', 'text');
+                    icon.removeClass('bi-eye').addClass('bi-eye-slash');
+                    $(this).addClass('active');
+                } else {
+                    input.attr('type', 'password');
+                    icon.removeClass('bi-eye-slash').addClass('bi-eye');
+                    $(this).removeClass('active');
+                }
+            });
+
+            // تحميل الزر عند الإرسال
+            $('form').on('submit', function () {
+                const submitBtn = $(this).find('.login-btn');
+                const spinner = submitBtn.find('.spinner-border');
+                submitBtn.addClass('loading');
+                submitBtn.prop('disabled', true);
+                spinner.removeClass('d-none');
+            });
+
+            // التحقق من صحة النموذج
+            $('form').addClass('was-validated');
+
+            // إضافة تأثيرات عند التركيز
+            $('.form-control').focus(function () {
+                $(this).parent().addClass('focused');
+            }).blur(function () {
+                $(this).parent().removeClass('focused');
+            });
+
+            // تأثيرات Hover للبطاقة
+            $('.auth-card').hover(
+                function () {
+                    $(this).css('transform', 'translateY(-5px)');
+                },
+                function () {
+                    $(this).css('transform', 'translateY(0)');
+                }
+            );
+
+            // تحسين UX للأخطاء
+            $('.form-control').on('input', function () {
+                const feedback = $(this).siblings('.invalid-feedback');
+                if ($(this).val().trim() !== '') {
+                    $(this).removeClass('is-invalid');
+                    feedback.hide();
+                }
+            });
+
+            // إضافة تأثير للتنبيهات
+            $('.alert-custom .btn-close').click(function () {
+                $(this).closest('.alert-custom').fadeOut(300, function () {
+                    $(this).remove();
+                });
+            });
+        });
+
+        // إخفاء التنبيهات تلقائياً بعد 5 ثواني
+        setTimeout(function() {
+            $('.alert-custom').fadeTo(500, 0).slideUp(500, function() {
+                $(this).remove();
+            });
+        }, 5000);
+    </script>
+}
