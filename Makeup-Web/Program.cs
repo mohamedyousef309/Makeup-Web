@@ -7,8 +7,11 @@ using Infastructure_Layer.Data;
 using Infastructure_Layer.Data.DependencyInjection;
 using Makeup_Web.Middlewares;
 using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System.Reflection;
+using System.Text;
 namespace Makeup_Web
 {
     public class Program
@@ -28,6 +31,22 @@ namespace Makeup_Web
 
             builder.Services.AddValidatorsFromAssemblyContaining<LoginCommendValidator>();
             builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+
+
+           // builder.Services.AddAuthentication().AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, option =>
+           //option.TokenValidationParameters = new TokenValidationParameters()
+           //{
+           //    ValidateIssuer = true,
+           //    ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
+           //    ValidateAudience = true,
+           //    ValidAudience = builder.Configuration["JWT:ValidAudience"],
+           //    ValidateLifetime = true,
+           //    ClockSkew = TimeSpan.Zero,
+           //    ValidateIssuerSigningKey = true,
+           //    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:AuthKey"] ?? string.Empty))
+
+           //}
+           //);
 
 
 
@@ -73,7 +92,7 @@ namespace Makeup_Web
             app.MapStaticAssets();
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}")
+                pattern: "{controller=Authantication}/{action=Login}/{id?}")
                 .WithStaticAssets();
 
             app.Run();

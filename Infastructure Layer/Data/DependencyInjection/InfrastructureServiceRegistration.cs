@@ -28,7 +28,7 @@ namespace Infastructure_Layer.Data.DependencyInjection
             services.AddScoped(typeof(IGenaricRepository<>), typeof(GenaricRepository<>));
 
 
-
+            services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IPasswordHasher,PasswordHasher>();
 
 
