@@ -23,7 +23,7 @@ namespace Makeup_Web.Controllers
 
         public IActionResult Login()
         {
-            return View();
+            return View(new LoginViewModel());
         }
         [HttpPost]
         public async Task<ActionResult<EndpointRespones<AuthModleDto>>> Login(LoginViewModel model)
