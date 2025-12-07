@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Infastructure_Layer.Data.Configurations.AuthanticationConfiguration
 {
-    pu class UserPermissionsConfigrations : IEntityTypeConfiguration<UserPermissions>
+    public class UserPermissionsConfigrations : IEntityTypeConfiguration<UserPermissions>
     {
         public void Configure(EntityTypeBuilder<UserPermissions> builder)
         {
