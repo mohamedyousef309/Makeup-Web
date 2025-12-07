@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Infastructure_Layer.Data.Configurations.AuthanticationConfiguration
 {
-    internal class RefreshTokensConfigrations : IEntityTypeConfiguration<RefreshTokens>
+    public class RefreshTokensConfigrations : IEntityTypeConfiguration<RefreshTokens>
     {
         public void Configure(EntityTypeBuilder<RefreshTokens> builder)
         {
