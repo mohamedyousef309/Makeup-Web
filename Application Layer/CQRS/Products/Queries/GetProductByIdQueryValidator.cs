@@ -5,13 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application_Layer.CQRS.Product.Queries
+namespace Application_Layer.CQRS.Products.Queries
 {
     public class GetProductByIdQueryValidator : AbstractValidator<GetProductByIdQuery>
     {
         public GetProductByIdQueryValidator()
         {
-            RuleFor(x => x.ProductId).GreaterThan(0).WithMessage("Product Id is required.");
+            RuleFor(x => x.Id).GreaterThan(0).WithMessage("Product Id is required.");
         }
     }
 }
