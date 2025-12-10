@@ -1,46 +1,16 @@
 ﻿
 using Domain_Layer.Interfaces.ServiceInterfaces;
 using Infastructure_Layer;
+using MediatR;
+using System.Windows.Input;
 
 namespace Makeup_Web.Middlewares
 {
-    public class TransactionMiddleWare : IMiddleware
+    public class TransactionBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : ICommand
     {
-        private readonly IunitofWork unitofwork;
-
-        public TransactionMiddleWare(IunitofWork unitofwork)
+        public Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {
-            this.unitofwork = unitofwork;
-        }
-        public async Task InvokeAsync(HttpContext context, RequestDelegate next)
-        {
-            try
-            {
-                if (context.Request.Method == HttpMethods.Get)
-                {
-
-                    await next(context);
-
-                }
-                else 
-                {
-                    await unitofwork.BeginTransactionAsync();
-                    await next(context);
-                    await unitofwork.CommitTransactionAsync();
-                }
-
-
-
-            }
-            catch (Exception)
-            {
-
-              await  unitofwork.RollbackTransactionAsync();
-
-                throw;
-
-            }
-
+            throw new NotImplementedException();
         }
     }
 }

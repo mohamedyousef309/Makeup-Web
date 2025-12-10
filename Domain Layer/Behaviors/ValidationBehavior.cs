@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application_Layer.CQRS
+namespace Domain_Layer.Behaviors
 {
     public class ValidationBehavior<TRequest, TRespone> : IPipelineBehavior<IRequest, TRespone> where TRequest : IRequest<TRespone>
     {

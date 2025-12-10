@@ -31,6 +31,7 @@ namespace Makeup_Web
 
             builder.Services.AddValidatorsFromAssemblyContaining<LoginCommendValidator>();
             builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+            builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(TransactionBehavior<,>));
 
 
            // builder.Services.AddAuthentication().AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, option =>
@@ -50,10 +51,13 @@ namespace Makeup_Web
 
 
 
-            builder.Services.AddScoped<TransactionMiddleWare>();
+            builder.Services.AddTransient<GlobalExceptionHandler>();
 
 
             var app = builder.Build();
+
+            app.UseMiddleware<GlobalExceptionHandler>();
+
 
             app.UseStaticFiles();
 
@@ -83,7 +87,6 @@ namespace Makeup_Web
             app.UseHttpsRedirection();
             app.UseRouting();
 
-            app.UseMiddleware<TransactionMiddleWare>();
 
 
             app.UseAuthorization();
