@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Infastructure_Layer.Data.Configurations.AuthanticationConfiguration
 {
-    internal class UserRoleConfigrations : IEntityTypeConfiguration<UserRole>
+    public class UserRoleConfigrations : IEntityTypeConfiguration<UserRole>
     {
         public void Configure(EntityTypeBuilder<UserRole> builder)
         {
