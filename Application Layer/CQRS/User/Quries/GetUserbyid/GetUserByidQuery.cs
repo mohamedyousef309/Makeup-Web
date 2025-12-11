@@ -13,9 +13,9 @@ using System.Threading.Tasks;
 
 namespace Application_Layer.CQRS.User.Quries.GetUserbyid
 {
-    public record GetUserByidQuery(int userid):IRequest<RequestRespones<UsetToReturnDTo>>;
+    public record GetUserByidQuery(int userid):IRequest<RequestRespones<UserToReturnWithRolsDTo>>;
 
-    public class GetUserByidQueryHandler:IRequestHandler<GetUserByidQuery,RequestRespones<UsetToReturnDTo>>
+    public class GetUserByidQueryHandler:IRequestHandler<GetUserByidQuery,RequestRespones<UserToReturnWithRolsDTo>>
     {
         private readonly IGenaricRepository<Domain_Layer.Entites.Authantication.User> _genaricRepository;
 
@@ -23,9 +23,9 @@ namespace Application_Layer.CQRS.User.Quries.GetUserbyid
         {
             this._genaricRepository = genaricRepository;
         }
-        public async Task<RequestRespones<UsetToReturnDTo>> Handle(GetUserByidQuery request, CancellationToken cancellationToken)
+        public async Task<RequestRespones<UserToReturnWithRolsDTo>> Handle(GetUserByidQuery request, CancellationToken cancellationToken)
         {
-            var user = await _genaricRepository.GetByIdQueryable(request.userid).Select(u => new UsetToReturnDTo
+            var user = await _genaricRepository.GetByIdQueryable(request.userid).Select(u => new UserToReturnWithRolsDTo
             {
                 Id = u.Id,
                 Username = u.Username,
@@ -49,11 +49,11 @@ namespace Application_Layer.CQRS.User.Quries.GetUserbyid
 
             if (user==null)
             {
-                return RequestRespones<UsetToReturnDTo>.Fail("User not found",404);
+                return RequestRespones<UserToReturnWithRolsDTo>.Fail("User not found",404);
 
             }
 
-            return RequestRespones<UsetToReturnDTo>.Success(user);
+            return RequestRespones<UserToReturnWithRolsDTo>.Success(user);
 
 
         }
