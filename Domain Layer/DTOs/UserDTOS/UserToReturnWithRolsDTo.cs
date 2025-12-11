@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Domain_Layer.DTOs.UserDTOS
 {
-    public class UsetToReturnDTo
+    public class UserToReturnWithRolsDTo
     {
         public int Id { get; set; }
         public string Username { get; set; } = default!;
