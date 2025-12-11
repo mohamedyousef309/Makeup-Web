@@ -4,7 +4,7 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using System.Windows.Input;
 
-namespace Domain_Layer.Middlewares
+namespace Domain_Layer.Behaviors
 {
     public class TransactionBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : ICommand
     {

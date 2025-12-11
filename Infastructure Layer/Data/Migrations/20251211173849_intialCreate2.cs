@@ -144,6 +144,7 @@ namespace Infastructure_Layer.Data.Migrations
                     Userid = table.Column<int>(type: "int", nullable: false),
                     PermissionId = table.Column<int>(type: "int", nullable: false),
                     Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1")
                 },
                 constraints: table =>
                 {
@@ -162,24 +163,25 @@ namespace Infastructure_Layer.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserRole",
+                name: "UserRoles",
                 columns: table => new
                 {
                     Userid = table.Column<int>(type: "int", nullable: false),
                     Roleid = table.Column<int>(type: "int", nullable: false),
                     Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserRole", x => new { x.Roleid, x.Userid });
+                    table.PrimaryKey("PK_UserRoles", x => new { x.Roleid, x.Userid });
                     table.ForeignKey(
-                        name: "FK_UserRole_Roles_Roleid",
+                        name: "FK_UserRoles_Roles_Roleid",
                         column: x => x.Roleid,
                         principalTable: "Roles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_UserRole_Users_Userid",
+                        name: "FK_UserRoles_Users_Userid",
                         column: x => x.Userid,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -300,8 +302,8 @@ namespace Infastructure_Layer.Data.Migrations
                 column: "PermissionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserRole_Userid",
-                table: "UserRole",
+                name: "IX_UserRoles_Userid",
+                table: "UserRoles",
                 column: "Userid");
 
             migrationBuilder.CreateIndex(
@@ -330,7 +332,7 @@ namespace Infastructure_Layer.Data.Migrations
                 name: "UserPermissions");
 
             migrationBuilder.DropTable(
-                name: "UserRole");
+                name: "UserRoles");
 
             migrationBuilder.DropTable(
                 name: "Orders");

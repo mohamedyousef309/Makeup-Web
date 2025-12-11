@@ -13,6 +13,7 @@ namespace Infastructure_Layer.Data.Configurations.AuthanticationConfiguration
     {
         public void Configure(EntityTypeBuilder<Role> builder)
         {
+            builder.Property(x=>x.Id).ValueGeneratedOnAdd().HasColumnType("int");    
 
             builder.Property(u => u.Name)
                    .IsRequired()

@@ -14,6 +14,8 @@ namespace Infastructure_Layer.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<Category> builder)
         {
+            builder.Property(x => x.Id).ValueGeneratedOnAdd().HasColumnType("int");
+
             builder.ToTable("Categories");
 
             builder.HasKey(x => x.Id);

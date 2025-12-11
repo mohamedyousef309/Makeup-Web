@@ -2,9 +2,11 @@
 using Application_Layer.CQRS;
 using Application_Layer.CQRS.Authantication.Commads.Login;
 using Autofac.Core;
+using Domain_Layer.ViewModels.AuthanticationViewModles.Register;
 using FluentValidation;
 using Infastructure_Layer.Data;
 using Infastructure_Layer.Data.DependencyInjection;
+using Infastructure_Layer.Data.Seeders;
 using Makeup_Web.Middlewares;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -12,11 +14,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 namespace Makeup_Web
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -30,8 +33,14 @@ namespace Makeup_Web
             });
 
             builder.Services.AddValidatorsFromAssemblyContaining<LoginCommendValidator>();
+
+
+
+
+            // ??? ????? ???? ??? Client-side Validation (JQuery Unobtrusive)
+
             builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
-            builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(TransactionBehavior<,>));
+            builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(Domain_Layer.Behaviors.TransactionBehavior<,>));
 
 
            // builder.Services.AddAuthentication().AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, option =>
@@ -46,8 +55,8 @@ namespace Makeup_Web
            //    ValidateIssuerSigningKey = true,
            //    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:AuthKey"] ?? string.Empty))
 
-           //}
-           //);
+            //}
+            //);
 
 
 
@@ -67,6 +76,7 @@ namespace Makeup_Web
             try
             {
                 _dbcontext.Database.Migrate();
+                await DataSeeder.SeedAsync(_dbcontext);
 
             }
             catch (Exception ex)

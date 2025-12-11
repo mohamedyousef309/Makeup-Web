@@ -1,4 +1,5 @@
-﻿using Domain_Layer.Entites.Authantication;
+﻿using Domain_Layer.Constants;
+using Domain_Layer.Entites.Authantication;
 using Domain_Layer.Interfaces.Repositryinterfaces;
 using Domain_Layer.Interfaces.ServiceInterfaces;
 using Domain_Layer.Respones;
@@ -25,30 +26,49 @@ namespace Application_Layer.CQRS.Authantication.Commads.Register
         }
         public async Task<RequestRespones<bool>> Handle(RegisterCommand request, CancellationToken cancellationToken)
         {
-            var HashedPassword = passwordHasher.Hash(request.Password);
-
-            var isdataNotDuplicated= ValidateRegister(request.Email,request.PhoneNumber);
-
-            var UserRoles = new List<Domain_Layer.Entites.Authantication.Role>
+            try
             {
-                new UserRole {S }
-            };
+                var HashedPassword = passwordHasher.Hash(request.Password);
 
-            var newUser = new Domain_Layer.Entites.Authantication.User
+                var validationResult = await ValidateRegister(request.Email, request.PhoneNumber);
+
+                if (!validationResult.IsSuccess)
+                {
+                    return validationResult;
+
+                }
+
+                var newUser = new Domain_Layer.Entites.Authantication.User
+                {
+                    Email = request.Email,
+                    PasswordHash = HashedPassword,
+                    PhoneNumber = request.PhoneNumber,
+                    UserAddress = request.UserAddress,
+                    Username = request.Email.Split('@')[0],
+
+
+                };
+
+                newUser.UserRoles = new List<Domain_Layer.Entites.Authantication.UserRole>
+                {
+                new UserRole { Userid = newUser.Id, Roleid = RoleConstants.User_id}
+                };
+
+                await genaricRepository.addAsync(newUser);
+                await genaricRepository.SaveChanges();
+                return RequestRespones<bool>.Success(true);
+
+            }
+            catch (Exception ex)
             {
-                Email = request.Email,
-                PasswordHash = HashedPassword,
-                PhoneNumber = request.PhoneNumber,
-                UserAddress = request.UserAddress,
-                Username = request.Email.Split('@')[0],
-                UserRoles = UserRoles
+                return RequestRespones<bool>.Fail("Error while registering",400);
 
-
-            };
-            return RequestRespones<bool>.Success(true);
+                throw;
+            }
+           
         }
 
-        private async Task< RequestRespones<bool>> ValidateRegister(string Email,string phone)
+        private async Task<RequestRespones<bool>> ValidateRegister(string Email,string phone)
         {
             var emailExists = await genaricRepository.ExistsAsync(u => u.Email == Email);
             if (emailExists)

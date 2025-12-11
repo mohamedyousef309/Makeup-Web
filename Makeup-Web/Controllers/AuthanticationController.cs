@@ -1,9 +1,13 @@
 ﻿using Application_Layer.CQRS.Authantication.Commads.Login;
+using Application_Layer.CQRS.Authantication.Commads.Register;
 using Domain_Layer.DTOs.AthanticationDtos;
 using Domain_Layer.Respones;
-using Domain_Layer.ViewModels.AuthanticationViewModles;
+using Domain_Layer.ViewModels.AuthanticationViewModles.Login;
+using Domain_Layer.ViewModels.AuthanticationViewModles.Register;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System.Threading.Tasks;
 
 namespace Makeup_Web.Controllers
 {
@@ -44,6 +48,42 @@ namespace Makeup_Web.Controllers
 
             return View(model);
 
+        }
+
+
+        public IActionResult Register()
+        {
+            return View(new RegisterViewModel());
+        }
+        [HttpPost]
+        public async Task<IActionResult> Register(RegisterViewModel model)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return View(model);
+                }
+                {
+                    var RegisterResult = await mediator.Send(new RegisterCommand(model.Email, model.Password, model.PhoneNumber, model.UserAddress));
+                    if (!RegisterResult.IsSuccess)
+                    {
+                        ModelState.AddModelError(string.Empty, RegisterResult.Message ?? "Registration failed");
+
+                        return View(model);
+                    }
+                }
+                return RedirectToAction("Login");
+
+            }
+            catch (Exception ex)
+            {
+
+                ModelState.AddModelError(string.Empty, $"An unexpected error occurred: {ex.Message}");
+                return View(model);
+            }
+
+           
         }
     }
 }

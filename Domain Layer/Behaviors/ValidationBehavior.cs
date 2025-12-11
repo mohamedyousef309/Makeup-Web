@@ -9,7 +9,8 @@ using System.Threading.Tasks;
 
 namespace Domain_Layer.Behaviors
 {
-    public class ValidationBehavior<TRequest, TRespone> : IPipelineBehavior<IRequest, TRespone> where TRequest : IRequest<TRespone>
+    public class ValidationBehavior<TRequest, TRespone> :
+        IPipelineBehavior<TRequest, TRespone> where TRequest : IRequest<TRespone>
     {
         private readonly IEnumerable<IValidator<TRequest>> validators;
 
@@ -17,7 +18,7 @@ namespace Domain_Layer.Behaviors
         {
             this.validators = validators;
         }
-        public async Task<TRespone> Handle(IRequest request, RequestHandlerDelegate<TRespone> next, CancellationToken cancellationToken)
+        public async Task<TRespone> Handle(TRequest request, RequestHandlerDelegate<TRespone> next, CancellationToken cancellationToken)
         {
             if (validators.Any())
             {
@@ -42,6 +43,7 @@ namespace Domain_Layer.Behaviors
 
         }
 
+        
     }
 
 

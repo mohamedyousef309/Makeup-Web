@@ -13,6 +13,8 @@ namespace Infastructure_Layer.Data.Configurations.AuthanticationConfiguration
     {
         public void Configure(EntityTypeBuilder<RefreshTokens> builder)
         {
+            builder.Property(x => x.Id).ValueGeneratedOnAdd().HasColumnType("int");
+
             builder.Property(rt => rt.userid)
                   .IsRequired();
 

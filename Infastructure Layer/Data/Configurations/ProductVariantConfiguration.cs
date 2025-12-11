@@ -13,6 +13,8 @@ namespace Infastructure_Layer.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<ProductVariant> builder)
         {
+            builder.Property(x => x.Id).ValueGeneratedOnAdd().HasColumnType("int");
+
             builder.ToTable("ProductVariants");
 
             builder.HasKey(x => x.Id);

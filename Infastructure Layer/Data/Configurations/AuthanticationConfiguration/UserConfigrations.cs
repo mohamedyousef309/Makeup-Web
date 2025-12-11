@@ -14,6 +14,8 @@ namespace Infastructure_Layer.Data.Configurations.AuthanticationConfiguration
       
         public void Configure(EntityTypeBuilder<User> builder)
         {
+            builder.Property(x => x.Id).ValueGeneratedOnAdd().HasColumnType("int");
+
 
             builder.ToTable("Users");
 

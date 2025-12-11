@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infastructure_Layer.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251202193004_intialCreate2")]
+    [Migration("20251211173849_intialCreate2")]
     partial class intialCreate2
     {
         /// <inheritdoc />
@@ -179,7 +179,10 @@ namespace Infastructure_Layer.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.HasKey("Userid", "PermissionId");
 
@@ -197,13 +200,16 @@ namespace Infastructure_Layer.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.HasKey("Roleid", "Userid");
 
                     b.HasIndex("Userid");
 
-                    b.ToTable("UserRole");
+                    b.ToTable("UserRoles");
                 });
 
             modelBuilder.Entity("Domain_Layer.Entites.Category", b =>
