@@ -57,7 +57,7 @@ namespace Application_Layer.CQRS
         }
 
         protected IQueryable<T> ApplySorting<T>( IQueryable<T> query, string? sortBy, string? sortDir,
-         Dictionary<string, Expression<Func<T, object>>> sortColumns) // نمرر الخريطة هنا
+         Dictionary<string, Expression<Func<T, object>>> sortColumns) 
         {
             if (string.IsNullOrWhiteSpace(sortBy) || !sortColumns.ContainsKey(sortBy.ToLower()))
                 return query;
