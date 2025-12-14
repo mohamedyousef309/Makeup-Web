@@ -4,6 +4,7 @@ using Domain_Layer.Interfaces.Repositryinterfaces;
 using Domain_Layer.Interfaces.ServiceInterfaces;
 using Domain_Layer.Respones;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,17 +13,19 @@ using System.Threading.Tasks;
 
 namespace Application_Layer.CQRS.Authantication.Commads.Register
 {
-    public record RegisterCommand(string Email, string Password, string PhoneNumber,string UserAddress) :IRequest<RequestRespones<bool>>;
+    public record RegisterCommand(string Email, string Password, string PhoneNumber,string UserAddress, IFormFile? Image) :IRequest<RequestRespones<bool>>;
 
     public class RegisterCommandHandler : IRequestHandler<RegisterCommand, RequestRespones<bool>>
     {
         private readonly IGenaricRepository<Domain_Layer.Entites.Authantication.User> genaricRepository;
         private readonly IPasswordHasher passwordHasher;
+        private readonly IAttachmentService attachmentService;
 
-        public RegisterCommandHandler(IGenaricRepository<Domain_Layer.Entites.Authantication.User > genaricRepository,IPasswordHasher passwordHasher)
+        public RegisterCommandHandler(IGenaricRepository<Domain_Layer.Entites.Authantication.User > genaricRepository,IPasswordHasher passwordHasher,IAttachmentService attachmentService)
         {
             this.genaricRepository = genaricRepository;
             this.passwordHasher = passwordHasher;
+            this.attachmentService = attachmentService;
         }
         public async Task<RequestRespones<bool>> Handle(RegisterCommand request, CancellationToken cancellationToken)
         {
@@ -49,6 +52,10 @@ namespace Application_Layer.CQRS.Authantication.Commads.Register
 
                 };
 
+                if (request.Image!=null)
+                {
+                    newUser.Picture = attachmentService.UploadImage(request.Image, "Images")??"null";
+                }
                 newUser.UserRoles = new List<Domain_Layer.Entites.Authantication.UserRole>
                 {
                 new UserRole { Userid = newUser.Id, Roleid = RoleConstants.User_id}

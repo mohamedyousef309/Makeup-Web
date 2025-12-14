@@ -1,4 +1,5 @@
 ﻿using Domain_Layer.Entites.Authantication;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -35,6 +36,8 @@ namespace Domain_Layer.ViewModels.AuthanticationViewModles.Register
         [Required(ErrorMessage = "User address is required")]
         [StringLength(200, ErrorMessage = "Address cannot exceed 200 characters")]
         public string UserAddress { get; set; } = default!;
+
+        public IFormFile? Image = null;
 
         public string? ErrorMessage { get; set; }
 

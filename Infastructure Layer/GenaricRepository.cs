@@ -83,6 +83,11 @@ namespace Infastructure_Layer
             appDbContext.Set<T>().Remove(item);
         }
 
+        public void DeleteRange(IEnumerable<T> entities)
+        {
+            appDbContext.Set<T>().RemoveRange(entities);
+        }
+
         public void SaveInclude(T entity)
         {
             var existingEntity = _dbSet.Local.FirstOrDefault(e => e.Id == entity.Id);
@@ -143,5 +148,7 @@ namespace Infastructure_Layer
         {
             return await appDbContext.SaveChangesAsync();
         }
+
+        
     }
 }

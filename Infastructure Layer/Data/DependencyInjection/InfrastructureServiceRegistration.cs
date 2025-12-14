@@ -30,7 +30,7 @@ namespace Infastructure_Layer.Data.DependencyInjection
 
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IPasswordHasher,PasswordHasher>();
-
+            services.AddScoped<IAttachmentService, AttachmnetService>();
 
 
 

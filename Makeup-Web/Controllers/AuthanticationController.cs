@@ -65,7 +65,7 @@ namespace Makeup_Web.Controllers
                     return View(model);
                 }
                 {
-                    var RegisterResult = await mediator.Send(new RegisterCommand(model.Email, model.Password, model.PhoneNumber, model.UserAddress));
+                    var RegisterResult = await mediator.Send(new RegisterCommand(model.Email, model.Password, model.PhoneNumber, model.UserAddress,model.Image));
                     if (!RegisterResult.IsSuccess)
                     {
                         ModelState.AddModelError(string.Empty, RegisterResult.Message ?? "Registration failed");

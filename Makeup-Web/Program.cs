@@ -43,20 +43,20 @@ namespace Makeup_Web
             builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(Domain_Layer.Behaviors.TransactionBehavior<,>));
 
 
-            builder.Services.AddAuthentication().AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, option =>
-           option.TokenValidationParameters = new TokenValidationParameters()
-           {
-               ValidateIssuer = true,
-               ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
-               ValidateAudience = true,
-               ValidAudience = builder.Configuration["JWT:ValidAudience"],
-               ValidateLifetime = true,
-               ClockSkew = TimeSpan.Zero,
-               ValidateIssuerSigningKey = true,
-               IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:AuthKey"] ?? string.Empty))
+           // builder.Services.AddAuthentication().AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, option =>
+           //option.TokenValidationParameters = new TokenValidationParameters()
+           //{
+           //    ValidateIssuer = true,
+           //    ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
+           //    ValidateAudience = true,
+           //    ValidAudience = builder.Configuration["JWT:ValidAudience"],
+           //    ValidateLifetime = true,
+           //    ClockSkew = TimeSpan.Zero,
+           //    ValidateIssuerSigningKey = true,
+           //    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:AuthKey"] ?? string.Empty))
 
-           }
-            );
+           //}
+           // );
 
 
 

@@ -47,6 +47,8 @@ namespace Domain_Layer.Interfaces.Repositryinterfaces
 
         void Delete(T item);
 
+        void DeleteRange(IEnumerable<T> entities);
+
         Task<int> SaveChanges();
     }
 }
