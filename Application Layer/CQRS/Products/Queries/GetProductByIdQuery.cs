@@ -5,6 +5,7 @@ using Domain_Layer.Interfaces.Repositryinterfaces;
 using Domain_Layer.Interfaces.ServiceInterfaces;
 using Domain_Layer.Respones;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,30 +31,32 @@ namespace Application_Layer.CQRS.Products.Queries
             try
             {
                 // جلب المنتج مع Variants
-                var product = await _productRepo.GetByCriteriaAsync(x => x.Id == request.Id);
+                var product = await _productRepo.GetByCriteriaQueryable(x => x.Id == request.Id).
+                    Select(x=> new ProductDto
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Description = x.Description,
+                        Price = x.Price,
+                        Stock = x.Stock,
+                        CategoryId = x.CategoryId,
+                        IsActive = x.IsActive,
+                        Variants = x.Variants.Select(v => new ProductVariantDto
+                        {
+                            Id = v.Id,
+                            VariantName = v.VariantName,
+                            VariantValue = v.VariantValue,
+                            Stock = v.Stock
+                        }).ToList()
+                    })
+                    .FirstOrDefaultAsync();
 
                 if (product == null)
                     return RequestRespones<ProductDto>.Fail($"Product with Id {request.Id} not found.", 404);
 
-                var productDto = new ProductDto
-                {
-                    Id = product.Id,
-                    Name = product.Name,
-                    Description = product.Description,
-                    Price = product.Price,
-                    Stock = product.Stock,
-                    CategoryId = product.CategoryId,
-                    IsActive = product.IsActive,
-                    Variants = product.Variants.Select(v => new ProductVariantDto
-                    {
-                        Id = v.Id,
-                        VariantName = v.VariantName,
-                        VariantValue = v.VariantValue,
-                        Stock = v.Stock
-                    }).ToList()
-                };
+               
 
-                return RequestRespones<ProductDto>.Success(productDto, 200, "Product retrieved successfully.");
+                return RequestRespones<ProductDto>.Success(product, 200, "Product retrieved successfully.");
             }
             catch (System.Exception ex)
             {

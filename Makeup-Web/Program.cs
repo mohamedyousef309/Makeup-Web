@@ -13,6 +13,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using StackExchange.Redis;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -34,29 +35,31 @@ namespace Makeup_Web
             });
 
             builder.Services.AddValidatorsFromAssemblyContaining<LoginCommendValidator>();
-
-
-
-
-
             builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
             builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(Domain_Layer.Behaviors.TransactionBehavior<,>));
 
 
-           // builder.Services.AddAuthentication().AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, option =>
-           //option.TokenValidationParameters = new TokenValidationParameters()
-           //{
-           //    ValidateIssuer = true,
-           //    ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
-           //    ValidateAudience = true,
-           //    ValidAudience = builder.Configuration["JWT:ValidAudience"],
-           //    ValidateLifetime = true,
-           //    ClockSkew = TimeSpan.Zero,
-           //    ValidateIssuerSigningKey = true,
-           //    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:AuthKey"] ?? string.Empty))
 
-           //}
-           // );
+            builder.Services.AddSingleton<IConnectionMultiplexer>(x =>
+            {
+                return ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("RedisConnection")!);
+            });
+
+
+            // builder.Services.AddAuthentication().AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, option =>
+            //option.TokenValidationParameters = new TokenValidationParameters()
+            //{
+            //    ValidateIssuer = true,
+            //    ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
+            //    ValidateAudience = true,
+            //    ValidAudience = builder.Configuration["JWT:ValidAudience"],
+            //    ValidateLifetime = true,
+            //    ClockSkew = TimeSpan.Zero,
+            //    ValidateIssuerSigningKey = true,
+            //    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:AuthKey"] ?? string.Empty))
+
+            //}
+            // );
 
 
 

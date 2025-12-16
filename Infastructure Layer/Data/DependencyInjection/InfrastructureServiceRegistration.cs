@@ -32,6 +32,7 @@ namespace Infastructure_Layer.Data.DependencyInjection
             services.AddScoped<IPasswordHasher,PasswordHasher>();
             services.AddScoped<IAttachmentService, AttachmnetService>();
 
+            services.AddScoped<IBasketRepository, BasketRepository>();
 
 
 
