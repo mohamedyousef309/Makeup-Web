@@ -79,7 +79,7 @@ namespace Makeup_Web
             try
             {
                 _dbcontext.Database.Migrate();
-                //await DataSeeder.SeedAsync(_dbcontext);
+                await DataSeeder.SeedAsync(_dbcontext);
 
             }
             catch (Exception ex)

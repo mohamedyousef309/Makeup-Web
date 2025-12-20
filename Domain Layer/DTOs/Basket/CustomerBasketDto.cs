@@ -9,11 +9,8 @@ namespace Domain_Layer.DTOs.Basket
     public class CustomerBasketDto
     {
         public string Id { get; set; }
-        public ICollection<BasketItemsDto> items { get; set; } = [];
+        public IEnumerable<BasketItemsDto> items { get; set; } = new HashSet<BasketItemsDto>();
 
-        public string? PaymentIntentID { get; set; }
-        public string? ClientSecret { get; set; }
 
-        public int? DeliveryMethodId { get; set; }
     }
 }

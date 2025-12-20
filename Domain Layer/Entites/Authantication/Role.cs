@@ -10,7 +10,6 @@ namespace Domain_Layer.Entites.Authantication
     {
         public string Name { get; set; }=default!;
 
-        public string Description { get; set; }=default!;
 
         public IEnumerable<UserRole> UserRoles { get; set; } = new HashSet<UserRole>();
 
