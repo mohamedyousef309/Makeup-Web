@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Application_Layer.CQRS.Basket.Commands.CreateOrUpdateBasket
 {
-    public record CreateOrUpdateBasketoCommands(string UserCartId, int ProductId, string ProductName, decimal Price, int Quantity):IRequest<RequestRespones<bool>>;
+    public record CreateOrUpdateBasketoCommands( int userid,int ProductId, string ProductName, decimal Price, int Quantity):IRequest<RequestRespones<bool>>;
 
     public class CreateOrUpdateBasketoCommandsHandler : IRequestHandler<CreateOrUpdateBasketoCommands, RequestRespones<bool>>
     {
@@ -21,13 +21,14 @@ namespace Application_Layer.CQRS.Basket.Commands.CreateOrUpdateBasket
         }
         public async Task<RequestRespones<bool>> Handle(CreateOrUpdateBasketoCommands request, CancellationToken cancellationToken)
         {
-            var basket= await basketRepository.GetCustomerBasket(request.UserCartId);
+            var basket= await basketRepository.GetCustomerBasketByUserId(request.userid.ToString());
 
             if (basket == null)
             {
                 basket = new Domain_Layer.Entites.Basket.UserCart
                 {
-                    Id = request.UserCartId,
+                    Id = request.userid.ToString(),
+                    UserId= request.userid,
                     Items = new List<Domain_Layer.Entites.Basket.CartItem>()
                 };
             }
@@ -47,7 +48,7 @@ namespace Application_Layer.CQRS.Basket.Commands.CreateOrUpdateBasket
                         Price = request.Price,
                         ProductName = request.ProductName,
                         Quantity = request.Quantity,
-                        UserCartId = request.UserCartId,
+                        UserCartId = request.userid.ToString(),
 
                     });
 

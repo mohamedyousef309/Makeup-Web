@@ -11,6 +11,9 @@ namespace Domain_Layer.Interfaces.Repositryinterfaces
     {
         Task<UserCart?> GetCustomerBasket(string basketId);
 
+        Task<UserCart?> GetCustomerBasketByUserId(string userId);
+
+
         Task<UserCart?> UpdateOrCreateCustomerBasket(UserCart basket);
 
         Task<bool> DeleteCustomerBasket(string basketId);

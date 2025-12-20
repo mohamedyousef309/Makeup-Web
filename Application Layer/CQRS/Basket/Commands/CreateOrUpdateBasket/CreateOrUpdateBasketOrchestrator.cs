@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Application_Layer.CQRS.Basket.Commands.CreateOrUpdateBasket
 {
-    public record CreateOrUpdateBasketOrchestrator(int userid, string basketid,int Productid,int Quantity) :IRequest<RequestRespones<bool>>;
+    public record CreateOrUpdateBasketOrchestrator(int userid, int Productid,int Quantity) :IRequest<RequestRespones<bool>>;
 
     public class CreateOrUpdateBasketOrchestratorHandler : IRequestHandler<CreateOrUpdateBasketOrchestrator, RequestRespones<bool>>
     {
@@ -28,7 +28,7 @@ namespace Application_Layer.CQRS.Basket.Commands.CreateOrUpdateBasket
             }
 
             var addProductTobasketResult= await mediator.Send(new CreateOrUpdateBasketoCommands(
-                request.basketid,
+                request.userid,
                 GetProductResult.Data.Id,
                 GetProductResult.Data.Name,
                 GetProductResult.Data.Price,

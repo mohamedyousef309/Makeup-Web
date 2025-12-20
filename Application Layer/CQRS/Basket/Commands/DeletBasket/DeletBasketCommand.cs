@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Application_Layer.CQRS.Basket.Commands.DeletBasket
 {
-    public record DeletBasketCommand(string BasketId) :IRequest<RequestRespones<bool>>;
+    public record DeletBasketCommand(int userid) :IRequest<RequestRespones<bool>>;
 
     public class DeletBasketCommandHandler : IRequestHandler<DeletBasketCommand, RequestRespones<bool>>
     {
@@ -21,8 +21,14 @@ namespace Application_Layer.CQRS.Basket.Commands.DeletBasket
         }
         public async Task<RequestRespones<bool>> Handle(DeletBasketCommand request, CancellationToken cancellationToken)
         {
+            var basket = await basketRepository.GetCustomerBasket(request.userid.ToString());
+            if (basket==null)
+            {
+                return RequestRespones<bool>.Fail("Basket not found", 404);
 
-            var isDeleted = await basketRepository.DeleteCustomerBasket(request.BasketId);
+            }
+
+            var isDeleted = await basketRepository.DeleteCustomerBasket(basket.Id);
 
             if (!isDeleted)
             {

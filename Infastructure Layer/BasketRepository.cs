@@ -13,7 +13,7 @@ namespace Infastructure_Layer
     public class BasketRepository : IBasketRepository
     {
         IDatabase _DbContext;
-        public BasketRepository(ConnectionMultiplexer context)
+        public BasketRepository(IConnectionMultiplexer context)
         {
             _DbContext = context.GetDatabase();
         }
@@ -26,6 +26,13 @@ namespace Infastructure_Layer
             if (basket.IsNullOrEmpty)
                 return null;
 
+            return JsonSerializer.Deserialize<UserCart>(basket.ToString());
+        }
+
+        public async Task<UserCart?> GetCustomerBasketByUserId(string userId)
+        {
+            var basket = await  _DbContext.StringGetAsync(userId);
+            if (basket.IsNullOrEmpty) return null;
             return JsonSerializer.Deserialize<UserCart>(basket.ToString());
         }
 
@@ -44,5 +51,7 @@ namespace Infastructure_Layer
 
         public async Task<bool> DeleteCustomerBasket(string basketId)
         => await _DbContext.KeyDeleteAsync(basketId);
+
+      
     }
 }
