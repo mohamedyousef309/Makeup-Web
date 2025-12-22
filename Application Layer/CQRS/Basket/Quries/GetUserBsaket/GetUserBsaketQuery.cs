@@ -41,6 +41,7 @@ namespace Application_Layer.CQRS.Basket.Quries.GetUserBsaket
                 Id = basket.Id,
                 items = basket.Items.Select(i => new BasketItemsDto
                 {
+                    productid=i.ProductId,
                     ProductName = i.ProductName,
                     Price = i.Price,
                     Quantity = i.Quantity

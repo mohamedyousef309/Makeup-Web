@@ -1,5 +1,6 @@
 ﻿using Domain_Layer.Entites;
 using Domain_Layer.Entites.Authantication;
+using Domain_Layer.Entites.Order;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -22,7 +23,7 @@ namespace Infastructure_Layer.Data
         public DbSet<Product> Products { get; set; }
         public DbSet<ProductVariant> ProductVariants { get; set; }
         public DbSet<Order> Orders { get; set; }
-        public DbSet<OrderItem> OrderItems { get; set; }
+        public DbSet<OrderItems> OrderItems { get; set; }
 
 
         public DbSet<User> Users { get; set; }

@@ -4,7 +4,7 @@ namespace Domain_Layer.DTOs.Basket
 {
     public class BasketItemsDto
     {
-
+        public int productid { get; set; }
         public string ProductName { get; set; }
 
       

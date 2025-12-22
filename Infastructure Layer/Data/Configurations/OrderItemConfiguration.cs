@@ -1,4 +1,5 @@
 ﻿using Domain_Layer.Entites;
+using Domain_Layer.Entites.Order;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
@@ -9,9 +10,9 @@ using System.Threading.Tasks;
 
 namespace Infastructure_Layer.Data.Configurations
 {
-    public class OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
+    public class OrderItemConfiguration : IEntityTypeConfiguration<OrderItems>
     {
-        public void Configure(EntityTypeBuilder<OrderItem> builder)
+        public void Configure(EntityTypeBuilder<OrderItems> builder)
         {
             builder.Property(x => x.Id).ValueGeneratedOnAdd().HasColumnType("int");
 
@@ -19,21 +20,21 @@ namespace Infastructure_Layer.Data.Configurations
 
             builder.HasKey(x => x.Id);
 
-            builder.Property(x => x.Quantity)
+            builder.Property(oi => oi.ProductName)
+              .IsRequired()
+              .HasMaxLength(200);
+
+            builder.Property(oi => oi.PictureUrl)
                    .IsRequired();
 
-            builder.Property(x => x.UnitPrice)
-                   .HasColumnType("decimal(10,2)")
+            builder.Property(oi => oi.Quantity)
                    .IsRequired();
 
-            builder.HasOne(x => x.Order)
-                   .WithMany(x => x.Items)
-                   .HasForeignKey(x => x.OrderId).OnDelete(DeleteBehavior.Cascade);
+            builder.Property(oi => oi.Price)
+                   .HasColumnType("decimal(18,2)")
+                   .IsRequired();
 
-            builder.HasOne(x => x.Variant)
-                   .WithMany()
-                   .HasForeignKey(x => x.VariantId)
-                   .OnDelete(DeleteBehavior.Restrict);
+
         }
     }
 }
