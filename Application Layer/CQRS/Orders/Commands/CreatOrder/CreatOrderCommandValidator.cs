@@ -24,9 +24,9 @@ namespace Application_Layer.CQRS.Orders.Commands.CreatOrder
                 .NotEmpty().WithMessage("Address is required")
                 .MaximumLength(500);
 
-            RuleFor(x => x.Deliverycost)
-                .GreaterThanOrEqualTo(0)
-                .WithMessage("Delivery cost cannot be negative");
+            //RuleFor(x => x.Deliverycost)
+            //    .GreaterThanOrEqualTo(0)
+            //    .WithMessage("Delivery cost cannot be negative");
 
             RuleFor(x => x.subTotal)
                 .GreaterThan(0)

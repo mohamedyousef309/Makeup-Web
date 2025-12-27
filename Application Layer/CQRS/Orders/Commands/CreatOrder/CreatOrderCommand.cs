@@ -1,8 +1,10 @@
 ﻿using Domain_Layer.DTOs.OrderDTOs;
 using Domain_Layer.Entites.Order;
+using Domain_Layer.Interfaces.Abstraction;
 using Domain_Layer.Interfaces.Repositryinterfaces;
 using Domain_Layer.Respones;
 using MediatR;
+using Microsoft.AspNetCore.Http.HttpResults;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Application_Layer.CQRS.Orders.Commands.CreatOrder
 {
-    public record CreatOrderCommand(string BuyerEmail, string PhoneNumber, string Address , IEnumerable<OrderItems> Items, decimal subTotal) :IRequest<RequestRespones<bool>>;
+    public record CreatOrderCommand(string BuyerEmail, string PhoneNumber, string Address , IEnumerable<OrderItems> Items, decimal subTotal) : ICommand<RequestRespones<bool>>;
 
     public class CreatOrderCommandHandler : IRequestHandler<CreatOrderCommand, RequestRespones<bool>>
     {
@@ -23,8 +25,8 @@ namespace Application_Layer.CQRS.Orders.Commands.CreatOrder
         }
         public async Task<RequestRespones<bool>> Handle(CreatOrderCommand request, CancellationToken cancellationToken)
         {
-            try
-            {
+            
+            
                 var order = new Order
                 {
                     BuyerEmail = request.BuyerEmail,
@@ -41,12 +43,8 @@ namespace Application_Layer.CQRS.Orders.Commands.CreatOrder
                 await genaricRepository.SaveChanges();
 
                 return RequestRespones<bool>.Success(true,Message: "Order Created Succesfuly");
-            }
-            catch (Exception ex)
-            {
-
-                return RequestRespones<bool>.Fail("Failed to create order",400);
-            }
+            
+          
 
         }
     }

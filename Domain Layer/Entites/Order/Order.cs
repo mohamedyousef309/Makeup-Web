@@ -13,11 +13,15 @@ namespace Domain_Layer.Entites.Order
         [EnumMember(Value = "pending")]
         pending,
 
-        [EnumMember(Value = "PaymentReceving")]
-        PaymentReceving,
+        [EnumMember(Value = "Preparing")]
+        Preparing,
 
-        [EnumMember(Value = "PaymentFaild")]
-        PaymentFaild
+        [EnumMember(Value = "OutForDelivery ")]
+        OutForDelivery,
+        [EnumMember(Value = "Delivered")]
+        Delivered,
+        [EnumMember(Value = "Cancelled")]
+        Cancelled
     }
     public class Order:BaseEntity
     {

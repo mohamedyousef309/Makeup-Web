@@ -3,6 +3,7 @@ using Application_Layer.CQRS.Products.Queries;
 using Domain_Layer.DTOs.Basket;
 using Domain_Layer.DTOs.OrderDTOs;
 using Domain_Layer.Entites.Order;
+using Domain_Layer.Interfaces.Abstraction;
 using Domain_Layer.Respones;
 using MediatR;
 using System;
@@ -13,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Application_Layer.CQRS.Orders.Commands.CreatOrder
 {
-    public record CreatOrderOrchestrator(string BuyerEmail, int userid, string PhoneNumber, string Address, IEnumerable<OrderItems> Items) :IRequest<RequestRespones<OrderToReturnDto>>;
+    public record CreatOrderOrchestrator(string BuyerEmail, int userid, string PhoneNumber, string Address, IEnumerable<OrderItems> Items) : ICommand<RequestRespones<OrderToReturnDto>>;
 
     public class CreatOrderOrchestratorHandler:IRequestHandler<CreatOrderOrchestrator,RequestRespones<OrderToReturnDto>>
     {

@@ -1,4 +1,5 @@
 ﻿using Domain_Layer.Entites;
+using Domain_Layer.Interfaces.Abstraction;
 using Domain_Layer.Interfaces.Repositryinterfaces;
 using Domain_Layer.Respones;
 using MediatR;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 namespace Application_Layer.CQRS.Caegories.Commands.DeleteCategory
 {
     public record DeleteCategoryCommand(int Id)
-         : IRequest<RequestRespones<bool>>;
+         : ICommand<RequestRespones<bool>>;
     public class DeleteCategoryHandler
     : IRequestHandler<DeleteCategoryCommand, RequestRespones<bool>>
     {
@@ -24,8 +25,8 @@ namespace Application_Layer.CQRS.Caegories.Commands.DeleteCategory
 
         public async Task<RequestRespones<bool>> Handle(DeleteCategoryCommand request, CancellationToken cancellationToken)
         {
-            try
-            {
+           
+            
                 
                 var category = await _categoryRepo.GetByCriteriaAsync(c => c.Id == request.Id);
                 if (category == null)
@@ -38,11 +39,8 @@ namespace Application_Layer.CQRS.Caegories.Commands.DeleteCategory
                 await _categoryRepo.SaveChanges();
 
                 return RequestRespones<bool>.Success(true, 200, "Category deleted successfully.");
-            }
-            catch (Exception ex)
-            {
-                return RequestRespones<bool>.Fail($"Error: {ex.Message}", 500);
-            }
+            
+            
         }
     }
 

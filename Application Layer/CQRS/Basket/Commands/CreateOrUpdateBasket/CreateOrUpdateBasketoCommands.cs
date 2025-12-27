@@ -1,4 +1,5 @@
-﻿using Domain_Layer.Interfaces.Repositryinterfaces;
+﻿using Domain_Layer.Interfaces.Abstraction;
+using Domain_Layer.Interfaces.Repositryinterfaces;
 using Domain_Layer.Respones;
 using MediatR;
 using System;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Application_Layer.CQRS.Basket.Commands.CreateOrUpdateBasket
 {
-    public record CreateOrUpdateBasketoCommands( int userid,int ProductId, string ProductName, decimal Price, int Quantity):IRequest<RequestRespones<bool>>;
+    public record CreateOrUpdateBasketoCommands( int userid,int ProductId, string ProductName, decimal Price, int Quantity): ICommand<RequestRespones<bool>>;
 
     public class CreateOrUpdateBasketoCommandsHandler : IRequestHandler<CreateOrUpdateBasketoCommands, RequestRespones<bool>>
     {
@@ -21,14 +22,13 @@ namespace Application_Layer.CQRS.Basket.Commands.CreateOrUpdateBasket
         }
         public async Task<RequestRespones<bool>> Handle(CreateOrUpdateBasketoCommands request, CancellationToken cancellationToken)
         {
-            var basket= await basketRepository.GetCustomerBasketByUserId(request.userid.ToString());
+            var basket= await basketRepository.GetCustomerBasket(request.userid.ToString());
 
             if (basket == null)
             {
                 basket = new Domain_Layer.Entites.Basket.UserCart
                 {
                     Id = request.userid.ToString(),
-                    UserId= request.userid,
                     Items = new List<Domain_Layer.Entites.Basket.CartItem>()
                 };
             }

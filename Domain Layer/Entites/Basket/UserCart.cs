@@ -10,7 +10,6 @@ namespace Domain_Layer.Entites.Basket
     {
         public string Id { get; set; }
 
-        public int UserId { get; set; }
         public ICollection<CartItem> Items { get; set; }
     }
 }

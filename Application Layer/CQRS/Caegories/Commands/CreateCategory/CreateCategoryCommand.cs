@@ -1,5 +1,6 @@
 ﻿using Domain_Layer.DTOs._ِCategoryDtos;
 using Domain_Layer.Entites;
+using Domain_Layer.Interfaces.Abstraction;
 using Domain_Layer.Interfaces.Repositryinterfaces;
 using Domain_Layer.Respones;
 using MediatR;
@@ -7,7 +8,7 @@ using MediatR;
 namespace Application_Layer.CQRS.Caegories.Commands.CreateCategory
 {
     public record CreateCategoryCommand(CreateCategoryDto CreateCategoryDto)
-        : IRequest<RequestRespones<CategoryDto>>;
+        : ICommand<RequestRespones<CategoryDto>>;
 
     public class CreateCategoryHandler
         : IRequestHandler<CreateCategoryCommand, RequestRespones<CategoryDto>>
@@ -21,8 +22,8 @@ namespace Application_Layer.CQRS.Caegories.Commands.CreateCategory
 
         public async Task<RequestRespones<CategoryDto>> Handle(CreateCategoryCommand request, CancellationToken cancellationToken)
         {
-            try
-            {
+            
+            
                 var dto = request.CreateCategoryDto;
 
                  
@@ -44,11 +45,8 @@ namespace Application_Layer.CQRS.Caegories.Commands.CreateCategory
                 };
 
                 return RequestRespones<CategoryDto>.Success(resultDto, 201, "Category created successfully.");
-            }
-            catch (Exception ex)
-            {
-                return RequestRespones<CategoryDto>.Fail($"Error: {ex.Message}", 500);
-            }
+            
+            
         }
     }
 }

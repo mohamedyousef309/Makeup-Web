@@ -1,5 +1,6 @@
 ﻿using Domain_Layer.DTOs._ِCategoryDtos;
 using Domain_Layer.Entites;
+using Domain_Layer.Interfaces.Abstraction;
 using Domain_Layer.Interfaces.Repositryinterfaces;
 using Domain_Layer.Respones;
 using MediatR;
@@ -12,7 +13,7 @@ using System.Threading.Tasks;
 namespace Application_Layer.CQRS.Caegories.Commands.UpdateCategory
 {
     public record UpdateCategoryCommand(UpdateCategoryDto UpdateCategoryDto)
-        : IRequest<RequestRespones<CategoryDto>>;
+        : ICommand<RequestRespones<CategoryDto>>;
     public class UpdateCategoryHandler
     : IRequestHandler<UpdateCategoryCommand, RequestRespones<CategoryDto>>
     {
@@ -25,8 +26,8 @@ namespace Application_Layer.CQRS.Caegories.Commands.UpdateCategory
 
         public async Task<RequestRespones<CategoryDto>> Handle(UpdateCategoryCommand request, CancellationToken cancellationToken)
         {
-            try
-            {
+            
+            
                 var dto = request.UpdateCategoryDto;
 
                 // 1️⃣ هل الكاتيجوري موجود؟
@@ -54,11 +55,8 @@ namespace Application_Layer.CQRS.Caegories.Commands.UpdateCategory
                 };
 
                 return RequestRespones<CategoryDto>.Success(resultDto, 200, "Category updated successfully.");
-            }
-            catch (Exception ex)
-            {
-                return RequestRespones<CategoryDto>.Fail($"Error: {ex.Message}", 500);
-            }
+            
+           
         }
     }
 }

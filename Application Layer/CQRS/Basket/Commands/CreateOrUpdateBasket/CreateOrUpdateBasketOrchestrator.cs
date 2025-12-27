@@ -1,4 +1,5 @@
 ﻿using Application_Layer.CQRS.Products.Queries;
+using Domain_Layer.Interfaces.Abstraction;
 using Domain_Layer.Respones;
 using MediatR;
 using System;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Application_Layer.CQRS.Basket.Commands.CreateOrUpdateBasket
 {
-    public record CreateOrUpdateBasketOrchestrator(int userid, int Productid,int Quantity) :IRequest<RequestRespones<bool>>;
+    public record CreateOrUpdateBasketOrchestrator(int userid, int Productid,int Quantity) : ICommand<RequestRespones<bool>>;
 
     public class CreateOrUpdateBasketOrchestratorHandler : IRequestHandler<CreateOrUpdateBasketOrchestrator, RequestRespones<bool>>
     {

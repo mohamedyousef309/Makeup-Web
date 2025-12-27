@@ -24,6 +24,10 @@ namespace Infastructure_Layer
         }
         public async Task BeginTransactionAsync()
         {
+            if (_Transaction != null)
+            {
+                return;
+            }
             _Transaction = await _dbContext.Database.BeginTransactionAsync();
 
         }

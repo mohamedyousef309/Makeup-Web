@@ -9,9 +9,8 @@ namespace Domain_Layer.Interfaces.Repositryinterfaces
 {
     public interface IBasketRepository
     {
-        Task<UserCart?> GetCustomerBasket(string basketId);
+        Task<UserCart?> GetCustomerBasket(string USerId);
 
-        Task<UserCart?> GetCustomerBasketByUserId(string userId);
 
 
         Task<UserCart?> UpdateOrCreateCustomerBasket(UserCart basket);

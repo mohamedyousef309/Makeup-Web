@@ -1,4 +1,5 @@
-﻿using Domain_Layer.Interfaces.Repositryinterfaces;
+﻿using Domain_Layer.Interfaces.Abstraction;
+using Domain_Layer.Interfaces.Repositryinterfaces;
 using Domain_Layer.Respones;
 using MediatR;
 using System;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Application_Layer.CQRS.Basket.Commands.DeletBasket
 {
-    public record DeletBasketCommand(int userid) :IRequest<RequestRespones<bool>>;
+    public record DeletBasketCommand(int userid) : ICommand<RequestRespones<bool>>;
 
     public class DeletBasketCommandHandler : IRequestHandler<DeletBasketCommand, RequestRespones<bool>>
     {

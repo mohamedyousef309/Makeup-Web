@@ -1,4 +1,5 @@
-﻿using Domain_Layer.Entites.Basket;
+﻿using Domain_Layer.Entites.Authantication;
+using Domain_Layer.Entites.Basket;
 using Domain_Layer.Interfaces.Repositryinterfaces;
 using StackExchange.Redis;
 using System;
@@ -19,9 +20,9 @@ namespace Infastructure_Layer
         }
        
 
-        public async Task<UserCart?> GetCustomerBasket(string basketId)
+        public async Task<UserCart?> GetCustomerBasket(string USerId)
         {
-            var basket = await _DbContext.StringGetAsync(basketId);
+            var basket = await _DbContext.StringGetAsync(RedisKeys.BasketKey(USerId));
 
             if (basket.IsNullOrEmpty)
                 return null;
@@ -29,18 +30,14 @@ namespace Infastructure_Layer
             return JsonSerializer.Deserialize<UserCart>(basket.ToString());
         }
 
-        public async Task<UserCart?> GetCustomerBasketByUserId(string userId)
-        {
-            var basket = await  _DbContext.StringGetAsync(userId);
-            if (basket.IsNullOrEmpty) return null;
-            return JsonSerializer.Deserialize<UserCart>(basket.ToString());
-        }
+      
 
         public async Task<UserCart?> UpdateOrCreateCustomerBasket(UserCart basket)
         {
+            string key = RedisKeys.BasketKey(basket.Id);
             var jsonbasket = JsonSerializer.Serialize(basket);
 
-            var isCreated = await _DbContext.StringSetAsync(basket.Id, jsonbasket, TimeSpan.FromDays(30));
+            var isCreated = await _DbContext.StringSetAsync(key, jsonbasket, TimeSpan.FromDays(10));
             if (isCreated)
             {
                 return await GetCustomerBasket(basket.Id);
@@ -49,9 +46,18 @@ namespace Infastructure_Layer
 
         }
 
-        public async Task<bool> DeleteCustomerBasket(string basketId)
-        => await _DbContext.KeyDeleteAsync(basketId);
+        public async Task<bool> DeleteCustomerBasket(string userId)
+        {
+            // يجب حذف المفتاح بالـ Prefix أيضاً
+            return await _DbContext.KeyDeleteAsync(RedisKeys.BasketKey(userId));
+        }
 
-      
+
+    }
+
+     class RedisKeys
+    {
+        // ميثود ثابتة لإنتاج المفتاح
+        public static string BasketKey(string userId) => $"basket:{userId}";
     }
 }
