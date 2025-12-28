@@ -27,50 +27,46 @@ namespace Application_Layer.CQRS.Orders.Commands.CreatOrder
         public async Task<RequestRespones<OrderToReturnDto>> Handle(CreatOrderOrchestrator request, CancellationToken cancellationToken)
         {
             var userBasket = await mediator.Send(new GetUserBsaketQuery(request.userid));
-            if (!userBasket.IsSuccess || userBasket.Data == null || !userBasket.Data.items.Any())
-            {
-                return RequestRespones<OrderToReturnDto>.Fail(userBasket.Message, 400);
-            }
+            if (!userBasket.IsSuccess || userBasket.Data?.items == null || !userBasket.Data.items.Any())
+                return RequestRespones<OrderToReturnDto>.Fail(userBasket.Message ?? "Basket is empty.", 400);
 
             var productIds = userBasket.Data.items.Select(i => i.productid).ToList();
+
             var productsResult = await mediator.Send(new GetProductsByIdsQuery(productIds));
-
             if (!productsResult.IsSuccess || productsResult.Data == null)
-            {
-                return RequestRespones<OrderToReturnDto>.Fail(productsResult.Message, 404);
-            }
+                return RequestRespones<OrderToReturnDto>.Fail(productsResult.Message ?? "Products not found.", 404);
 
-            var orderItems = new List<OrderItems>();
-            decimal calculatedSubtotal = 0;
+            var productsDict = productsResult.Data.ToDictionary(p => p.Id);
 
-            foreach (var basketItem in userBasket.Data.items)
-            {
-                var product = productsResult.Data.FirstOrDefault(p => p.Id == basketItem.productid);
-                if (product != null)
-                {
-                    var item = new OrderItems
+            var orderItems = userBasket.Data.items
+                .Select(item => {
+                    if (!productsDict.TryGetValue(item.productid, out var product)) return null;
+                    return new OrderItems
                     {
-                        Id = product.Id,
+                        Id = item.productid,
                         ProductName = product.Name,
                         Price = product.Price,
-                        Quantity = basketItem.Quantity
+                        Quantity = item.Quantity,
                     };
-                    orderItems.Add(item);
-                    calculatedSubtotal += item.Price * item.Quantity;
-                }
-            }
+                }).Where(x => x != null).ToList();
+
+
+
+
+            if (!orderItems.Any())
+                return RequestRespones<OrderToReturnDto>.Fail("No valid items to create order.", 400);
+
+            decimal calculatedSubtotal = orderItems.Sum(i => i.Price * i.Quantity);
 
             var createOrderResult = await mediator.Send(new CreatOrderCommand(
-            request.BuyerEmail,
-            request.PhoneNumber,
-            request.Address,
-            orderItems,
-            calculatedSubtotal));
-            
+                request.BuyerEmail,
+                request.PhoneNumber,
+                request.Address,
+                orderItems,
+                calculatedSubtotal));
+
             if (!createOrderResult.IsSuccess)
-            {
                 return RequestRespones<OrderToReturnDto>.Fail(createOrderResult.Message, 500);
-            }
 
 
             var resultDto = new OrderToReturnDto
@@ -79,16 +75,20 @@ namespace Application_Layer.CQRS.Orders.Commands.CreatOrder
                 Address = request.Address,
                 subTotal = calculatedSubtotal,
                 orderDate = DateTime.Now,
-                Items = orderItems.Select(i => new OrderItemsDTo 
+                Items = orderItems.Select(i => new OrderItemsDTo
                 {
                     ProductName = i.ProductName,
-                    Price= i.Price,
+                    Price = i.Price,
                     PictureUrl = i.PictureUrl,
-                    Quantity = i.Quantity,
+                    Quantity = i.Quantity
                 }).ToList()
             };
 
-            return RequestRespones<OrderToReturnDto>.Success(resultDto, 200, "تم إنشاء الطلب بنجاح");
+            return RequestRespones<OrderToReturnDto>.Success(
+                resultDto,
+                200,
+                "Order created successfully :) We will contact you via your phone number."
+            );
         }
 
     }

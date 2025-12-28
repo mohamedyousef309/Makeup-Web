@@ -1,10 +1,13 @@
 ﻿using Domain_Layer.DTOs.OrderDTOs;
+using Domain_Layer.Entites;
 using Domain_Layer.Entites.Order;
+using Domain_Layer.Events;
 using Domain_Layer.Interfaces.Abstraction;
 using Domain_Layer.Interfaces.Repositryinterfaces;
 using Domain_Layer.Respones;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,18 +20,22 @@ namespace Application_Layer.CQRS.Orders.Commands.CreatOrder
 
     public class CreatOrderCommandHandler : IRequestHandler<CreatOrderCommand, RequestRespones<bool>>
     {
-        private readonly IGenaricRepository<Order> genaricRepository;
+        private readonly IGenaricRepository<Order> OrderRepo;
+        private readonly IGenaricRepository<Product> productRepo;
+        private readonly IMediator mediator;
 
-        public CreatOrderCommandHandler(IGenaricRepository<Order> genaricRepository)
+        public CreatOrderCommandHandler(IGenaricRepository<Order> OrderRepo,IGenaricRepository<Product> ProductRepo,IMediator mediator)
         {
-            this.genaricRepository = genaricRepository;
+            this.OrderRepo = OrderRepo;
+            productRepo = ProductRepo;
+            this.mediator = mediator;
         }
         public async Task<RequestRespones<bool>> Handle(CreatOrderCommand request, CancellationToken cancellationToken)
         {
-            
-            
-                var order = new Order
-                {
+            var outOfStockEvents = await ProcessStockReductionAsync(request.Items, cancellationToken);
+
+            var order = new Order
+            {
                     BuyerEmail = request.BuyerEmail,
                     PhoneNumber = request.PhoneNumber,
                     Address = request.Address,
@@ -37,17 +44,54 @@ namespace Application_Layer.CQRS.Orders.Commands.CreatOrder
                     orderDate = DateTimeOffset.UtcNow,
                     subTotal = request.subTotal,
 
-                };
+            };
 
-               await genaricRepository.addAsync(order);
-                await genaricRepository.SaveChanges();
+            
 
-                return RequestRespones<bool>.Success(true,Message: "Order Created Succesfuly");
+            await OrderRepo.addAsync(order);
+
+                await OrderRepo.SaveChanges();
+
+            foreach (var Event in outOfStockEvents)
+            {
+                await mediator.Publish(Event);
+            }
+            return RequestRespones<bool>.Success(true,Message: "Order Created Succesfuly");
             
           
 
         }
+
+        public async Task<IEnumerable<OutOfStockEvent>> ProcessStockReductionAsync(IEnumerable<OrderItems> items, CancellationToken CT ) 
+        {
+            var events = new List<OutOfStockEvent>();
+
+            var productsIds = items.Select(x => x.Id).ToList();
+
+            var products = await productRepo.GetByCriteriaQueryable(p => productsIds.Contains(p.Id))
+                .ToListAsync(CT);
+
+            foreach (var item in items)
+            {
+                var product = products.FirstOrDefault(p => p.Id == item.Id);
+                if (product!=null)
+                {
+                    bool isFinished = product.ReduceStock(item.Quantity);
+                    if (isFinished) 
+                    {
+                        events.Add(new OutOfStockEvent(product.Id,product.Name));
+                    }
+                }
+
+            }
+
+            return events;
+
+        }
+    
+
+  
     }
 
 
-}
+  }

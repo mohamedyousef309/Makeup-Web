@@ -112,7 +112,7 @@ namespace Makeup_Web
             app.MapStaticAssets();
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Authantication}/{action=Login}/{id?}")
+                pattern: "{controller=Product}/{action=Index}/{id?}")
                 .WithStaticAssets();
 
             app.Run();

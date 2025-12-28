@@ -1,5 +1,6 @@
 ﻿using Application_Layer.CQRS.Authantication.Commads.Login;
 using Application_Layer.Services;
+using Application_Layer.Services.MailService;
 using Domain_Layer.Interfaces.Repositryinterfaces;
 using Domain_Layer.Interfaces.ServiceInterfaces;
 using FluentValidation;
@@ -34,7 +35,10 @@ namespace Infastructure_Layer.Data.DependencyInjection
 
             services.AddScoped<IBasketRepository, BasketRepository>();
 
+            services.Configure<MailSettings>(config.GetSection("MailSettings"));
 
+
+            services.AddScoped<IEMailService, EMailService>();
 
 
             return services;

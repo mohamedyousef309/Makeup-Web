@@ -23,7 +23,7 @@ namespace Application_Layer.CQRS.Basket.Quries.GetUserBsaket
         }
         public async Task<RequestRespones<CustomerBasketDto>> Handle(GetUserBsaketQuery request, CancellationToken cancellationToken)
         {
-            var basket = await basketRepository.GetCustomerBasketByUserId(request.userid.ToString());
+            var basket = await basketRepository.GetCustomerBasket(request.userid.ToString());
             
             if (basket == null)
             {
