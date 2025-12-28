@@ -2,8 +2,8 @@
 @model RegisterViewModel
 
 @{
-    ViewData["Title"] = "Sign up - Ryan's Salon";
-    Layout = null;
+    ViewData["Title"] = "Sign up - Pro Makeup Studio";
+    Layout = null; // لجعلها صفحة مستقلة تماماً مثل Index
 }
 
 <!DOCTYPE html>
@@ -13,27 +13,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"]</title>
 
-    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --primary-purple: #903cff;
-            --dark-bg: #1f1430;
-            --card-bg: #291c3d;
-            --input-bg: #3f3152;
+            /* الألوان المستوحاة من صفحة الـ Index والـ Logo */
+            --primary-pink: #d68a8a; /* لون الزر الروز */
+            --dark-bg: #121212; /* الأسود العميق للخلفية */
+            --card-bg: #1e1e1e; /* أسود فاتح قليلاً للبطاقة */
+            --input-bg: #2a2a2a; /* لون الحقول الداكن */
             --text-light: #ffffff;
-            --text-subtle: #a0a0a0;
-            --gradient-primary: linear-gradient(90deg, #d946ef, #6d28d9);
+            --text-subtle: #888888;
         }
 
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(180deg, #300a4e 0%, #1f1430 100%);
+            background-color: var(--dark-bg); /* تغيير الخلفية للأسود السادة */
             min-height: 100vh;
             margin: 0;
             padding: 20px;
@@ -48,14 +45,15 @@
             max-width: 520px;
             background: var(--card-bg);
             border-radius: 24px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border: 1px solid #333; /* حدود خفيفة للفخامة */
             overflow: hidden;
         }
 
         /* الهيدر */
         .register-header {
             position: relative;
-            padding: 2rem 2rem 1rem;
+            padding: 2.5rem 2rem 1rem;
             text-align: center;
         }
 
@@ -64,264 +62,138 @@
             left: 1.5rem;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--text-light);
+            color: var(--primary-pink); /* تغيير لون زر العودة للروز */
             font-size: 1.5rem;
             text-decoration: none;
-            transition: opacity 0.2s;
+            transition: 0.3s;
         }
 
             .back-btn:hover {
-                opacity: 0.8;
+                opacity: 0.7;
             }
 
         .register-header h1 {
             font-size: 1.8rem;
-            font-weight: 600;
+            font-weight: 700;
             color: var(--text-light);
             margin: 0;
+            letter-spacing: 1px;
+            text-transform: uppercase; /* يطابق ستايل PRO MAKEUP */
         }
 
         .register-subtitle {
-            color: var(--text-subtle);
-            font-size: 0.95rem;
+            color: var(--primary-pink); /* اللون الروز للنص الفرعي */
+            font-size: 1rem;
             text-align: center;
             margin-bottom: 1.5rem;
             padding: 0 2rem;
+            font-style: italic;
+            font-family: Georgia, serif;
         }
 
         /* أزرار التواصل الاجتماعي */
-        .social-buttons {
-            padding: 0 2rem;
-            margin-bottom: 2rem;
-        }
-
         .social-btn {
             background: var(--input-bg) !important;
-            border: none !important;
+            border: 1px solid #444 !important;
             border-radius: 12px !important;
             color: var(--text-light) !important;
             padding: 12px 0 !important;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+            transition: 0.3s;
         }
 
             .social-btn:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+                border-color: var(--primary-pink) !important;
+                background: #333 !important;
             }
 
         /* نموذج التسجيل */
-        .register-form {
-            padding: 0 2rem;
-        }
-
         .form-control-custom {
             background: var(--input-bg);
-            border: none;
+            border: 1px solid #444;
             border-radius: 12px;
             color: var(--text-light);
             padding: 14px 16px;
-            font-size: 1rem;
         }
 
             .form-control-custom:focus {
                 background: var(--input-bg);
                 color: var(--text-light);
-                box-shadow: 0 0 0 3px rgba(144, 60, 255, 0.2);
-                border: none;
-            }
-
-            .form-control-custom::placeholder {
-                color: #a0a0a0;
+                border: 1px solid var(--primary-pink);
+                box-shadow: 0 0 0 3px rgba(214, 138, 138, 0.2);
             }
 
         .form-label {
             color: var(--text-light);
             font-weight: 500;
-            margin-bottom: 0.5rem;
-            display: block;
+            font-size: 0.9rem;
         }
 
         /* زر تسجيل الحساب */
         .register-btn {
-            background: var(--gradient-primary);
+            background: var(--primary-pink); /* اللون الروز مثل Index */
             border: none;
-            border-radius: 12px;
+            border-radius: 30px; /* حواف دائرية أكثر */
             color: white;
             font-weight: 600;
             font-size: 1.1rem;
-            padding: 16px;
+            padding: 14px;
             width: 100%;
             margin-top: 1.5rem;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
+            transition: 0.4s ease;
         }
 
             .register-btn:hover {
+                background: #c27676;
                 transform: translateY(-2px);
-                box-shadow: 0 8px 20px rgba(144, 60, 255, 0.3);
+                box-shadow: 0 8px 20px rgba(214, 138, 138, 0.3);
             }
 
-            .register-btn:active {
-                transform: translateY(0);
+        /* تخصيص حقل رفع الملف */
+        .file-input-custom {
+            background: var(--input-bg);
+            border: 2px dashed #444;
+            border-radius: 12px;
+            color: var(--text-subtle);
+            padding: 14px 16px;
+            transition: 0.3s;
+        }
+
+            .file-input-custom:hover {
+                border-color: var(--primary-pink);
+                color: white;
             }
+
+        .file-input-icon {
+            color: var(--primary-pink);
+        }
 
         /* رابط تسجيل الدخول */
         .login-link {
             text-align: center;
-            padding: 2rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            margin-top: 1.5rem;
+            padding: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            margin-top: 1rem;
         }
 
-            .login-link span {
-                color: var(--text-subtle);
-            }
-
             .login-link a {
-                color: var(--primary-purple);
+                color: var(--primary-pink);
                 text-decoration: none;
                 font-weight: 600;
-                margin-left: 4px;
-                transition: opacity 0.2s;
             }
 
-                .login-link a:hover {
-                    opacity: 0.9;
-                }
-
-        /* رسائل الخطأ */
         .error-message {
             background: rgba(248, 113, 113, 0.1);
             border: 1px solid rgba(248, 113, 113, 0.3);
-            border-radius: 8px;
-            padding: 1rem;
-            margin: 0 2rem 1.5rem;
             color: #f87171;
-        }
-
-        /* تعديلات للجوال */
-        @@media (max-width: 576px) {
-            body {
-                padding: 0;
-                background: var(--dark-bg);
-            }
-
-            .register-container {
-                max-width: 100%;
-                min-height: 100vh;
-                border-radius: 0;
-                box-shadow: none;
-            }
-
-            .register-header {
-                padding: 3rem 1.5rem 1rem;
-            }
-
-            .register-subtitle,
-            .social-buttons,
-            .register-form {
-                padding: 0 1.5rem;
-            }
-
-            .login-link {
-                padding: 1.5rem;
-            }
-
-            .error-message {
-                margin: 0 1.5rem 1.5rem;
-            }
-
-            .back-btn {
-                left: 1rem;
-            }
-        }
-
-        /* تعديلات للتابلت */
-        @@media (min-width: 577px) and (max-width: 768px) {
-            .register-container {
-                max-width: 540px;
-            }
-        }
-
-        .validation-message {
-            font-size: 0.85rem;
-            margin-top: 4px;
-        }
-
-        /* تخصيص حقل رفع الملف */
-        .file-input-wrapper {
-            position: relative;
-            overflow: hidden;
-            display: inline-block;
-            width: 100%;
-        }
-
-            .file-input-wrapper input[type="file"] {
-                position: absolute;
-                left: 0;
-                top: 0;
-                opacity: 0;
-                width: 100%;
-                height: 100%;
-                cursor: pointer;
-            }
-
-        .file-input-custom {
-            background: var(--input-bg);
-            border: 2px dashed #4a3c5c;
-            border-radius: 12px;
-            color: var(--text-light);
-            padding: 14px 16px;
-            font-size: 1rem;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-            .file-input-custom:hover {
-                background: #4a3c5c;
-                border-color: var(--primary-purple);
-            }
-
-            .file-input-custom.dragover {
-                background: #4a3c5c;
-                border-color: var(--primary-purple);
-                border-style: solid;
-            }
-
-        .file-input-text {
-            color: #a0a0a0;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            flex-grow: 1;
-        }
-
-        .file-input-icon {
-            color: var(--primary-purple);
-            font-size: 1.2rem;
-        }
-
-        .file-info {
-            margin-top: 8px;
-            font-size: 0.85rem;
-            color: var(--text-subtle);
+            margin: 0 2rem 1rem;
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
         }
     </style>
 </head>
 <body>
     <div class="register-container">
-        <!-- الهيدر مع زر العودة -->
         <div class="register-header">
             <a href="#" class="back-btn" onclick="history.back()">
                 <i class="bi bi-arrow-left"></i>
@@ -329,263 +201,82 @@
             <h1>Create Account</h1>
         </div>
 
-        <!-- النص التوضيحي -->
-        <p class="register-subtitle">Sign up with one of following options</p>
+        <p class="register-subtitle">creativity & professional</p>
 
-        <!-- أزرار التواصل الاجتماعي -->
-        <div class="social-buttons row g-3">
+        <div class="social-buttons row g-3 px-4 mb-4">
             <div class="col-6">
                 <button class="social-btn w-100">
-                    <i class="bi bi-google"></i>
-                    <span>Google</span>
+                    <i class="bi bi-google"></i> <span>Google</span>
                 </button>
             </div>
             <div class="col-6">
                 <button class="social-btn w-100">
-                    <i class="bi bi-apple"></i>
-                    <span>Apple</span>
+                    <i class="bi bi-apple"></i> <span>Apple</span>
                 </button>
             </div>
         </div>
 
-        <!-- رسالة الخطأ -->
         @if (!string.IsNullOrEmpty(Model.ErrorMessage))
         {
             <div class="error-message">
-                <i class="bi bi-exclamation-circle"></i>
-                @Model.ErrorMessage
+                <i class="bi bi-exclamation-circle"></i> @Model.ErrorMessage
             </div>
         }
 
-        <!-- نموذج تسجيل الحساب -->
-        <form asp-action="Register" asp-controller="Account" method="post" class="register-form needs-validation" novalidate enctype="multipart/form-data">
-            <!-- حقل اسم المستخدم والبريد الإلكتروني -->
+        <form asp-action="Register" asp-controller="Account" method="post" class="register-form px-4 needs-validation" novalidate enctype="multipart/form-data">
             <div class="row g-3 mb-3">
-                <div class="col-12 col-md-6">
-                    <label for="Username" class="form-label">Username</label>
-                    <input asp-for="Username"
-                           type="text"
-                           class="form-control form-control-custom"
-                           placeholder="Enter your username"
-                           required>
-                    <span asp-validation-for="Username" class="text-danger validation-message"></span>
+                <div class="col-md-6">
+                    <label class="form-label">Username</label>
+                    <input asp-for="Username" type="text" class="form-control form-control-custom" placeholder="User name" required>
                 </div>
-                <div class="col-12 col-md-6">
-                    <label for="Email" class="form-label">Email</label>
-                    <input asp-for="Email"
-                           type="email"
-                           class="form-control form-control-custom"
-                           placeholder="example@email.com"
-                           required>
-                    <span asp-validation-for="Email" class="text-danger validation-message"></span>
+                <div class="col-md-6">
+                    <label class="form-label">Email</label>
+                    <input asp-for="Email" type="email" class="form-control form-control-custom" placeholder="Email address" required>
                 </div>
             </div>
 
-            <!-- حقل كلمة المرور ورقم الهاتف -->
             <div class="row g-3 mb-3">
-                <div class="col-12 col-md-6">
-                    <label for="Password" class="form-label">Password</label>
-                    <input asp-for="Password"
-                           type="password"
-                           class="form-control form-control-custom"
-                           placeholder="At least 6 characters"
-                           required>
-                    <span asp-validation-for="Password" class="text-danger validation-message"></span>
+                <div class="col-md-6">
+                    <label class="form-label">Password</label>
+                    <input asp-for="Password" type="password" class="form-control form-control-custom" placeholder="Password" required>
                 </div>
-                <div class="col-12 col-md-6">
-                    <label for="PhoneNumber" class="form-label">Phone Number</label>
-                    <input asp-for="PhoneNumber"
-                           type="tel"
-                           class="form-control form-control-custom"
-                           placeholder="+20 123 456 7890"
-                           required>
-                    <span asp-validation-for="PhoneNumber" class="text-danger validation-message"></span>
+                <div class="col-md-6">
+                    <label class="form-label">Phone</label>
+                    <input asp-for="PhoneNumber" type="tel" class="form-control form-control-custom" placeholder="Phone number" required>
                 </div>
             </div>
 
-            <!-- حقل رفع الصورة (اختياري) -->
             <div class="mb-3">
-                <label for="Image" class="form-label">Profile Picture (Optional)</label>
-                <div class="file-input-wrapper">
-                    <input asp-for="Image"
-                           type="file"
-                           class="form-control"
-                           id="imageFile"
-                           accept="image/*">
-                    <div class="file-input-custom" id="fileDropArea">
-                        <span class="file-input-text" id="fileName">Click to upload or drag & drop</span>
-                        <i class="file-input-icon bi bi-cloud-upload"></i>
+                <label class="form-label">Profile Picture (Optional)</label>
+                <div class="position-relative">
+                    <input asp-for="Image" type="file" class="form-control opacity-0 position-absolute w-100 h-100" style="z-index:2; cursor:pointer;" id="imageFile">
+                    <div class="file-input-custom d-flex justify-content-between align-items-center" id="fileDropArea">
+                        <span id="fileName">Click to upload</span>
+                        <i class="bi bi-cloud-upload file-input-icon"></i>
                     </div>
                 </div>
-                <div class="file-info">
-                    <small class="text-muted" style="color: var(--text-subtle) !important;">
-                        <i class="bi bi-info-circle"></i> Upload a profile picture (optional). Supported formats: JPG, PNG, GIF. Max size: 5MB
-                    </small>
-                </div>
             </div>
 
-            <!-- حقل العنوان -->
             <div class="mb-3">
-                <label for="UserAddress" class="form-label">Address</label>
-                <textarea asp-for="UserAddress"
-                          class="form-control form-control-custom"
-                          placeholder="Enter your full address"
-                          rows="2"
-                          required></textarea>
-                <span asp-validation-for="UserAddress" class="text-danger validation-message"></span>
+                <label class="form-label">Address</label>
+                <textarea asp-for="UserAddress" class="form-control form-control-custom" placeholder="Full address" rows="2" required></textarea>
             </div>
 
-            <!-- زر إنشاء الحساب -->
-            <button type="submit" class="register-btn">
-                <span class="register-btn-text">Create Account</span>
-            </button>
+            <button type="submit" class="register-btn">Create Account</button>
         </form>
 
-        <!-- رابط تسجيل الدخول -->
         <div class="login-link">
-            <span>Already have an account?</span>
+            <span style="color: #666;">Already have an account?</span>
             <a asp-action="Login" asp-controller="Account">Log in</a>
         </div>
     </div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
     <script>
-        $(document).ready(function () {
-            // التحقق من صحة النموذج باستخدام Bootstrap
-            (function () {
-                'use strict';
-                var forms = document.querySelectorAll('.needs-validation');
-                Array.prototype.slice.call(forms).forEach(function (form) {
-                    form.addEventListener('submit', function (event) {
-                        if (!form.checkValidity()) {
-                            event.preventDefault();
-                            event.stopPropagation();
-                        }
-                        form.classList.add('was-validated');
-                    }, false);
-                });
-            })();
-
-            // إضافة تأثيرات للأزرار
-            $('.social-btn, .register-btn').on('mousedown', function() {
-                $(this).css('transform', 'translateY(0)');
-            }).on('mouseup mouseleave', function() {
-                $(this).css('transform', 'translateY(-2px)');
-            });
-
-            // زر العودة
-            $('.back-btn').click(function(e) {
-                e.preventDefault();
-                window.history.back();
-            });
-
-            // تنسيق رقم الهاتف تلقائياً
-            $('#PhoneNumber').on('input', function() {
-                let value = $(this).val().replace(/\D/g, '');
-                if (value.length > 0) {
-                    if (!value.startsWith('+')) {
-                        if (!value.startsWith('20')) {
-                            value = '+20' + value;
-                        } else {
-                            value = '+' + value;
-                        }
-                    }
-                    if (value.length > 3) {
-                        value = value.replace(/(\+\d{2})(\d{3})(\d{3})(\d{4})/, '$1 $2 $3 $4');
-                    }
-                    $(this).val(value);
-                }
-            });
-
-            // عرض اسم الملف المختار
-            $('#imageFile').change(function(e) {
-                var file = e.target.files[0];
-                if (file) {
-                    // التحقق من حجم الملف (5MB كحد أقصى)
-                    if (file.size > 5 * 1024 * 1024) {
-                        alert('File size exceeds 5MB limit');
-                        $(this).val('');
-                        $('#fileName').text('Click to upload or drag & drop');
-                        $('#fileName').css('color', '#a0a0a0');
-                        return;
-                    }
-
-                    // التحقق من نوع الملف
-                    var validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg'];
-                    if (!validTypes.includes(file.type)) {
-                        alert('Invalid file type. Please upload JPG, PNG, or GIF image.');
-                        $(this).val('');
-                        $('#fileName').text('Click to upload or drag & drop');
-                        $('#fileName').css('color', '#a0a0a0');
-                        return;
-                    }
-
-                    $('#fileName').text(file.name);
-                    $('#fileName').css('color', 'var(--text-light)');
-                } else {
-                    $('#fileName').text('Click to upload or drag & drop');
-                    $('#fileName').css('color', '#a0a0a0');
-                }
-            });
-
-            // دعم سحب وإفلات الملفات
-            var fileDropArea = document.getElementById('fileDropArea');
-            var fileInput = document.getElementById('imageFile');
-
-            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-                fileDropArea.addEventListener(eventName, preventDefaults, false);
-            });
-
-            function preventDefaults(e) {
-                e.preventDefault();
-                e.stopPropagation();
-            }
-
-            ['dragenter', 'dragover'].forEach(eventName => {
-                fileDropArea.addEventListener(eventName, highlight, false);
-            });
-
-            ['dragleave', 'drop'].forEach(eventName => {
-                fileDropArea.addEventListener(eventName, unhighlight, false);
-            });
-
-            function highlight() {
-                fileDropArea.classList.add('dragover');
-            }
-
-            function unhighlight() {
-                fileDropArea.classList.remove('dragover');
-            }
-
-            fileDropArea.addEventListener('drop', handleDrop, false);
-
-            function handleDrop(e) {
-                var dt = e.dataTransfer;
-                var files = dt.files;
-
-                if (files.length > 0) {
-                    fileInput.files = files;
-                    var event = new Event('change', { bubbles: true });
-                    fileInput.dispatchEvent(event);
-                }
-            }
-
-            // إظهار معاينة الصورة (اختياري)
-            $('#imageFile').on('change', function(e) {
-                var file = e.target.files[0];
-                if (file) {
-                    var reader = new FileReader();
-                    reader.onload = function(e) {
-                        // يمكن إضافة معاينة للصورة هنا إذا أردت
-                        // console.log('File loaded:', e.target.result);
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
+        // كود عرض اسم الملف المختار
+        $('#imageFile').change(function(e) {
+            var name = e.target.files[0] ? e.target.files[0].name : "Click to upload";
+            $('#fileName').text(name).css('color', '#fff');
         });
     </script>
 </body>

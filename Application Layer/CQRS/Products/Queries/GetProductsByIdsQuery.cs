@@ -33,7 +33,8 @@ namespace Application_Layer.CQRS.Products.Queries
                     Price=p.Price,
                     Stock=p.Stock,
                     CategoryId=p.CategoryId,
-                    IsActive=p.IsActive
+                    IsActive=p.IsActive,
+                    ProductStock=p.productStock,
                 }).ToListAsync(cancellationToken);
             if (!Products.Any())
             {

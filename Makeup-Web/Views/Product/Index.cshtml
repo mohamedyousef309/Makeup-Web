@@ -1,0 +1,261 @@
+﻿@model IEnumerable<Domain_Layer.Entites.Product>
+
+@{
+    // إزالة الهيدر والفوتر والخط الأزرق تماماً
+    Layout = null;
+
+    // تحديد أول منتج في الداتابيز ليكون هو "المنتج المميز" المعروض
+    var featuredProduct = Model?.FirstOrDefault();
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pro Makeup Studio</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        /* التنسيق الأساسي للموقع */
+        body {
+            background-color: #121212; /* اللون الأسود الفخم */
+            color: white;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        .full-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+        /* تنسيق الروابط العلوية */
+        .top-nav {
+            position: absolute;
+            top: 40px;
+            right: 10%;
+            z-index: 10;
+        }
+
+            .top-nav a {
+                color: #888;
+                text-decoration: none;
+                font-size: 0.85rem;
+                letter-spacing: 2px;
+                margin-left: 25px;
+                text-transform: uppercase;
+                transition: 0.3s;
+            }
+
+                .top-nav a:hover {
+                    color: white;
+                }
+
+        /* تنسيق العنوان الكبير */
+        .hero-title {
+            font-size: clamp(3.5rem, 10vw, 7rem);
+            font-weight: 800;
+            line-height: 0.85;
+            letter-spacing: -2px;
+            text-transform: uppercase;
+        }
+
+        .pink-text {
+            color: #df9191; /* لون الروز الموجود بالصورة */
+            font-weight: 300;
+        }
+
+        .tagline {
+            color: #df9191;
+            font-style: italic;
+            font-size: 1.3rem;
+            margin-top: 15px;
+            font-family: Georgia, serif;
+        }
+
+        .description {
+            color: #777;
+            max-width: 450px;
+            margin-top: 25px;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .btn-view {
+            background-color: #d68a8a;
+            border: none;
+            color: white;
+            padding: 12px 40px;
+            border-radius: 30px;
+            font-weight: 500;
+            margin-top: 35px;
+            transition: 0.4s ease;
+        }
+
+            .btn-view:hover {
+                background-color: #c27676;
+                transform: translateY(-3px);
+                box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            }
+
+        /* منطقة الصور المبعثرة */
+        .visuals-area {
+            position: relative;
+            height: 90vh;
+        }
+
+        .floating-product {
+            position: absolute;
+            filter: drop-shadow(0 15px 35px rgba(0,0,0,0.8));
+            transition: transform 0.5s ease-in-out;
+        }
+
+        /* تحديد أماكن الصور بالضبط كما في التصميم */
+        .img-brushes {
+            top: 5%;
+            left: 10%;
+            width: 55%;
+            z-index: 5;
+        }
+
+        .img-lipstick {
+            top: 48%;
+            left: 5%;
+            width: 35%;
+            z-index: 6;
+        }
+
+        .img-smear {
+            top: 35%;
+            left: 50%;
+            width: 25%;
+            z-index: 3;
+            opacity: 0.9;
+        }
+
+        .img-powder {
+            bottom: 10%;
+            left: 30%;
+            width: 45%;
+            z-index: 2;
+        }
+
+        /* شريط التواصل السفلي */
+        .social-icons {
+            position: absolute;
+            bottom: 40px;
+            right: 80px;
+            display: flex;
+            gap: 25px;
+            color: #444;
+            font-size: 1.1rem;
+        }
+
+            .social-icons i:hover {
+                color: #df9191;
+                cursor: pointer;
+            }
+
+        /* تعديلات الموبايل ليكون متجاوباً */
+        @@media (max-width: 991px) {
+            .full-page {
+                text-align: center;
+                padding-top: 100px;
+            }
+
+            .visuals-area {
+                height: 450px;
+                order: 2;
+                margin-top: 50px;
+            }
+
+            .top-nav {
+                width: 100%;
+                right: 0;
+                text-align: center;
+                top: 20px;
+            }
+
+                .top-nav a {
+                    margin: 0 10px;
+                    font-size: 0.7rem;
+                }
+
+            .social-icons {
+                position: static;
+                justify-content: center;
+                margin: 40px 0;
+            }
+
+            .hero-title {
+                font-size: 4rem;
+            }
+
+            .img-brushes {
+                width: 70%;
+                left: 15%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container-fluid full-page">
+        <nav class="top-nav">
+            <a href="#">Home</a>
+            <a href="#">About</a>
+            <a href="#">Products</a>
+            <a href="#">Contact</a>
+        </nav>
+
+        <div class="row w-100 align-items-center">
+
+            <div class="col-lg-6 visuals-area">
+                <img src="/images/brushes.png" class="floating-product img-brushes" alt="Brushes">
+                <img src="/images/lipstick.png" class="floating-product img-lipstick" alt="Lipstick">
+                <img src="/images/smear.png" class="floating-product img-smear" alt="Makeup Smear">
+                <img src="/images/powder.png" class="floating-product img-powder" alt="Powder">
+            </div>
+
+            <div class="col-lg-5 offset-lg-1 px-5">
+                <div class="content-wrapper">
+                    <h1 class="hero-title m-0">PRO</h1>
+                    <h1 class="hero-title m-0">MAKEUP</h1>
+                    <h1 class="hero-title pink-text m-0">STUDIO</h1>
+
+                    <p class="tagline">creativity & professional</p>
+
+                    <p class="description">
+                        @if (featuredProduct != null)
+                        {
+                            @featuredProduct.Description
+                        }
+                        else
+                        {
+                            @:"Experience the art of beauty with our professional makeup services and high-quality products tailored for your unique style."
+                        }
+                    </p>
+
+                    <button class="btn btn-view">VIEW PROJECT</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="social-icons">
+            <i class="bi bi-info-circle"></i>
+            <i class="bi bi-telephone"></i>
+            <i class="bi bi-geo-alt"></i>
+            <i class="bi bi-youtube"></i>
+            <i class="bi bi-chat-dots"></i>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
