@@ -13,14 +13,23 @@ using System.Threading.Tasks;
 
 namespace Application_Layer.CQRS.Products.Commands
 {
-    public class UpdateProductCommand : UpdateProductDto, IRequest<RequestRespones<ProductDto>>
+    using Domain_Layer.DTOs.ProductDtos;
+    using Domain_Layer.Respones;
+    using global::Application_Layer.CQRS.Products.Commands.Application_Layer.CQRS.Products.Commands;
+    using MediatR;
+
+    namespace Application_Layer.CQRS.Products.Commands
     {
+        public record UpdateProductCommand(UpdateProductDto UpdateProductDto)
+            : IRequest<RequestRespones<ProductDto>>;
     }
 
-    // Handler
-    
 
-    public class UpdateProductHandler : IRequestHandler<UpdateProductCommand, RequestRespones<ProductDto>>
+    // Handler
+
+
+    public class UpdateProductHandler
+         : IRequestHandler<UpdateProductCommand, RequestRespones<ProductDto>>
     {
         private readonly IGenaricRepository<Product> _productRepo;
         private readonly IGenaricRepository<ProductVariant> _variantRepo;
@@ -33,29 +42,37 @@ namespace Application_Layer.CQRS.Products.Commands
             _variantRepo = variantRepo;
         }
 
-        public async Task<RequestRespones<ProductDto>> Handle(UpdateProductCommand request, CancellationToken cancellationToken)
+        public async Task<RequestRespones<ProductDto>> Handle(
+            UpdateProductCommand request,
+            CancellationToken cancellationToken)
         {
             try
             {
-                
-                var product = _productRepo.GetAll().FirstOrDefault(p => p.Id == request.Id);
+                var dto = request.UpdateProductDto;
+
+                var product = _productRepo.GetAll()
+                    .FirstOrDefault(p => p.Id == dto.Id);
+
                 if (product == null)
-                    return RequestRespones<ProductDto>.Fail($"Product with Id {request.Id} not found.", 404);
+                    return RequestRespones<ProductDto>
+                        .Fail($"Product with Id {dto.Id} not found.", 404);
 
-                
-                product.Name = request.Name;
-                product.Description = request.Description;
-                product.Price = request.Price;
-                product.Stock = request.Stock;
-                product.CategoryId = request.CategoryId;
-                product.IsActive = request.IsActive;
+                // Update product fields
+                product.Name = dto.Name;
+                product.Description = dto.Description;
+                product.Price = dto.Price;
+                product.Stock = dto.Stock;
+                product.CategoryId = dto.CategoryId;
+                product.IsActive = dto.IsActive;
 
-                
-                if (request.Variants != null)
+                // Update / Add variants
+                if (dto.Variants != null)
                 {
-                    foreach (var v in request.Variants)
+                    foreach (var v in dto.Variants)
                     {
-                        var existingVariant = _variantRepo.GetAll().FirstOrDefault(ev => ev.Id == v.Id);
+                        var existingVariant = _variantRepo.GetAll()
+                            .FirstOrDefault(ev => ev.Id == v.Id);
+
                         if (existingVariant != null)
                         {
                             existingVariant.VariantName = v.VariantName;
@@ -71,19 +88,16 @@ namespace Application_Layer.CQRS.Products.Commands
                                 VariantValue = v.VariantValue,
                                 Stock = v.Stock
                             };
-                            
+
                             await _variantRepo.addAsync(newVariant);
                         }
                     }
                 }
 
-                
                 _productRepo.SaveInclude(product);
-
-                
                 await _productRepo.SaveChanges();
 
-              
+                // Map result
                 var productDto = new ProductDto
                 {
                     Id = product.Id,
@@ -104,11 +118,13 @@ namespace Application_Layer.CQRS.Products.Commands
                         }).ToList()
                 };
 
-                return RequestRespones<ProductDto>.Success(productDto, 200, "Product updated successfully.");
+                return RequestRespones<ProductDto>
+                    .Success(productDto, 200, "Product updated successfully.");
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                return RequestRespones<ProductDto>.Fail($"Error: {ex.Message}", 500);
+                return RequestRespones<ProductDto>
+                    .Fail($"Error: {ex.Message}", 500);
             }
         }
     }

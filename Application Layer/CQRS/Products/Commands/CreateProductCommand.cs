@@ -13,10 +13,10 @@ using System.Threading.Tasks;
 
 namespace Application_Layer.CQRS.Products.Commands
 {
-    public class CreateProductCommand : CreateProductDto, IRequest<RequestRespones<ProductDto>>
-    {
-    }
-    public class CreateProductHandler : IRequestHandler<CreateProductCommand, RequestRespones<ProductDto>>
+    public record CreateProductCommand(CreateProductDto CreateProductDto)
+       : IRequest<RequestRespones<ProductDto>>;
+    public class CreateProductHandler
+        : IRequestHandler<CreateProductCommand, RequestRespones<ProductDto>>
     {
         private readonly IGenaricRepository<Product> _productRepo;
         private readonly IGenaricRepository<ProductVariant> _variantRepo;
@@ -29,27 +29,29 @@ namespace Application_Layer.CQRS.Products.Commands
             _variantRepo = variantRepo;
         }
 
-        public async Task<RequestRespones<ProductDto>> Handle(CreateProductCommand request, CancellationToken cancellationToken)
+        public async Task<RequestRespones<ProductDto>> Handle(
+            CreateProductCommand request,
+            CancellationToken cancellationToken)
         {
             try
             {
+                var dto = request.CreateProductDto;
+
                 var product = new Product
                 {
-                    Name = request.Name,
-                    Description = request.Description,
-                    Price = request.Price,
-                    Stock = request.Stock,
-                    CategoryId = request.CategoryId,
+                    Name = dto.Name,
+                    Description = dto.Description,
+                    Price = dto.Price,
+                    Stock = dto.Stock,
+                    CategoryId = dto.CategoryId,
                     IsActive = true
                 };
 
-                // Add product
                 await _productRepo.addAsync(product);
 
-                // Add variants if exist
-                if (request.Variants != null && request.Variants.Any())
+                if (dto.Variants != null && dto.Variants.Any())
                 {
-                    foreach (var v in request.Variants)
+                    foreach (var v in dto.Variants)
                     {
                         var variant = new ProductVariant
                         {
@@ -63,10 +65,8 @@ namespace Application_Layer.CQRS.Products.Commands
                     }
                 }
 
-                // Save changes once — منتظر الـ Transaction Middleware لعمل commit
                 await _productRepo.SaveChanges();
 
-                // Map result
                 var productDto = new ProductDto
                 {
                     Id = product.Id,
@@ -82,14 +82,16 @@ namespace Application_Layer.CQRS.Products.Commands
                         VariantName = v.VariantName,
                         VariantValue = v.VariantValue,
                         Stock = v.Stock
-                    }).ToList() ?? new System.Collections.Generic.List<ProductVariantDto>()
+                    }).ToList() ?? new List<ProductVariantDto>()
                 };
 
-                return RequestRespones<ProductDto>.Success(productDto, 201, "Product created successfully");
+                return RequestRespones<ProductDto>
+                    .Success(productDto, 201, "Product created successfully");
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                return RequestRespones<ProductDto>.Fail($"Error: {ex.Message}", 500);
+                return RequestRespones<ProductDto>
+                    .Fail($"Error: {ex.Message}", 500);
             }
         }
     }
