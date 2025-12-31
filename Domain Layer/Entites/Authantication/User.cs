@@ -24,5 +24,7 @@ namespace Domain_Layer.Entites.Authantication
         public IEnumerable<RefreshTokens> refreshTokens= new HashSet<RefreshTokens>();
 
        public  IEnumerable<UserPermissions> userPermissions= new HashSet<UserPermissions>();
+
+        public IEnumerable<UserToken> userTokens= new HashSet<UserToken>();
     }
 }

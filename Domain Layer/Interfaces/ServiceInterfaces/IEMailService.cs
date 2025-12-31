@@ -10,5 +10,8 @@ namespace Domain_Layer.Interfaces.ServiceInterfaces
     public interface IEMailService
     {
         public Task SendEmail(EmailDTo Email);
+
+        public string GenerateVerificationCode();
+
     }
 }

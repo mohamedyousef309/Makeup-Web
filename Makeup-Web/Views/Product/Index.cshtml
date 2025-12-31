@@ -1,33 +1,17 @@
 ﻿@model IEnumerable<Domain_Layer.Entites.Product>
 
 @{
-    // إزالة الهيدر والفوتر والخط الأزرق تماماً
-    Layout = null;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Pro Makeup Studio";
 
-    // تحديد أول منتج في الداتابيز ليكون هو "المنتج المميز" المعروض
     var featuredProduct = Model?.FirstOrDefault();
+    var description = featuredProduct?.Description ??
+        "Experience the art of beauty with our professional makeup services and high-quality products tailored for your unique style.";
 }
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Pro Makeup Studio</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-
+@section Styles {
     <style>
-        /* التنسيق الأساسي للموقع */
-        body {
-            background-color: #121212; /* اللون الأسود الفخم */
-            color: white;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-        }
-
+        /* الأنماط الخاصة بالصفحة الرئيسية فقط */
         .full-page {
             min-height: 100vh;
             display: flex;
@@ -35,39 +19,17 @@
             position: relative;
         }
 
-        /* تنسيق الروابط العلوية */
-        .top-nav {
-            position: absolute;
-            top: 40px;
-            right: 10%;
-            z-index: 10;
-        }
-
-            .top-nav a {
-                color: #888;
-                text-decoration: none;
-                font-size: 0.85rem;
-                letter-spacing: 2px;
-                margin-left: 25px;
-                text-transform: uppercase;
-                transition: 0.3s;
-            }
-
-                .top-nav a:hover {
-                    color: white;
-                }
-
-        /* تنسيق العنوان الكبير */
         .hero-title {
             font-size: clamp(3.5rem, 10vw, 7rem);
             font-weight: 800;
             line-height: 0.85;
             letter-spacing: -2px;
             text-transform: uppercase;
+            font-family: 'Playfair Display', serif;
         }
 
         .pink-text {
-            color: #df9191; /* لون الروز الموجود بالصورة */
+            color: #df9191;
             font-weight: 300;
         }
 
@@ -76,7 +38,7 @@
             font-style: italic;
             font-size: 1.3rem;
             margin-top: 15px;
-            font-family: Georgia, serif;
+            font-family: 'Playfair Display', serif;
         }
 
         .description {
@@ -96,7 +58,22 @@
             font-weight: 500;
             margin-top: 35px;
             transition: 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
         }
+
+            .btn-view:before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+                transition: 0.5s;
+                z-index: -1;
+            }
 
             .btn-view:hover {
                 background-color: #c27676;
@@ -104,7 +81,10 @@
                 box-shadow: 0 10px 20px rgba(0,0,0,0.3);
             }
 
-        /* منطقة الصور المبعثرة */
+                .btn-view:hover:before {
+                    left: 100%;
+                }
+
         .visuals-area {
             position: relative;
             height: 90vh;
@@ -114,9 +94,10 @@
             position: absolute;
             filter: drop-shadow(0 15px 35px rgba(0,0,0,0.8));
             transition: transform 0.5s ease-in-out;
+            image-rendering: -webkit-optimize-contrast;
+            will-change: transform;
         }
 
-        /* تحديد أماكن الصور بالضبط كما في التصميم */
         .img-brushes {
             top: 5%;
             left: 10%;
@@ -146,23 +127,36 @@
             z-index: 2;
         }
 
-        /* شريط التواصل السفلي */
-        .social-icons {
+        .scroll-indicator {
             position: absolute;
-            bottom: 40px;
-            right: 80px;
-            display: flex;
-            gap: 25px;
-            color: #444;
-            font-size: 1.1rem;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #df9191;
+            animation: bounce 2s infinite;
+            display: none;
         }
 
-            .social-icons i:hover {
-                color: #df9191;
-                cursor: pointer;
+        @@keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        @@keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateX(-50%) translateY(0);
             }
 
-        /* تعديلات الموبايل ليكون متجاوباً */
+            40% {
+                transform: translateX(-50%) translateY(-10px);
+            }
+
+            60% {
+                transform: translateX(-50%) translateY(-5px);
+            }
+        }
+
         @@media (max-width: 991px) {
             .full-page {
                 text-align: center;
@@ -175,24 +169,6 @@
                 margin-top: 50px;
             }
 
-            .top-nav {
-                width: 100%;
-                right: 0;
-                text-align: center;
-                top: 20px;
-            }
-
-                .top-nav a {
-                    margin: 0 10px;
-                    font-size: 0.7rem;
-                }
-
-            .social-icons {
-                position: static;
-                justify-content: center;
-                margin: 40px 0;
-            }
-
             .hero-title {
                 font-size: 4rem;
             }
@@ -201,61 +177,103 @@
                 width: 70%;
                 left: 15%;
             }
+
+            .scroll-indicator {
+                display: block;
+            }
+        }
+
+        @@media (min-width: 1600px) {
+            .container-fluid {
+                max-width: 1600px;
+                margin: 0 auto;
+            }
         }
     </style>
-</head>
-<body>
+}
 
-    <div class="container-fluid full-page">
-        <nav class="top-nav">
-            <a href="#">Home</a>
-            <a href="#">About</a>
-            <a href="#">Products</a>
-            <a href="#">Contact</a>
-        </nav>
-
-        <div class="row w-100 align-items-center">
-
-            <div class="col-lg-6 visuals-area">
-                <img src="/images/brushes.png" class="floating-product img-brushes" alt="Brushes">
-                <img src="/images/lipstick.png" class="floating-product img-lipstick" alt="Lipstick">
-                <img src="/images/smear.png" class="floating-product img-smear" alt="Makeup Smear">
-                <img src="/images/powder.png" class="floating-product img-powder" alt="Powder">
-            </div>
-
-            <div class="col-lg-5 offset-lg-1 px-5">
-                <div class="content-wrapper">
-                    <h1 class="hero-title m-0">PRO</h1>
-                    <h1 class="hero-title m-0">MAKEUP</h1>
-                    <h1 class="hero-title pink-text m-0">STUDIO</h1>
-
-                    <p class="tagline">creativity & professional</p>
-
-                    <p class="description">
-                        @if (featuredProduct != null)
-                        {
-                            @featuredProduct.Description
-                        }
-                        else
-                        {
-                            @:"Experience the art of beauty with our professional makeup services and high-quality products tailored for your unique style."
-                        }
-                    </p>
-
-                    <button class="btn btn-view">VIEW PROJECT</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="social-icons">
-            <i class="bi bi-info-circle"></i>
-            <i class="bi bi-telephone"></i>
-            <i class="bi bi-geo-alt"></i>
-            <i class="bi bi-youtube"></i>
-            <i class="bi bi-chat-dots"></i>
-        </div>
+<div class="container-fluid full-page">
+    <!-- لاحظ: تم إزالة .top-nav لأن الـ Layout يحتوي على navbar -->
+    <div class="scroll-indicator d-lg-none">
+        <i class="bi bi-chevron-down" style="font-size: 1.5rem;"></i>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+    <div class="row w-100 align-items-center">
+        <div class="col-lg-6 visuals-area">
+            <img src="~/images/brushes.png" class="floating-product img-brushes" alt="Brushes" data-speed="0.3">
+            <img src="~/images/lipstick.png" class="floating-product img-lipstick" alt="Lipstick" data-speed="0.5">
+            <img src="~/images/smear.png" class="floating-product img-smear" alt="Smear" data-speed="0.4">
+            <img src="~/images/powder.png" class="floating-product img-powder" alt="Powder" data-speed="0.2">
+        </div>
+
+        <div class="col-lg-5 offset-lg-1 px-5">
+            <div class="content-wrapper">
+                <h1 class="hero-title m-0">PRO</h1>
+                <h1 class="hero-title m-0">MAKEUP</h1>
+                <h1 class="hero-title pink-text m-0">STUDIO</h1>
+                <p class="tagline">creativity & professional</p>
+                <p class="description">@description</p>
+                <button class="btn btn-view">VIEW PROJECT</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const floatingImages = document.querySelectorAll('.floating-product');
+
+            // منطق تحريك الصور عند التمرير الذي كتبته أنت
+            window.addEventListener('scroll', () => {
+                floatingImages.forEach(img => {
+                    const speed = parseFloat(img.getAttribute('data-speed')) || 0.5;
+                    const yOffset = window.pageYOffset * speed;
+                    img.style.transform = `translateY(${yOffset}px)`;
+                });
+            });
+
+            // تأثيرات التحويم (Hover)
+            floatingImages.forEach(img => {
+                img.addEventListener('mouseenter', () => {
+                    img.style.transform = 'scale(1.05) rotate(2deg)';
+                    img.style.filter = 'drop-shadow(0 20px 40px rgba(0,0,0,0.9)) brightness(1.1)';
+                });
+
+                img.addEventListener('mouseleave', () => {
+                    const speed = parseFloat(img.getAttribute('data-speed')) || 0.5;
+                    const yOffset = window.pageYOffset * speed;
+                    img.style.transform = `translateY(${yOffset}px) scale(1) rotate(0deg)`;
+                    img.style.filter = 'drop-shadow(0 15px 35px rgba(0,0,0,0.8))';
+                });
+            });
+
+            // منطق زر VIEW PROJECT
+            const viewButton = document.querySelector('.btn-view');
+            if (viewButton) {
+                viewButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => { this.style.transform = 'scale(1)'; }, 150);
+                    console.log('View Project clicked');
+                });
+            }
+
+            // تأثير ظهور الصفحة الذي كتبته أنت
+            setTimeout(() => {
+                document.body.style.opacity = 1;
+            }, 100);
+        });
+
+        // منطق الـ ticking لتحسين الأداء الذي كتبته أنت
+        let ticking = false;
+        window.addEventListener('scroll', function() {
+            if (!ticking) {
+                window.requestAnimationFrame(function() {
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        });
+    </script>
+}

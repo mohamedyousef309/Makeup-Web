@@ -69,6 +69,8 @@ namespace Infastructure_Layer.Data.Configurations.AuthanticationConfiguration
 
             builder.HasMany(x=>x.refreshTokens).WithOne(x=>x.User).HasForeignKey(x=>x.userid).OnDelete(DeleteBehavior.Cascade);
 
+            builder.HasMany(x=>x.userTokens).WithOne(x=>x.User).HasForeignKey(x=>x.UserId).OnDelete(DeleteBehavior.Cascade);
+
 
         }
     }
