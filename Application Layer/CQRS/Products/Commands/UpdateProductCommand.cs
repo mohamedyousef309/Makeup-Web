@@ -29,7 +29,8 @@ namespace Application_Layer.CQRS.Products.Commands
 
 
     public class UpdateProductHandler
-         : IRequestHandler<UpdateProductCommand, RequestRespones<ProductDto>>
+         
+        : IRequestHandler<UpdateProductCommand, RequestRespones<ProductDto>>
     {
         private readonly IGenaricRepository<Product> _productRepo;
         private readonly IGenaricRepository<ProductVariant> _variantRepo;

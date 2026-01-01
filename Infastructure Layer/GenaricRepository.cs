@@ -2,6 +2,7 @@
 using Domain_Layer.Interfaces.Repositryinterfaces;
 using Infastructure_Layer.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using System;
 using System.Collections.Generic;
@@ -104,41 +105,58 @@ namespace Infastructure_Layer
 
             var entry = appDbContext.Entry(existingEntity);
 
-            var primaryKey = entry.Metadata.FindPrimaryKey();
+          
 
-            if (primaryKey == null)
+            foreach (var property in entry.Properties)
             {
-                throw new InvalidOperationException(
-                    $"Entity {typeof(T).Name} does not have a primary key defined.");
-            }
+                if (property.Metadata.IsPrimaryKey()) continue;
 
-            var keyNames = primaryKey.Properties
-                                      .Select(p => p.Name)
-                                      .ToList();
 
-            foreach (var property in typeof(T).GetProperties())
-            {
-                if (entry.Metadata.FindProperty(property.Name) == null)
-                    continue;
 
-                if (keyNames.Contains(property.Name))
-                    continue;
+                var oldValue = property.CurrentValue;
+                var newValue = appDbContext.Entry(entity).Property(property.Metadata.Name).CurrentValue;
 
-                var oldvalue = property.GetValue(existingEntity);
-                var newvale = property.GetValue(entity);
-
-                if (newvale != null && !object.Equals(oldvalue, newvale))
+                if (newValue != null && !object.Equals(oldValue, newValue))
                 {
-                    property.SetValue(existingEntity, newvale);
-                    entry.Property(property.Name).IsModified = true;
+                    property.CurrentValue = newValue;
+                    property.IsModified = true;
                 }
                 else
                 {
-                    entry.Property(property.Name).IsModified = false;
+                    property.IsModified = false;
                 }
             }
         }
 
+
+        public void SaveInclude(T entity, params string[] includedProperties)
+        {
+            var localEntity = _dbSet.Local.FirstOrDefault(e => e.Id == entity.Id);
+            EntityEntry<T> entry;
+
+            if (localEntity != null)
+            {
+                entry = appDbContext.Entry(localEntity);
+
+                foreach (var propertyName in includedProperties)
+                {
+                    var newValue = appDbContext.Entry(entity).Property(propertyName).CurrentValue;
+
+                    entry.Property(propertyName).CurrentValue = newValue;
+                    entry.Property(propertyName).IsModified = true;
+                }
+            }
+            else
+            {
+                _dbSet.Attach(entity);
+                entry = appDbContext.Entry(entity);
+
+                foreach (var propertyName in includedProperties)
+                {
+                    entry.Property(propertyName).IsModified = true;
+                }
+            }
+        }
         public void Update(T item)
         {
             appDbContext.Set<T>().Update(item);

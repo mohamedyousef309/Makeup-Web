@@ -65,7 +65,6 @@ namespace Application_Layer.CQRS.Orders.Commands.CreatOrder
         public async Task<IEnumerable<OutOfStockEvent>> ProcessStockReductionAsync(IEnumerable<OrderItems> items, CancellationToken CT ) 
         {
             var events = new List<OutOfStockEvent>();
-
             var productsIds = items.Select(x => x.Id).ToList();
 
             var products = await productRepo.GetByCriteriaQueryable(p => productsIds.Contains(p.Id))
@@ -74,15 +73,23 @@ namespace Application_Layer.CQRS.Orders.Commands.CreatOrder
             foreach (var item in items)
             {
                 var product = products.FirstOrDefault(p => p.Id == item.Id);
-                if (product!=null)
+
+                if (product == null)
                 {
-                    bool isFinished = product.ReduceStock(item.Quantity);
-                    if (isFinished) 
-                    {
-                        events.Add(new OutOfStockEvent(product.Id,product.Name));
-                    }
+                    throw new Exception($"Product with ID {item.Id} not found in database.");
                 }
 
+                if (product.Stock < item.Quantity)
+                {
+                    throw new Exception($"Product {product.Name} Out Of Stock: {product.Stock}");
+                }
+
+                bool isFinished = product.ReduceStock(item.Quantity);
+
+                if (isFinished)
+                {
+                    events.Add(new OutOfStockEvent(product.Id, product.Name));
+                }
             }
 
             return events;

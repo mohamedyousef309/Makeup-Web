@@ -8,6 +8,7 @@ using Domain_Layer.Interfaces.ServiceInterfaces;
 using Domain_Layer.Respones;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -52,7 +53,15 @@ namespace Application_Layer.CQRS.Authantication.Commads.ForgetPasswrd
                 To=GetUserByEmailResult.Data.Email
 
             };
-            await EMailService.SendEmail(EmailDTo);
+
+            try
+            {
+                await EMailService.SendEmail(EmailDTo);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Could not send verification email. Process cancelled.");
+            }
 
             return RequestRespones<bool>.Success(true,200,"Verification code sent to your email");
         }

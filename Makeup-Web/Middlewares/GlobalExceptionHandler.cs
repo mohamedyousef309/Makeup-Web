@@ -1,6 +1,7 @@
 ﻿
 using Domain_Layer.Respones;
 using FluentValidation;
+using Makeup_Web.Exceptions;
 
 namespace Makeup_Web.Middlewares
 {
@@ -31,6 +32,15 @@ namespace Makeup_Web.Middlewares
                 var respone= RequestRespones<string>.Fail(messageString,400);
 
                 await context.Response.WriteAsJsonAsync(respone);
+            }
+            catch(BusinessException ex) 
+            {
+                context.Response.StatusCode=StatusCodes.Status400BadRequest;
+                context.Response.ContentType = "application/json";
+
+                var  response = RequestRespones<string>.Fail(ex.Message, 400);
+
+                await context.Response.WriteAsJsonAsync(response);
             }
 
             catch(Exception ex) 

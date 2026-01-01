@@ -44,7 +44,8 @@ namespace Application_Layer.CQRS.Authantication.Commads.ValidateUserVerification
                 return validation;
 
             userToken!.IsVerified = true;
-             genaricRepository.SaveInclude(userToken);
+
+            genaricRepository.SaveInclude(userToken, nameof(UserToken.IsVerified));
 
             return RequestRespones<bool>.Success(true, 200, "Verified successfully.");
 

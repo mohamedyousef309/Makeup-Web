@@ -37,6 +37,8 @@ namespace Domain_Layer.Interfaces.Repositryinterfaces
 
 
         void SaveInclude(T entity);
+        public void SaveInclude(T entity, params string[] includedProperties);
+
 
         Task addAsync(T item);
 
