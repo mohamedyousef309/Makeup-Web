@@ -25,24 +25,24 @@ namespace Makeup_Web.Controllers
       
         public async Task<IActionResult> Index()
         {
-            var result = await _mediator.Send(new GetAllProductsQuery());
+            //var result = await _mediator.Send(new GetAllProductsQuery());
 
-            if (!result.IsSuccess)
-            {
-                TempData["ErrorMessage"] = result.Message;
-                return View(new List<ProductListItemViewModel>());
-            }
+            //if (!result.IsSuccess)
+            //{
+            //    TempData["ErrorMessage"] = result.Message;
+            //    return View(new List<ProductListItemViewModel>());
+            //}
 
-            var viewModel = result.Data.Select(p => new ProductListItemViewModel
-            {
-                Id = p.Id,
-                Name = p.Name,
-                Price = p.Price,
-                Stock = p.Stock,
-                IsActive = p.IsActive
-            }).ToList();
+            //var viewModel = result.Data.Select(p => new ProductListItemViewModel
+            //{
+            //    Id = p.Id,
+            //    Name = p.Name,
+            //    Price = p.Price,
+            //    Stock = p.Stock,
+            //    IsActive = p.IsActive
+            //}).ToList();
 
-            return View(viewModel);
+            return View(/*viewModel*/);
         }
 
        

@@ -2,6 +2,7 @@
 using Domain_Layer.Interfaces.Repositryinterfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,10 +16,12 @@ namespace Application_Layer.CQRS.Authantication.Quries.GetRefreshToken
     public class GetRefreshTokenQueryHandler : IRequestHandler<GetRefreshTokenQuery, Domain_Layer.Entites.Authantication.RefreshTokens?>
     {
         private readonly IGenaricRepository<RefreshTokens> genaricRepository;
+        private readonly IMemoryCache memoryCache;
 
-        public GetRefreshTokenQueryHandler(IGenaricRepository<Domain_Layer.Entites.Authantication.RefreshTokens> genaricRepository)
+        public GetRefreshTokenQueryHandler(IGenaricRepository<Domain_Layer.Entites.Authantication.RefreshTokens> genaricRepository,IMemoryCache memoryCache)
         {
             this.genaricRepository = genaricRepository;
+            this.memoryCache = memoryCache;
         }
         public async Task<Domain_Layer.Entites.Authantication.RefreshTokens?> Handle(GetRefreshTokenQuery request, CancellationToken cancellationToken)
         {
