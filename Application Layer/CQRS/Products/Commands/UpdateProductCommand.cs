@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using global::Application_Layer.CQRS.Products.Commands.Application_Layer.CQRS.Products.Commands;
 
 namespace Application_Layer.CQRS.Products.Commands
 {
