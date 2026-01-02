@@ -51,6 +51,12 @@ namespace Makeup_Web
                 return ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("RedisConnection")!);
             });
 
+            builder.Services.AddAuthentication(option => 
+            {
+                option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                option.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            });
+
 
             builder.Services.AddAuthentication().AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, option =>
            option.TokenValidationParameters = new TokenValidationParameters()
@@ -73,6 +79,7 @@ namespace Makeup_Web
 
 
             var app = builder.Build();
+
 
             app.UseMiddleware<GlobalExceptionHandler>();
 
@@ -104,12 +111,15 @@ namespace Makeup_Web
             }
 
             app.UseHttpsRedirection();
+
+
             app.UseRouting();
 
+            app.UseMiddleware<TokenLifecycleMiddleware>();
 
 
-            app.UseAuthorization();
             app.UseAuthentication();
+            app.UseAuthorization();
 
             app.MapStaticAssets();
             app.MapControllerRoute(

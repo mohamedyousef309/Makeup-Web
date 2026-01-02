@@ -58,8 +58,10 @@ namespace Application_Layer.Services
 
         public async Task<AuthModleDto> RefreshTokenAsync(string refreshToken)
         {
-            var UserRespone = await mediator.Send(new GetUserByRefreshTokenQuery(refreshToken));
-            if (!UserRespone.IsSuccess)
+           
+
+            var refreshTokenRespone=await mediator.Send(new GetRefreshTokenQuery(refreshToken));
+            if (refreshTokenRespone==null)
             {
                 return new AuthModleDto
                 {
@@ -67,32 +69,21 @@ namespace Application_Layer.Services
                 };
             }
 
-            var refreshTokenRespone=await mediator.Send(new GetRefrshTokenByuserIdQuery(UserRespone.Data.Id));
-            if (!refreshTokenRespone.IsSuccess)
-            {
-                return new AuthModleDto
-                {
-                    IsAuthenticated = false,
-                };
-            }
-
-            if (refreshTokenRespone.Data is null || !refreshTokenRespone.Data.IsActive)
+            if (refreshTokenRespone== null || !refreshTokenRespone.IsActive)
                 return new AuthModleDto { IsAuthenticated = false };
 
-            refreshTokenRespone.Data.IsUsed = true;
-            refreshTokenRespone.Data.RevokedOn = DateTime.UtcNow;
 
-            var roles = UserRespone.Data.UserRoles.Select(ur => ur.role);
-            var permissions = UserRespone.Data.userPermissions.Select(up => up.permission);
-            var jwt = CreateToken(UserRespone.Data, roles, permissions);
+            var roles = refreshTokenRespone.User.UserRoles.Select(ur => ur.role);
+            var permissions = refreshTokenRespone.User.userPermissions.Select(up => up.permission);
+            var jwt = CreateToken(refreshTokenRespone.User, roles, permissions);
 
             var authModel = new AuthModleDto
             {
                 IsAuthenticated = true,
                 Token = new JwtSecurityTokenHandler().WriteToken(jwt),
                 TokenExpiresOn = jwt.ValidTo,
-                RefreshToken = refreshTokenRespone.Data.Token,
-                RefreshTokenExpiration = refreshTokenRespone.Data.ExpiresOn,
+                RefreshToken = refreshTokenRespone.Token,
+                RefreshTokenExpiration = refreshTokenRespone.ExpiresOn,
 
             };
             return authModel;

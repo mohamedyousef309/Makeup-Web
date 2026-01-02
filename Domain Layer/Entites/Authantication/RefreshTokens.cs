@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace Domain_Layer.Entites.Authantication
 {
-    public class RefreshTokens:BaseEntity
+    public class RefreshTokens : BaseEntity
     {
-        public int userid { get; set; }=default!;   
+        public int userid { get; set; } = default!;
 
-        public User User { get; set; }=default!;  
-        
+        public User User { get; set; } = default!;
 
-       public string Token { get; set; }=default!;
+
+        public string Token { get; set; } = default!;
         public bool IsUsed { get; set; } = false; // لمنع إعادة الاستخدام
 
 
@@ -22,6 +22,9 @@ namespace Domain_Layer.Entites.Authantication
         public DateTime? RevokedOn { get; set; }
 
         public bool IsExpired => DateTime.UtcNow >= ExpiresOn;
-        public bool IsActive => RevokedOn == null && !IsExpired;
+        public bool IsActive =>
+            RevokedOn == null &&
+            !IsUsed &&
+            !IsExpired;
     }
 }

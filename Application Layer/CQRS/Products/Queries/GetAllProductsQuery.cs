@@ -39,6 +39,7 @@ namespace Application_Layer.CQRS.Products.Queries
                         Description = p.Description,
                         Price = p.Price,
                         Stock = p.Stock,
+                        ProductStock = p.productStock,
                         CategoryId = p.CategoryId,
                         IsActive = p.IsActive,
                         Variants = p.Variants.Select(v => new ProductVariantDto
