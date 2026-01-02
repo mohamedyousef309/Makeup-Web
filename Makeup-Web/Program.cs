@@ -1,6 +1,7 @@
 
 using Application_Layer.CQRS;
 using Application_Layer.CQRS.Authantication.Commads.Login;
+using Application_Layer.CQRS.Authantication.Commads.Register;
 using Autofac.Core;
 using Domain_Layer.Behaviors;
 using Domain_Layer.ViewModels.AuthanticationViewModles.Register;
@@ -35,8 +36,9 @@ namespace Makeup_Web
 
             builder.Services.AddMediatR(cfg =>
             {
-                cfg.RegisterServicesFromAssemblies(Assembly.GetExecutingAssembly());
+                cfg.RegisterServicesFromAssemblyContaining<RegisterCommand>();
             });
+
 
             builder.Services.AddValidatorsFromAssemblyContaining<LoginCommendValidator>();
             builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
@@ -50,20 +52,20 @@ namespace Makeup_Web
             });
 
 
-            // builder.Services.AddAuthentication().AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, option =>
-            //option.TokenValidationParameters = new TokenValidationParameters()
-            //{
-            //    ValidateIssuer = true,
-            //    ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
-            //    ValidateAudience = true,
-            //    ValidAudience = builder.Configuration["JWT:ValidAudience"],
-            //    ValidateLifetime = true,
-            //    ClockSkew = TimeSpan.Zero,
-            //    ValidateIssuerSigningKey = true,
-            //    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:AuthKey"] ?? string.Empty))
+            builder.Services.AddAuthentication().AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, option =>
+           option.TokenValidationParameters = new TokenValidationParameters()
+           {
+               ValidateIssuer = true,
+               ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
+               ValidateAudience = true,
+               ValidAudience = builder.Configuration["JWT:ValidAudience"],
+               ValidateLifetime = true,
+               ClockSkew = TimeSpan.Zero,
+               ValidateIssuerSigningKey = true,
+               IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? string.Empty))
 
-            //}
-            // );
+           }
+            );
 
 
 
@@ -112,7 +114,7 @@ namespace Makeup_Web
             app.MapStaticAssets();
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Product}/{action=Index}/{id?}")
+                pattern: "{controller=Products}/{action=Index}/{id?}")
                 .WithStaticAssets();
 
             app.Run();

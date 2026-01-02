@@ -11,9 +11,9 @@ namespace Application_Layer.CQRS.Authantication.Commads.AddRefreshToken
     {
         public AddRefreshTokenCommandValidator()
         {
-            RuleFor(x => x.RefreshTokens.Id)
-                .GreaterThan(0)
-                .WithMessage("UserId must be a valid positive number.");
+            RuleFor(x => x.RefreshTokens.userid)
+             .GreaterThan(0)
+             .WithMessage("UserId must be a valid positive number.");
 
             RuleFor(x => x.RefreshTokens.Token)
                 .NotEmpty()

@@ -8,12 +8,12 @@ using Domain_Layer.DTOs.ProductDtos;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace Makeup_Web.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class ProductsController : ControllerBase
+    
+    public class ProductsController : Controller
     {
         private readonly IMediator _mediator;
 
@@ -22,7 +22,11 @@ namespace Makeup_Web.Controllers
             _mediator = mediator;
         }
 
-   
+        public IActionResult Index()
+        {
+            return View();
+        }
+
         [Authorize(Roles = "User,Admin,SuperAdmin")]
         [HttpGet]
         public async Task<IActionResult> GetAll()

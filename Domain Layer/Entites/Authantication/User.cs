@@ -11,7 +11,6 @@ namespace Domain_Layer.Entites.Authantication
         public string Username { get; set; } = default!;
         public string Email { get; set; } = default!;
         public string PasswordHash { get; set; } = default!;
-        public string PasswordSalt { get; set; } = default!; // مطلوب للأمان
         public string PhoneNumber { get; set; } = default!;
         public string Picture { get; set; } = default!;
         public string UserAddress { get; set; } = default!;

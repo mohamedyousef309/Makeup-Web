@@ -29,15 +29,13 @@ namespace Domain_Layer.ViewModels.AuthanticationViewModles.Register
         [Phone(ErrorMessage = "Invalid phone number")]
         public string PhoneNumber { get; set; } = default!;
 
-        [Required(ErrorMessage = "Picture is required")]
-        [Url(ErrorMessage = "Invalid picture URL")]
-        public string Picture { get; set; } = default!;
+        
 
         [Required(ErrorMessage = "User address is required")]
         [StringLength(200, ErrorMessage = "Address cannot exceed 200 characters")]
         public string UserAddress { get; set; } = default!;
 
-        public IFormFile? Image = null;
+        public IFormFile? Image { get; set; } = null;
 
         public string? ErrorMessage { get; set; }
 

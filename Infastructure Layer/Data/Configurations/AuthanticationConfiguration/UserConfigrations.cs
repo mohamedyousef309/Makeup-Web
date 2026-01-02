@@ -32,8 +32,6 @@ namespace Infastructure_Layer.Data.Configurations.AuthanticationConfiguration
             builder.Property(u => u.PasswordHash)
                    .IsRequired();
 
-            builder.Property(u => u.PasswordSalt)
-                   .IsRequired();
 
             builder.Property(u => u.PhoneNumber)
                    .HasMaxLength(20);

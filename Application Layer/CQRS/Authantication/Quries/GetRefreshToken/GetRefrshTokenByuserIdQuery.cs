@@ -24,9 +24,10 @@ namespace Application_Layer.CQRS.Authantication.Quries.GetRefreshToken
         }
         public async Task<RequestRespones<RefreshTokens>> Handle(GetRefrshTokenByuserIdQuery request, CancellationToken cancellationToken)
         {
-            var RefreshToken = await genaricRepository.GetByCriteriaQueryable(x=> x.userid == request.Userid 
-            &&x.IsActive
-            &&!x.IsUsed)
+            var RefreshToken = await genaricRepository.GetByCriteriaQueryable(x=> x.userid == request.Userid).Where(r =>
+            r.RevokedOn == null &&
+            r.ExpiresOn > DateTime.UtcNow &&!r.IsUsed)
+
                 .OrderByDescending(x => x.CreatedAt).FirstOrDefaultAsync();
 
             if (RefreshToken == null) 

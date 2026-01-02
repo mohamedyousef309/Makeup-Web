@@ -41,6 +41,22 @@ namespace Makeup_Web.Controllers
                     return View(model);
                 }
 
+                Response.Cookies.Append("AccessToken", loginRespone.Data.Token, new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true, 
+                    SameSite = SameSiteMode.Strict, 
+                    Expires = loginRespone.Data.TokenExpiresOn
+                });
+
+                Response.Cookies.Append("RefreshToken", loginRespone.Data.RefreshToken, new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true, 
+                    SameSite = SameSiteMode.Strict, 
+                    Expires = loginRespone.Data.RefreshTokenExpiration
+                });
+
                 return RedirectToAction("Index", "Home");
 
 
@@ -64,15 +80,15 @@ namespace Makeup_Web.Controllers
                 {
                     return View(model);
                 }
-                {
-                    var RegisterResult = await mediator.Send(new RegisterCommand(model.Email, model.Password, model.PhoneNumber, model.UserAddress,model.Image));
-                    if (!RegisterResult.IsSuccess)
-                    {
-                        ModelState.AddModelError(string.Empty, RegisterResult.Message ?? "Registration failed");
 
-                        return View(model);
-                    }
+                var RegisterResult = await mediator.Send(new RegisterCommand(model.Email, model.Password, model.PhoneNumber, model.UserAddress, model.Image));
+
+                if (!RegisterResult.IsSuccess)
+                {
+                    ModelState.AddModelError(string.Empty, RegisterResult.Message);
+                    return View(model);
                 }
+
                 return RedirectToAction("Login");
 
             }
