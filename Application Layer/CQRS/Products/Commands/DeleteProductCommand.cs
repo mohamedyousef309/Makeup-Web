@@ -31,8 +31,8 @@ namespace Application_Layer.CQRS.Products.Commands
 
         public async Task<RequestRespones<bool>> Handle(DeleteProductCommand request, CancellationToken cancellationToken)
         {
-            try
-            {
+           
+            
                 var product = await _productRepo.GetByCriteriaAsync(x => x.Id == request.Id);
 
                 if (product == null)
@@ -46,11 +46,8 @@ namespace Application_Layer.CQRS.Products.Commands
                 await _productRepo.SaveChanges();
 
                 return RequestRespones<bool>.Success(true, 200, "Product deleted successfully.");
-            }
-            catch (System.Exception ex)
-            {
-                return RequestRespones<bool>.Fail($"Error: {ex.Message}", 500);
-            }
+            
+           
         }
     }
 }
