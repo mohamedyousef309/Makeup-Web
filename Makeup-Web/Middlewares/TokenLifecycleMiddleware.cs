@@ -71,8 +71,8 @@ namespace Makeup_Web.Middlewares
                 SameSite = SameSiteMode.Strict,
                 Expires = authModle.TokenExpiresOn
             };
-            context.Response.Cookies.Append("AccessToken", authModle.Token, options);
-            context.Response.Cookies.Append("RefreshToken", authModle.RefreshToken, options);
+            context.Response.Cookies.Append("AccessToken", authModle.Token!, options);
+            context.Response.Cookies.Append("RefreshToken", authModle.RefreshToken!, options);
 
         }
 

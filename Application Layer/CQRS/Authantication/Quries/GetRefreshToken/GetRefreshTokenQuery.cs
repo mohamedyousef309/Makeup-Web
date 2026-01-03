@@ -16,16 +16,34 @@ namespace Application_Layer.CQRS.Authantication.Quries.GetRefreshToken
     public class GetRefreshTokenQueryHandler : IRequestHandler<GetRefreshTokenQuery, Domain_Layer.Entites.Authantication.RefreshTokens?>
     {
         private readonly IGenaricRepository<RefreshTokens> genaricRepository;
-        private readonly IMemoryCache memoryCache;
+        private readonly IMemoryCache _memoryCache;
+
 
         public GetRefreshTokenQueryHandler(IGenaricRepository<Domain_Layer.Entites.Authantication.RefreshTokens> genaricRepository,IMemoryCache memoryCache)
         {
             this.genaricRepository = genaricRepository;
-            this.memoryCache = memoryCache;
+            this._memoryCache = memoryCache;
         }
         public async Task<Domain_Layer.Entites.Authantication.RefreshTokens?> Handle(GetRefreshTokenQuery request, CancellationToken cancellationToken)
         {
-            var token = await genaricRepository.GetByCriteriaQueryable(x =>
+            string cacheKey = $"RT_{request.token}";
+            if (_memoryCache.TryGetValue(cacheKey, out RefreshTokens CachedToken))
+            {
+                if (CachedToken.IsActive) 
+                {
+                   return CachedToken;
+
+                }
+                else 
+                {
+                    _memoryCache.Remove(cacheKey);
+
+                }
+            }
+
+
+
+        var token = await genaricRepository.GetByCriteriaQueryable(x =>
             x.Token == request.token &&
             x.RevokedOn == null &&
             x.ExpiresOn > DateTime.UtcNow &&
@@ -55,10 +73,14 @@ namespace Application_Layer.CQRS.Authantication.Quries.GetRefreshToken
             }
         }).FirstOrDefaultAsync(cancellationToken);
 
-            if (token == null)
+            if (token == null || !token.IsActive)
             {
                 return null;
             }
+
+            _memoryCache.Set(cacheKey, token,TimeSpan.FromHours(2));
+
+
 
             return token;
 
