@@ -14,9 +14,9 @@ using System.Threading.Tasks;
 
 namespace Application_Layer.CQRS.Products.Commands.CreateProduct
 {
-    public record CreateProductCommand(CreateProductDto CreateProductDto): ICommand<RequestRespones<bool>>;
+    public record CreateProductCommand(CreateProductDto CreateProductDto): ICommand<RequestRespones<ProductDto>>;
    
-    public class CreateProductHandler: IRequestHandler<CreateProductCommand, RequestRespones<bool>>
+    public class CreateProductHandler: IRequestHandler<CreateProductCommand, RequestRespones<ProductDto>>
     {
         private readonly IGenaricRepository<Product> _productRepo;
 
@@ -25,7 +25,7 @@ namespace Application_Layer.CQRS.Products.Commands.CreateProduct
             _productRepo = productRepo;
         }
 
-        public async Task<RequestRespones<bool>> Handle(CreateProductCommand request,CancellationToken cancellationToken)
+        public async Task<RequestRespones<ProductDto>> Handle(CreateProductCommand request,CancellationToken cancellationToken)
         {
             
             
@@ -49,10 +49,24 @@ namespace Application_Layer.CQRS.Products.Commands.CreateProduct
                 await _productRepo.SaveChanges();
 
 
-                return RequestRespones<bool>
-                    .Success(true,Message:"Product created successfully");
+            var resultDto = new ProductDto
+            {
+                Id = product.Id, 
+                Name = product.Name,
+                Description = product.Description,
+                Price = product.Price,
+                Stock = product.Stock,
+                IsActive = product.IsActive,
+                ProductStock = product.productStock,
+                CategoryId = product.CategoryId,
             
-            
+                Variants = new List<ProductVariantDto>()
+            };
+
+            return RequestRespones<ProductDto>
+                .Success(resultDto, Message: "Product created successfully");
+
+
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿
 using Domain_Layer.Interfaces.ServiceInterfaces;
+using Domain_Layer.Respones;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using System.Windows.Input;
@@ -24,8 +25,14 @@ namespace Domain_Layer.Behaviors
 
                 var response = await next();
 
-                await unitofWork.CommitTransactionAsync();
-
+                if (response is IRequestResponse result && !result.IsSuccess)
+                {
+                    await unitofWork.RollbackTransactionAsync();
+                }
+                else
+                {
+                    await unitofWork.CommitTransactionAsync();
+                }
                 return response;
 
             }

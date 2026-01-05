@@ -13,7 +13,7 @@ using System.Windows.Input;
 
 namespace Application_Layer.CQRS.Products.Commands.Createvariants
 {
-    public record CreatevariantsCommand(IEnumerable<UpdateProductVariantDto> UpdateProductVariantDtos):ICommand<RequestRespones<bool>>;
+    public record CreatevariantsCommand(int productid,IEnumerable<UpdateProductVariantDto> UpdateProductVariantDtos):ICommand<RequestRespones<bool>>;
 
     public class CreatevariantsCommandHandler : IRequestHandler<CreatevariantsCommand, RequestRespones<bool>>
 {
@@ -23,9 +23,22 @@ namespace Application_Layer.CQRS.Products.Commands.Createvariants
         {
             this.genaricRepository = genaricRepository;
         }
-        public Task<RequestRespones<bool>> Handle(CreatevariantsCommand request, CancellationToken cancellationToken)
+        public async Task<RequestRespones<bool>> Handle(CreatevariantsCommand request, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var variants = request.UpdateProductVariantDtos.Select(dto => new ProductVariant
+            {
+                ProductId = request.productid,
+                VariantName = dto.VariantName,
+                VariantValue = dto.VariantValue,
+                Stock = dto.Stock,    
+            }).ToList();
+
+            await genaricRepository.AddRangeAsync(variants);
+
+            await genaricRepository.SaveChanges();  
+
+            return new RequestRespones<bool>(true);
+
         }
     }
 }

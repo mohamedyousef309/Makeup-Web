@@ -7,7 +7,12 @@ using System.Threading.Tasks;
 
 namespace Domain_Layer.Respones
 {
-    public class RequestRespones<T>
+
+    public interface IRequestResponse
+    {
+        bool IsSuccess { get; }
+    }
+    public class RequestRespones<T> : IRequestResponse
     {
         public T Data { get; set; } = default!;
 
