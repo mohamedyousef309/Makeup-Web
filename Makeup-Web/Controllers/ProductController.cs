@@ -1,5 +1,6 @@
 ﻿using Application_Layer.CQRS.Products.Commands;
 using Application_Layer.CQRS.Products.Commands.Application_Layer.CQRS.Products.Commands;
+using Application_Layer.CQRS.Products.Commands.CreateProduct;
 using Application_Layer.CQRS.Products.Queries;
 using Domain_Layer.DTOs.ProductDtos;
 using Domain_Layer.ViewModels.ProductsViewModels.CreateProductsViewModel;

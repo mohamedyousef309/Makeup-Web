@@ -34,7 +34,7 @@ namespace Application_Layer.CQRS.Authantication.Commads.ResetPassword
 
             bool isValid= ValidateUserToken(UserTokenResult.Data);
 
-            if (!isValid) { return RequestRespones<bool>.Fail("Token invalid", 400); }
+            if (!isValid) { return RequestRespones<bool>.Fail("invalid Code", 400); }
 
             var resetPasswordResult = await mediator.Send(new ResetPasswordCommand(request.UserEmail, request.NewPassword));
 
