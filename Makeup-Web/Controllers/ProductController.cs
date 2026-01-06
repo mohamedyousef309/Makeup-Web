@@ -1,9 +1,6 @@
 ﻿using Application_Layer.CQRS.Products.Commands;
+using Application_Layer.CQRS.Products.Commands.Application_Layer.CQRS.Products.Commands;
 using Application_Layer.CQRS.Products.Commands.CreateProduct;
-using Application_Layer.CQRS.Products.Commands.Createvariants;
-using Application_Layer.CQRS.Products.Commands.RemoveProductFromBasket;
-using Application_Layer.CQRS.Products.Commands.UpdateProductStock;
-using Application_Layer.CQRS.Products.Commands.UpdateVariants;
 using Application_Layer.CQRS.Products.Queries;
 using Domain_Layer.DTOs;
 using Domain_Layer.DTOs.ProductDtos;

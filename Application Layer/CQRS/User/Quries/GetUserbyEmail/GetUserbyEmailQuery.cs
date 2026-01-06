@@ -27,23 +27,9 @@ namespace Application_Layer.CQRS.User.Quries.GetUserbyEmail
             var user = await _genaricRepository.GetByCriteriaQueryable(x=>x.Email==request.email).Select(u => new UserToReturnWithRolsDTo
             {
                 Id = u.Id,
-                Username = u.Username,
                 Email = u.Email,
                 PhoneNumber = u.PhoneNumber,
-                Picture = u.Picture,
-                UserAddress = u.UserAddress,
 
-                UserPermissions = u.userPermissions.Select(p => new UserPermissionsDTo
-                {
-                    PermissionId = p.PermissionId,
-                    PermissionName = p.permission.Name
-                }).ToList(),
-
-                UserRoles = u.UserRoles.Select(r => new UserRolsDTo
-                {
-                    RoleId = r.Roleid,
-                    RoleName = r.role.Name
-                }).ToList()
             }).FirstOrDefaultAsync(cancellationToken);
 
             if (user == null)

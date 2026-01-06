@@ -12,7 +12,7 @@ namespace Domain_Layer.Entites.Authantication
         public string Email { get; set; } = default!;
         public string PasswordHash { get; set; } = default!;
         public string PhoneNumber { get; set; } = default!;
-        public string Picture { get; set; } = default!;
+        public string? Picture { get; set; } = default!;
         public string UserAddress { get; set; } = default!;
         public bool EmailConfirmed { get; set; } = false;
         public int FailedLoginAttempts { get; set; } = 0;
