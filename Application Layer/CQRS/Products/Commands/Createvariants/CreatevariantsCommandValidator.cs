@@ -28,23 +28,5 @@ namespace Application_Layer.CQRS.Products.Commands.Createvariants
     public class UpdateProductVariantDtoValidator
       : AbstractValidator<UpdateProductVariantDto>
     {
-        public UpdateProductVariantDtoValidator()
-        {
-          
-
-            RuleFor(x => x.VariantName)
-                .NotEmpty()
-                .WithMessage("Variant name is required.")
-                .MaximumLength(100);
-
-            RuleFor(x => x.VariantValue)
-                .NotEmpty()
-                .WithMessage("Variant value is required.")
-                .MaximumLength(100);
-
-            RuleFor(x => x.Stock)
-                .GreaterThanOrEqualTo(0)
-                .WithMessage("Stock cannot be negative.");
-        }
     }
 }
