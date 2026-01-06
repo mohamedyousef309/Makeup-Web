@@ -7,9 +7,9 @@ using MediatR;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Input; 
+using System.Windows.Input;
 
-namespace Application_Layer.CQRS.Products.Commands
+namespace Application_Layer.CQRS.Products.Commands.UpdateProduct
 {
     
     public record UpdateProductCommand(UpdateProductDto Dto)

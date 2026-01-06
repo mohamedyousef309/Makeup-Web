@@ -1,6 +1,7 @@
 ﻿using Domain_Layer.Entites;
 using Domain_Layer.Interfaces.Abstraction;
 using Domain_Layer.Interfaces.Repositryinterfaces;
+using Domain_Layer.Respones;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -11,9 +12,9 @@ using System.Threading.Tasks;
 
 namespace Application_Layer.CQRS.Products.Commands.UpdateProductStock
 {
-    public record UpdateProductStockCommand(int ProductId, int NewStock) : ICommand<bool>;
+    public record UpdateProductStockCommand(int ProductId, int NewStock) : ICommand<RequestRespones<bool>>;
 
-    public class UpdateProductStockCommandHandler : IRequestHandler<UpdateProductStockCommand, bool>
+    public class UpdateProductStockCommandHandler : IRequestHandler<UpdateProductStockCommand, RequestRespones<bool>>
     {
         private readonly IGenaricRepository<Product> productRepository;
 
@@ -21,17 +22,22 @@ namespace Application_Layer.CQRS.Products.Commands.UpdateProductStock
         {
             this.productRepository = productRepository;
         }
-        public async Task<bool> Handle(UpdateProductStockCommand request, CancellationToken cancellationToken)
+        public async Task<RequestRespones<bool>> Handle(UpdateProductStockCommand request, CancellationToken cancellationToken)
         {
-            var product = await productRepository.GetByCriteriaQueryable(x=>x.Id==request.ProductId).FirstOrDefaultAsync();
+            var product = await productRepository.GetByCriteriaQueryable(x=>x.Id==request.ProductId).Select(x=>new Product 
+            {
+                Id=x.Id,
+                Stock=x.Stock
+            }).FirstOrDefaultAsync();
 
             if (product == null)
             {
-                return false; 
+                return RequestRespones<bool>.Fail("there is no Product with this id",404); 
             }
             product.Stock = request.NewStock;
-             productRepository.Update(product);
-            return true; 
+
+            productRepository.SaveInclude(product, nameof(Product.Stock));
+            return RequestRespones<bool>.Success(true); 
         }
     }
 

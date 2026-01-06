@@ -1,7 +1,6 @@
-﻿using Application_Layer.CQRS.Products.Commands;
-using FluentValidation;
+﻿using FluentValidation;
 
-namespace Application_Layer.CQRS.Products.Commands
+namespace Application_Layer.CQRS.Products.Commands.UpdateProduct
 {
     public class UpdateProductCommandValidator
         : AbstractValidator<UpdateProductCommand>

@@ -1,0 +1,123 @@
+﻿using Application_Layer.CQRS.Products.Commands.Createvariants;
+using Application_Layer.CQRS.Products.Commands.UpdateVariants;
+using Application_Layer.CQRS.Products.Queries;
+using Domain_Layer.DTOs;
+using Domain_Layer.DTOs.ProductVariantDtos;
+using Domain_Layer.ViewModels.ProductsViewModels.ProductsVariantViewModel;
+using Domain_Layer.ViewModels.ProductsViewModels.UpdateProductsVariantViewModel;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
+
+namespace Makeup_Web.Controllers
+{
+    public class ProductVariantController : Controller
+    {
+        private readonly IMediator _mediator;
+
+        public IActionResult Index()
+        {
+            return View();
+        }
+
+        public ProductVariantController(IMediator mediator)
+        {
+            this._mediator = mediator;
+        }
+        public async Task<IActionResult> GetAllVariants(int productId, int pageIndex = 1, int pageSize = 10, string? sortBy = "id", string? sortDir = "asc", string? search = null)
+        {
+            var result = await _mediator.Send(new GetAllProductVariantsQuery(productId, pageSize, pageIndex, sortBy, sortDir, search));
+
+            if (!result.IsSuccess)
+            {
+                TempData["ErrorMessage"] = result.Message;
+                return View(new PaginatedListDto<ProductVariantViewModel> { Items = new List<ProductVariantViewModel>() });
+            }
+
+            var viewModel = new PaginatedListDto<ProductVariantViewModel>
+            {
+                Items = result.Data.Items.Select(v => new ProductVariantViewModel
+                {
+                    Id = v.Id,
+                    VariantName = v.VariantName,
+                    VariantValue = v.VariantValue,
+                    Stock = v.Stock
+                }).ToList(),
+                PageNumber = result.Data.PageNumber,
+                PageSize = result.Data.PageSize,
+                TotalCount = result.Data.TotalCount
+            };
+
+            return View(viewModel);
+        }
+
+        public async Task<IActionResult> VariantDetails(int id)
+        {
+            var result = await _mediator.Send(new GetProductVariantByIdQuery(id));
+
+            if (!result.IsSuccess)
+            {
+                TempData["ErrorMessage"] = result.Message;
+                return RedirectToAction(nameof(Index));
+            }
+
+            var dto = result.Data;
+            var model = new ProductVariantViewModel
+            {
+                Id = dto.Id,
+                VariantName = dto.VariantName,
+                VariantValue = dto.VariantValue,
+                Stock = dto.Stock
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateVariant(int productId, UpdateProductVariantViewModel model)
+        {
+            var dto = new UpdateProductVariantDto
+            {
+                VariantName = model.VariantName,
+                VariantValue = model.VariantValue,
+                Stock = model.Stock
+            };
+
+            var result = await _mediator.Send(new CreatevariantsCommand(productId, new[] { dto }));
+
+            if (!result.IsSuccess)
+                TempData["ErrorMessage"] = result.Message;
+
+            return RedirectToAction(nameof(GetAllVariants), new { productId });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateVariant(int productId, UpdateProductVariantViewModel model)
+        {
+            var dto = new UpdateProductVariantDto
+            {
+                Id = model.Id,
+                VariantName = model.VariantName,
+                VariantValue = model.VariantValue,
+                Stock = model.Stock
+            };
+
+            var result = await _mediator.Send(new UpdateProductVariantCommand(new[] { dto }));
+
+            if (!result.IsSuccess)
+                TempData["ErrorMessage"] = result.Message;
+
+            return RedirectToAction(nameof(GetAllVariants), new { productId });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteVariant(int id, int productId)
+        {
+            var result = await _mediator.Send(new DeleteProductVariantCommand(id));
+
+            if (!result.IsSuccess)
+                TempData["ErrorMessage"] = result.Message;
+
+            return RedirectToAction(nameof(GetAllVariants), new { productId });
+        }
+    }
+}
