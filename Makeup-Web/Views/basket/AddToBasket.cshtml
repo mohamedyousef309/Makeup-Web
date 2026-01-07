@@ -1,0 +1,211 @@
+﻿@model Domain_Layer.ViewModels.Basket.AddToBasketViewModle
+
+@{
+    ViewData["Title"] = "Add to Basket - Pro Makeup Studio";
+    Layout = "~/Views/Shared/_Layout.cshtml"; // استخدام الـ Layout العام للحفاظ على الهيدر
+}
+
+@section Styles {
+    <style>
+        :root {
+            --primary-pink: #d68a8a;
+            --dark-bg: #121212;
+            --card-bg: #1e1e1e;
+            --input-bg: #2a2a2a;
+            --text-light: #ffffff;
+        }
+
+        .basket-section {
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .basket-card {
+            width: 100%;
+            max-width: 500px;
+            background: var(--card-bg);
+            border-radius: 30px;
+            border: 1px solid #333;
+            padding: 40px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.4);
+            text-align: center;
+        }
+
+        .product-preview-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(214, 138, 138, 0.1);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: var(--primary-pink);
+            font-size: 2.5rem;
+        }
+
+        .basket-title {
+            font-family: 'Playfair Display', serif;
+            color: var(--text-light);
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .basket-subtitle {
+            color: var(--primary-pink);
+            font-style: italic;
+            margin-bottom: 30px;
+            font-size: 0.9rem;
+        }
+
+        /* تنسيق التحكم في الكمية */
+        .quantity-control {
+            background: var(--input-bg);
+            border-radius: 15px;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            border: 1px solid #444;
+        }
+
+        .qty-btn {
+            background: #333;
+            border: none;
+            color: white;
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            transition: 0.3s;
+        }
+
+            .qty-btn:hover {
+                background: var(--primary-pink);
+            }
+
+        .qty-input {
+            background: transparent;
+            border: none;
+            color: white;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+            width: 60px;
+        }
+
+            /* إخفاء أسهم الـ input number الافتراضية */
+            .qty-input::-webkit-inner-spin-button,
+            .qty-input::-webkit-outer-spin-button {
+                -webkit-appearance: none;
+                margin: 0;
+            }
+
+        .add-btn {
+            background: var(--primary-pink);
+            border: none;
+            color: white;
+            padding: 16px;
+            width: 100%;
+            border-radius: 30px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            transition: 0.4s;
+            text-transform: uppercase;
+        }
+
+            .add-btn:hover {
+                background: #c27676;
+                transform: translateY(-3px);
+                box-shadow: 0 10px 20px rgba(214, 138, 138, 0.3);
+            }
+
+        .cancel-link {
+            display: block;
+            margin-top: 20px;
+            color: #777;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: 0.3s;
+        }
+
+            .cancel-link:hover {
+                color: var(--primary-pink);
+            }
+
+        .text-danger {
+            font-size: 0.85rem;
+            margin-top: 10px;
+            display: block;
+        }
+    </style>
+}
+
+<div class="basket-section">
+    <div class="basket-card">
+        <div class="product-preview-icon">
+            <i class="bi bi-bag-plus"></i>
+        </div>
+
+        <h2 class="basket-title">Add to Collection</h2>
+        <p class="basket-subtitle">personalize your beauty selection</p>
+
+        <form asp-action="AddToBasket" method="post">
+            @* الحقول المخفية الضرورية *@
+            <input type="hidden" asp-for="ProductId" />
+            <input type="hidden" asp-for="UserId" />
+
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <label class="text-white-50 mb-2 d-block">Select Quantity</label>
+
+            <div class="quantity-control">
+                <button type="button" class="qty-btn" onclick="decrement()">-</button>
+                <input asp-for="Quantity" class="qty-input" id="quantityInput" readonly />
+                <button type="button" class="qty-btn" onclick="increment()">+</button>
+            </div>
+            <span asp-validation-for="Quantity" class="text-danger"></span>
+
+            <button type="submit" class="add-btn">
+                Confirm Selection
+            </button>
+        </form>
+
+        <a href="javascript:history.back()" class="cancel-link">Back to products</a>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function increment() {
+            let input = document.getElementById('quantityInput');
+            let val = parseInt(input.value);
+            if (val < 100) input.value = val + 1;
+        }
+
+        function decrement() {
+            let input = document.getElementById('quantityInput');
+            let val = parseInt(input.value);
+            if (val > 1) input.value = val - 1;
+        }
+
+        // إضافة تأثير أنيميشن خفيف عند التحميل
+        document.addEventListener('DOMContentLoaded', function() {
+            const card = document.querySelector('.basket-card');
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+
+            setTimeout(() => {
+                card.style.transition = '0.6s ease-out';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, 100);
+        });
+    </script>
+
+    <partial name="_ValidationScriptsPartial" />
+}

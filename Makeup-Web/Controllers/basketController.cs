@@ -4,6 +4,7 @@ using Application_Layer.CQRS.Basket.Quries.GetUserBsaket;
 using Domain_Layer.ViewModels.Basket;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Makeup_Web.Controllers
@@ -29,10 +30,24 @@ namespace Makeup_Web.Controllers
         [HttpPost]
         public async Task<IActionResult> AddToBasket(AddToBasketViewModle Modle)
         {
+
+            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (userIdStr == null)
+            {
+                return RedirectToAction("Login", "Authantication");
+            }
+
+            int userId = int.Parse(userIdStr);
+
+            Modle.UserId = userId;
+
             if (!ModelState.IsValid)
             {
                 return View(Modle);
             }
+
+            var userIdFromClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var result = await mediator.Send(new CreateOrUpdateBasketOrchestrator(Modle.UserId,Modle.ProductId,Modle.Quantity));
 
             if (!result.IsSuccess)

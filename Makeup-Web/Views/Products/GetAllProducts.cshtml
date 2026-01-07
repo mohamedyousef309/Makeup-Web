@@ -1,0 +1,135 @@
+﻿@model Domain_Layer.DTOs.PaginatedListDto<Domain_Layer.DTOs.ProductDtos.ProductDto>
+
+@{
+    ViewData["Title"] = "Our Products";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary fw-bold">🛒 Products List</h2>
+        <span class="badge bg-secondary">Total: @Model.TotalCount</span>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form asp-action="GetAllProducts" method="get" class="row g-3">
+                <div class="col-md-4">
+                    <input type="text" name="search" class="form-control" placeholder="Search by name..." value="@Context.Request.Query["search"]">
+                </div>
+                <div class="col-md-3">
+                    <select name="sortBy" class="form-select">
+                        <option value="id">Sort By ID</option>
+                        <option value="name">Sort By Name</option>
+                        <option value="price">Sort By Price</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select name="sortDir" class="form-select">
+                        <option value="asc">Ascending</option>
+                        <option value="desc">Descending</option>
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary w-100">Filter</button>
+                    <a asp-action="GetAllProducts" class="btn btn-outline-secondary w-100">Reset</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="table-responsive shadow-sm rounded">
+        <table class="table table-hover align-middle bg-white">
+            <thead class="table-dark">
+                <tr>
+                    <th>Product Name</th>
+                    <th>Description</th>
+                    <th>Price</th>
+                    <th class="text-center">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Items != null && Model.Items.Any())
+                {
+                    foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            <td class="fw-bold">@item.Name</td>
+                            <td class="text-muted text-truncate" style="max-width: 250px;">@item.Description</td>
+                            <td class="text-success fw-bold">@item.Price.ToString("C")</td>
+                            <td class="text-center">
+                                <form asp-action="AddToBasket" method="post" class="d-flex justify-content-center gap-2">
+                                    <input type="hidden" name="ProductId" value="@item.Id" />
+                                    <input type="number" name="Quantity" value="1" min="1" class="form-control form-control-sm" style="width: 60px;" />
+                                    <button type="submit" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-cart-plus"></i> Add
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="4" class="text-center py-4 text-muted">No products found.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+            <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
+                <a class="page-link" asp-action="GetAllProducts"
+                   asp-route-pageIndex="@(Model.PageNumber - 1)"
+                   asp-route-search="@Context.Request.Query["search"]"
+                   asp-route-sortBy="@Context.Request.Query["sortBy"]"
+                   asp-route-sortDir="@Context.Request.Query["sortDir"]">Previous</a>
+            </li>
+
+            @for (int i = 1; i <= Model.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                    <a class="page-link" asp-action="GetAllProducts"
+                       asp-route-pageIndex="@i"
+                       asp-route-search="@Context.Request.Query["search"]"
+                       asp-route-sortBy="@Context.Request.Query["sortBy"]"
+                       asp-route-sortDir="@Context.Request.Query["sortDir"]">@i</a>
+                </li>
+            }
+
+            <li class="page-item @(Model.PageNumber == Model.TotalPages ? "disabled" : "")">
+                <a class="page-link" asp-action="GetAllProducts"
+                   asp-route-pageIndex="@(Model.PageNumber + 1)"
+                   asp-route-search="@Context.Request.Query["search"]"
+                   asp-route-sortBy="@Context.Request.Query["sortBy"]"
+                   asp-route-sortDir="@Context.Request.Query["sortDir"]">Next</a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        .table thead th {
+            border: none;
+        }
+
+        .page-link {
+            border-radius: 5px;
+            margin: 0 2px;
+        }
+
+        .card {
+            border: none;
+            border-radius: 12px;
+        }
+
+        .btn-primary {
+            background-color: #0d6efd;
+            border: none;
+        }
+    </style>
+}
