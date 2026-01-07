@@ -35,7 +35,11 @@ namespace Makeup_Web.Controllers
 
         // =================== Products Endpoints ===================
 
-        public async Task<IActionResult> Index(int pageIndex = 1, int pageSize = 10, string? sortBy = "id", string? sortDir = "asc", string? search = null)
+        public IActionResult Index()
+        {
+            return View();
+        }
+        public async Task<IActionResult> GetAllProducts(int pageIndex = 1, int pageSize = 10, string? sortBy = "id", string? sortDir = "asc", string? search = null)
         {
             var result = await _mediator.Send(new GetAllProductsQuery(pageSize, pageIndex, sortBy, sortDir, search));
 
@@ -45,22 +49,10 @@ namespace Makeup_Web.Controllers
                 return View(new PaginatedListDto<ProductListItemViewModel> { Items = new List<ProductListItemViewModel>() });
             }
 
-            var viewModel = new PaginatedListDto<ProductListItemViewModel>
-            {
-                Items = result.Data.Items.Select(p => new ProductListItemViewModel
-                {
-                    Id = p.Id,
-                    Name = p.Name,
-                    Price = p.Price,
-                    Stock = p.Stock,
-                    IsActive = p.IsActive
-                }).ToList(),
-                PageNumber = result.Data.PageNumber,
-                PageSize = result.Data.PageSize,
-                TotalCount = result.Data.TotalCount
-            };
+            
+            
 
-            return View(viewModel);
+            return View(result.Data);
         }
 
         public async Task<IActionResult> Details(int id)

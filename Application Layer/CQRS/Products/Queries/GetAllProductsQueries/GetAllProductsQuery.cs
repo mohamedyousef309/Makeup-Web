@@ -36,46 +36,36 @@ namespace Application_Layer.CQRS.Products.Queries
             GetAllProductsQuery request,
             CancellationToken cancellationToken)
         {
-            
-            IQueryable<Product> query = _productRepo.GetAll().AsQueryable();
 
-            
+            var query = _productRepo.GetAll();
+
             if (!string.IsNullOrEmpty(request.SearchTerm))
             {
                 query = ApplySearch(query, request.SearchTerm, p => p.Name);
             }
 
-            
             var sortColumns = new Dictionary<string, System.Linq.Expressions.Expression<System.Func<Product, object>>>
-            {
-                { "id", p => p.Id },
-                { "name", p => p.Name },
-                { "price", p => p.Price },
-                { "stock", p => p.Stock }
-            };
+    {
+        { "id", p => p.Id },
+        { "name", p => p.Name },
+        { "price", p => p.Price },
+        { "stock", p => p.Stock }
+    };
 
             query = ApplySorting(query, request.SortBy, request.SortDir, sortColumns);
 
-            
             var totalCount = await query.CountAsync(cancellationToken);
 
-            
             query = ApplayPagination(query, request.PageIndex, request.PageSize);
 
-            
             var items = await query.Select(p => new ProductDto
             {
-                Id = p.Id,
                 Name = p.Name,
-                Description = p.Description,
                 Price = p.Price,
-                Stock = p.Stock,
-                ProductStock = p.productStock,
-                CategoryId = p.CategoryId,
-                IsActive = p.IsActive
+                ImageUrl=p.ImageUrl,
+                Description = p.Description
             }).ToListAsync(cancellationToken);
 
-          
             var result = new PaginatedListDto<ProductDto>
             {
                 Items = items,

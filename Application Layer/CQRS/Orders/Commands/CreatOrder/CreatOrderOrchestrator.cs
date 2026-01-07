@@ -1,5 +1,7 @@
 ﻿using Application_Layer.CQRS.Basket.Quries.GetUserBsaket;
 using Application_Layer.CQRS.Products.Queries;
+using Application_Layer.CQRS.Products.Queries.GetProductsByIds;
+using Application_Layer.CQRS.User.Quries.GetUserEmailbyUserid;
 using Domain_Layer.DTOs.Basket;
 using Domain_Layer.DTOs.OrderDTOs;
 using Domain_Layer.Entites.Order;
@@ -14,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace Application_Layer.CQRS.Orders.Commands.CreatOrder
 {
-    public record CreatOrderOrchestrator(string BuyerEmail, int userid, string PhoneNumber, string Address, IEnumerable<OrderItems> Items) : ICommand<RequestRespones<OrderToReturnDto>>;
+    public record CreatOrderOrchestrator(string? BuyerEmail, int userid, string? PhoneNumber, string? Address) : ICommand<RequestRespones<OrderToReturnDto>>;
 
     public class CreatOrderOrchestratorHandler:IRequestHandler<CreatOrderOrchestrator,RequestRespones<OrderToReturnDto>>
     {
@@ -26,7 +28,14 @@ namespace Application_Layer.CQRS.Orders.Commands.CreatOrder
         }
         public async Task<RequestRespones<OrderToReturnDto>> Handle(CreatOrderOrchestrator request, CancellationToken cancellationToken)
         {
-            var userBasket = await mediator.Send(new GetUserBsaketQuery(request.userid));
+            var userResult = await mediator.Send(new GetUserEmailbyUseridQuery(request.userid));
+            if (!userResult.IsSuccess|| userResult.Data==null)
+            {
+                return RequestRespones<OrderToReturnDto>.Fail(userResult.Message??"User not found.", 404);
+            }
+
+            var userBasket = await mediator.Send(new GetUserBsaketQuery(userResult.Data.Id));
+
             if (!userBasket.IsSuccess || userBasket.Data?.items == null || !userBasket.Data.items.Any())
                 return RequestRespones<OrderToReturnDto>.Fail(userBasket.Message ?? "Basket is empty.", 400);
 
@@ -59,9 +68,9 @@ namespace Application_Layer.CQRS.Orders.Commands.CreatOrder
             decimal calculatedSubtotal = orderItems.Sum(i => i.Price * i.Quantity);
 
             var createOrderResult = await mediator.Send(new CreatOrderCommand(
-                request.BuyerEmail,
-                request.PhoneNumber,
-                request.Address,
+                request.BuyerEmail ?? userResult.Data.Email,
+                request.PhoneNumber ?? userResult.Data.PhoneNumber,
+                request.Address ?? userResult.Data.UserAddress,
                 orderItems,
                 calculatedSubtotal));
 
@@ -71,9 +80,10 @@ namespace Application_Layer.CQRS.Orders.Commands.CreatOrder
 
             var resultDto = new OrderToReturnDto
             {
-                BuyerEmail = request.BuyerEmail,
-                Address = request.Address,
+                BuyerEmail = request.BuyerEmail ?? userResult.Data.Email,
+                Address = request.Address ?? userResult.Data.UserAddress,
                 subTotal = calculatedSubtotal,
+                PhoneNumber = request.PhoneNumber ?? userResult.Data.PhoneNumber,
                 orderDate = DateTime.Now,
                 Items = orderItems.Select(i => new OrderItemsDTo
                 {
