@@ -399,16 +399,16 @@
                             <div class="mt-auto">
                                 <span class="price-tag">$@product.Price.ToString("F2")</span>
 
-                                <!-- Add to Cart Form -->
-                                <form asp-controller="Basket"
+                                <form asp-controller="basket"
                                       asp-action="AddToBasket"
                                       method="post"
                                       class="add-to-cart-form">
 
                                     @Html.AntiForgeryToken()
 
-                                    <!-- الحقول الأساسية -->
                                     <input type="hidden" name="ProductId" value="@product.Id" />
+                                    <input type="hidden" name="ProductName" value="@product.Name" />
+                                    <input type="hidden" name="ProductPrice" value="@product.Price" />
 
                                     <div class="quantity-input">
                                         <input type="number"

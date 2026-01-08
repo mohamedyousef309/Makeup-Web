@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 
     <style>
-        /* التنسيق الأساسي للموقع */
+        /* [ ... Keep your existing styles here ... ] */
         body {
             background: linear-gradient(135deg, #121212 0%, #1a1a1a 100%);
             color: white;
@@ -23,7 +23,6 @@
             flex-direction: column;
         }
 
-        /* شريط التنقل العلوي */
         .main-navbar {
             background-color: rgba(18, 18, 18, 0.95);
             padding: 15px 40px;
@@ -34,7 +33,6 @@
             backdrop-filter: blur(10px);
         }
 
-        /* العلامة التجارية */
         .navbar-brand {
             color: #df9191 !important;
             font-family: 'Playfair Display', serif;
@@ -44,48 +42,35 @@
             transition: all 0.3s ease;
         }
 
-            .navbar-brand:hover {
-                color: #c27676 !important;
-                transform: scale(1.05);
-            }
-
-        /* روابط التنقل */
-        .nav-link-custom {
-            color: #888 !important;
-            font-size: 0.9rem;
-            letter-spacing: 1px;
-            margin: 0 15px;
-            text-transform: uppercase;
-            transition: all 0.3s ease;
+        /* --- NEW BASKET STYLES --- */
+        .basket-container {
             position: relative;
-            padding: 8px 0 !important;
+            margin-right: 20px;
+            transition: all 0.3s ease;
         }
 
-            .nav-link-custom:hover {
+        .basket-link {
+            color: #df9191 !important;
+            font-size: 1.5rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+            .basket-link:hover {
                 color: white !important;
+                transform: scale(1.1);
             }
 
-            .nav-link-custom.active {
-                color: #df9191 !important;
-            }
+        .basket-badge {
+            background-color: #df9191;
+            color: white;
+            font-size: 0.65rem;
+            padding: 0.3em 0.5em;
+            border: 2px solid #121212; /* Contrasts with the background */
+        }
 
-            .nav-link-custom:after {
-                content: '';
-                position: absolute;
-                width: 0;
-                height: 2px;
-                bottom: 0;
-                left: 0;
-                background-color: #df9191;
-                transition: width 0.3s;
-            }
-
-            .nav-link-custom:hover:after,
-            .nav-link-custom.active:after {
-                width: 100%;
-            }
-
-        /* أزرار Auth - موجودة في أقصى اليمين */
+        /* [ ... Keep your existing Auth Buttons and footer styles ... ] */
         .auth-buttons {
             display: flex;
             gap: 15px;
@@ -98,8 +83,6 @@
             border-radius: 25px;
             font-weight: 500;
             font-size: 0.9rem;
-            letter-spacing: 0.5px;
-            transition: all 0.3s ease;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
@@ -114,300 +97,82 @@
             color: #df9191;
         }
 
-            .btn-login:hover {
-                background-color: rgba(223, 145, 145, 0.1);
-                transform: translateY(-2px);
-                box-shadow: 0 5px 15px rgba(223, 145, 145, 0.2);
-            }
-
         .btn-register {
             background-color: #df9191;
             color: white;
-            border: 1.5px solid #df9191;
         }
 
-            .btn-register:hover {
-                background-color: #c27676;
-                border-color: #c27676;
-                transform: translateY(-2px);
-                box-shadow: 0 5px 15px rgba(223, 145, 145, 0.3);
-            }
-
-        /* المحتوى الرئيسي */
         .main-content {
             flex: 1;
             padding: 40px 0;
         }
 
-        /* التذييل */
         .footer {
             background-color: rgba(18, 18, 18, 0.9);
             padding: 40px 0;
             border-top: 1px solid #333;
             margin-top: auto;
         }
-
-        .footer-title {
-            color: #df9191;
-            font-family: 'Playfair Display', serif;
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-        }
-
-        .footer-links a {
-            color: #888;
-            text-decoration: none;
-            display: block;
-            margin-bottom: 10px;
-            transition: color 0.3s;
-        }
-
-            .footer-links a:hover {
-                color: #df9191;
-            }
-
-        .social-icons-footer {
-            display: flex;
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-            .social-icons-footer a {
-                color: #888;
-                font-size: 1.2rem;
-                transition: all 0.3s;
-            }
-
-                .social-icons-footer a:hover {
-                    color: #df9191;
-                    transform: translateY(-3px);
-                }
-
-        .copyright {
-            color: #555;
-            font-size: 0.9rem;
-            text-align: center;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #333;
-        }
-
-        /* تعديلات للشاشات الصغيرة */
-        @@media (max-width: 991px) {
-            .main-navbar {
-                padding: 15px 20px;
-            }
-
-            .auth-buttons {
-                margin-left: 0;
-                margin-top: 15px;
-                justify-content: center;
-                width: 100%;
-            }
-
-            .nav-link-custom {
-                margin: 5px 0;
-                text-align: center;
-            }
-        }
-
-        /* تأثيرات إضافية */
-        .floating-effect {
-            animation: floating 3s ease-in-out infinite;
-        }
-
-        @@keyframes floating {
-            0%, 100% {
-                transform: translateY(0);
-            }
-
-            50% {
-                transform: translateY(-10px);
-            }
-        }
-
-        /* تأثيرات النصوص */
-        .text-gradient {
-            background: linear-gradient(45deg, #df9191, #c27676);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        /* كروت المنتجات */
-        .product-card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid #333;
-            border-radius: 15px;
-            padding: 25px;
-            transition: all 0.3s ease;
-            height: 100%;
-        }
-
-            .product-card:hover {
-                transform: translateY(-10px);
-                box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
-                border-color: #df9191;
-            }
-
-        .product-title {
-            color: #df9191;
-            font-family: 'Playfair Display', serif;
-            font-size: 1.3rem;
-            margin-bottom: 15px;
-        }
     </style>
 
     @RenderSection("Styles", required: false)
 </head>
 <body>
-    <!-- شريط التنعل العلوي -->
     <nav class="navbar navbar-expand-lg navbar-dark main-navbar">
         <div class="container-fluid">
-            <!-- العلامة التجارية -->
             <a class="navbar-brand" href="/">
                 <i class="bi bi-brush me-2"></i>
                 PRO MAKEUP STUDIO
             </a>
 
-            <!-- زر القائمة للموبايل -->
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <!-- محتويات شريط التنقل -->
             <div class="collapse navbar-collapse" id="navbarMain">
                 <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link-custom nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Index" && ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" ? "active" : "")"
-                           href="/">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link-custom nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "About" ? "active" : "")"
-                           href="/About">About</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link-custom nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Products" ? "active" : "")"
-                           href="/Products">Products</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link-custom nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Contact" ? "active" : "")"
-                           href="/Contact">Contact</a>
-                    </li>
+                    <li class="nav-item"><a class="nav-link-custom nav-link" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link-custom nav-link" href="/About">About</a></li>
+                    <li class="nav-item"><a class="nav-link-custom nav-link" href="/Products">Products</a></li>
+                    <li class="nav-item"><a class="nav-link-custom nav-link" href="/Contact">Contact</a></li>
                 </ul>
 
-                <!-- أزرار Auth في أقصى اليمين -->
                 <div class="auth-buttons">
+
+                    <div class="basket-container">
+                        <a asp-controller="basket" asp-action="GetUserBasketByUserid" class="basket-link">
+                            <i class="bi bi-bag-heart"></i>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill basket-badge">
+                                0
+                                <span class="visually-hidden">unread messages</span>
+                            </span>
+                        </a>
+                    </div>
+
                     <a href="@Url.Action("Login", "Authantication")" class="btn-auth btn-login">
-                        <i class="bi bi-box-arrow-in-right me-2"></i>
-                        Login
+                        <i class="bi bi-box-arrow-in-right me-2"></i> Login
                     </a>
                     <a href="@Url.Action("Register", "Authantication")" class="btn-auth btn-register">
-                        <i class="bi bi-person-plus me-2"></i>
-                        Register
+                        <i class="bi bi-person-plus me-2"></i> Register
                     </a>
                 </div>
             </div>
         </div>
     </nav>
 
-    <!-- المحتوى الرئيسي -->
     <main class="main-content">
         @RenderBody()
     </main>
 
-    <!-- التذييل -->
     <footer class="footer">
         <div class="container">
-            <div class="row">
-                <div class="col-lg-4 mb-4">
-                    <h3 class="footer-title">Pro Makeup Studio</h3>
-                    <p style="color: #888; line-height: 1.8;">
-                        Experience the art of beauty with our professional makeup services
-                        and high-quality products tailored for your unique style.
-                    </p>
-                    <div class="social-icons-footer">
-                        <a href="#"><i class="bi bi-facebook"></i></a>
-                        <a href="#"><i class="bi bi-instagram"></i></a>
-                        <a href="#"><i class="bi bi-twitter"></i></a>
-                        <a href="#"><i class="bi bi-youtube"></i></a>
-                    </div>
-                </div>
-
-                <div class="col-lg-4 mb-4">
-                    <h5 class="text-white mb-4">Quick Links</h5>
-                    <div class="footer-links">
-                        <a href="/">Home</a>
-                        <a href="/About">About Us</a>
-                        <a href="/Products">Products</a>
-                        <a href="/Contact">Contact</a>
-                        <a href="@Url.Action("Login", "Authantication")">Login</a>
-                        <a href="@Url.Action("Register", "Authantication")">Register</a>
-                    </div>
-                </div>
-
-                <div class="col-lg-4 mb-4">
-                    <h5 class="text-white mb-4">Contact Info</h5>
-                    <div class="footer-links">
-                        <p style="color: #888; margin-bottom: 10px;">
-                            <i class="bi bi-geo-alt me-2"></i>
-                            123 Beauty Street, Makeup City
-                        </p>
-                        <p style="color: #888; margin-bottom: 10px;">
-                            <i class="bi bi-telephone me-2"></i>
-                            +1 234 567 8900
-                        </p>
-                        <p style="color: #888;">
-                            <i class="bi bi-envelope me-2"></i>
-                            info@promakeupstudio.com
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-12">
-                    <div class="copyright">
-                        &copy; 2024 Pro Makeup Studio. All rights reserved. | Designed with <i class="bi bi-heart-fill text-danger"></i>
-                    </div>
-                </div>
+            <div class="copyright">
+                &copy; 2024 Pro Makeup Studio. All rights reserved.
             </div>
         </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script>
-        // تأثيرات تفاعلية للصفحة
-        document.addEventListener('DOMContentLoaded', function() {
-            // إضافة تأثير نشط للروابط
-            const navLinks = document.querySelectorAll('.nav-link-custom');
-            navLinks.forEach(link => {
-                link.addEventListener('click', function() {
-                    navLinks.forEach(l => l.classList.remove('active'));
-                    this.classList.add('active');
-                });
-            });
-
-            // تأثير ظهور الصفحة
-            setTimeout(() => {
-                document.body.style.opacity = '1';
-            }, 100);
-
-            // تأثير تحريك عند التمرير
-            window.addEventListener('scroll', function() {
-                const navbar = document.querySelector('.main-navbar');
-                if (window.scrollY > 100) {
-                    navbar.style.backgroundColor = 'rgba(18, 18, 18, 0.98)';
-                    navbar.style.boxShadow = '0 5px 20px rgba(0, 0, 0, 0.5)';
-                } else {
-                    navbar.style.backgroundColor = 'rgba(18, 18, 18, 0.95)';
-                    navbar.style.boxShadow = 'none';
-                }
-            });
-        });
-    </script>
-
     @RenderSection("Scripts", required: false)
 </body>
 </html>

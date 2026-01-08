@@ -62,7 +62,7 @@ namespace Makeup_Web.Controllers
                     Expires = loginRespone.Data.RefreshTokenExpiration
                 });
 
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index","Products");
 
 
             }

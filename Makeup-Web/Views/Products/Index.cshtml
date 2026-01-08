@@ -61,6 +61,8 @@
             position: relative;
             overflow: hidden;
             z-index: 1;
+            display: inline-block;
+            text-decoration: none;
         }
 
             .btn-view:before {
@@ -79,6 +81,7 @@
                 background-color: #c27676;
                 transform: translateY(-3px);
                 box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+                color: white;
             }
 
                 .btn-view:hover:before {
@@ -193,7 +196,6 @@
 }
 
 <div class="container-fluid full-page">
-    <!-- لاحظ: تم إزالة .top-nav لأن الـ Layout يحتوي على navbar -->
     <div class="scroll-indicator d-lg-none">
         <i class="bi bi-chevron-down" style="font-size: 1.5rem;"></i>
     </div>
@@ -213,7 +215,9 @@
                 <h1 class="hero-title pink-text m-0">STUDIO</h1>
                 <p class="tagline">creativity & professional</p>
                 <p class="description">@description</p>
-                <button class="btn btn-view">VIEW PROJECT</button>
+
+                @* Changed Button to Anchor with Tag Helpers *@
+                <a asp-controller="Products" asp-action="GetAllProducts" class="btn btn-view">VIEW PROJECT</a>
             </div>
         </div>
     </div>
@@ -224,7 +228,6 @@
         document.addEventListener('DOMContentLoaded', function() {
             const floatingImages = document.querySelectorAll('.floating-product');
 
-            // منطق تحريك الصور عند التمرير الذي كتبته أنت
             window.addEventListener('scroll', () => {
                 floatingImages.forEach(img => {
                     const speed = parseFloat(img.getAttribute('data-speed')) || 0.5;
@@ -233,7 +236,6 @@
                 });
             });
 
-            // تأثيرات التحويم (Hover)
             floatingImages.forEach(img => {
                 img.addEventListener('mouseenter', () => {
                     img.style.transform = 'scale(1.05) rotate(2deg)';
@@ -248,24 +250,21 @@
                 });
             });
 
-            // منطق زر VIEW PROJECT
             const viewButton = document.querySelector('.btn-view');
             if (viewButton) {
                 viewButton.addEventListener('click', function(e) {
-                    e.preventDefault();
+                    // Removed e.preventDefault() so the link works
                     this.style.transform = 'scale(0.95)';
                     setTimeout(() => { this.style.transform = 'scale(1)'; }, 150);
                     console.log('View Project clicked');
                 });
             }
 
-            // تأثير ظهور الصفحة الذي كتبته أنت
             setTimeout(() => {
                 document.body.style.opacity = 1;
             }, 100);
         });
 
-        // منطق الـ ticking لتحسين الأداء الذي كتبته أنت
         let ticking = false;
         window.addEventListener('scroll', function() {
             if (!ticking) {

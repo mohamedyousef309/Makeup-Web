@@ -1,5 +1,6 @@
 ﻿using Application_Layer.CQRS.Basket.Commands.CreateOrUpdateBasket;
 using Application_Layer.CQRS.Basket.Commands.DeletBasket;
+using Application_Layer.CQRS.Basket.Commands.DeleteFromBasket;
 using Application_Layer.CQRS.Basket.Quries.GetUserBsaket;
 using Domain_Layer.Entites.Basket;
 using Domain_Layer.ViewModels.Basket;
@@ -60,6 +61,49 @@ namespace Makeup_Web.Controllers
             return RedirectToAction("GetAllProducts", "Products"); 
         }
 
+        [HttpPost]
+        public async Task<IActionResult> RemoveItemFromBasket(int productId) 
+        {
+            if(!TryGetUserId( out int userid)) 
+            {
+                return RedirectToAction("Login", "Authantication");
+            }
+            var DeleteFromBasketresult = await mediator.Send(new DeleteFromBasketCommand(userid, productId));
+
+            if (!DeleteFromBasketresult.IsSuccess)
+            {
+                ModelState.AddModelError(string.Empty,DeleteFromBasketresult.Message);
+                return View();
+            }
+            return View("GetUserBasketByUserid");
+
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateProductQunaty([FromBody]UpdateProductQuntatyViewModle Modle) 
+        {
+            if (!TryGetUserId(out var userId))
+            {
+                return RedirectToAction("Login", "Authantication");
+            }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var UpdateProductQunatyResult = await mediator.Send(new CreateOrUpdateBasketOrchestrator(userId, Modle.ProductId, Modle.ProductName, Modle.ProductPrice, Modle.NewQuantity));
+            if (!UpdateProductQunatyResult.IsSuccess)
+            {
+                ModelState.AddModelError(string.Empty, UpdateProductQunatyResult.Message);
+
+                var basket = await mediator.Send(new GetUserBsaketQuery(userId));
+
+                return View("GetUserBasketByUserid", basket);
+            }
+
+            return RedirectToAction(nameof(GetUserBasketByUserid));
+
+        }
+
         public async Task<IActionResult> GetUserBasketByUserid() // /basket/GetUserBasketByUserid
         {
            
@@ -68,6 +112,8 @@ namespace Makeup_Web.Controllers
             {
                 return RedirectToAction("Login", "Authantication");
             }
+
+            
 
 
             var basketResult =  await mediator.Send(new GetUserBsaketQuery(userId));
@@ -83,7 +129,7 @@ namespace Makeup_Web.Controllers
             }
         }
 
-        [HttpDelete]
+        [HttpPost]
         public async Task<IActionResult> DeleteCustomerBasket(int userid) 
         {
             var result = await mediator.Send(new DeletBasketCommand(userid));
