@@ -16,8 +16,8 @@ namespace Application_Layer.CQRS.Orders.Commands.CreatOrder
                .NotEmpty()
                .MaximumLength(200);
 
-            RuleFor(x => x.PictureUrl)
-                .NotEmpty();
+            //RuleFor(x => x.PictureUrl)
+            //    .NotEmpty();
 
             RuleFor(x => x.Quantity)
                 .GreaterThan(0)

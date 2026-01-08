@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Application_Layer.CQRS.Basket.Commands.CreateOrUpdateBasket
 {
-    public record CreateOrUpdateBasketOrchestrator(int userid, int Productid,int Quantity) : ICommand<RequestRespones<bool>>;
+    public record CreateOrUpdateBasketOrchestrator(int userid, int Productid,string ProductName,decimal ProductPrice,int Quantity) : ICommand<RequestRespones<bool>>;
 
     public class CreateOrUpdateBasketOrchestratorHandler : IRequestHandler<CreateOrUpdateBasketOrchestrator, RequestRespones<bool>>
     {
@@ -22,17 +22,13 @@ namespace Application_Layer.CQRS.Basket.Commands.CreateOrUpdateBasket
         }
         public async Task<RequestRespones<bool>> Handle(CreateOrUpdateBasketOrchestrator request, CancellationToken cancellationToken)
         {
-            var GetProductResult = await mediator.Send(new GetProductByIdQuery(request.Productid), cancellationToken);
-            if (!GetProductResult.IsSuccess)
-            {
-                return RequestRespones<bool>.Fail("this product is not exsit",403);
-            }
+           
 
             var addProductTobasketResult= await mediator.Send(new CreateOrUpdateBasketoCommands(
                 request.userid,
-                GetProductResult.Data.Id,
-                GetProductResult.Data.Name,
-                GetProductResult.Data.Price,
+                request.Productid,
+                request.ProductName,
+                request.ProductPrice,
                 Quantity: request.Quantity));
 
             if (!addProductTobasketResult.IsSuccess)

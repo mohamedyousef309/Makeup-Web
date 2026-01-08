@@ -52,7 +52,7 @@ namespace Application_Layer.CQRS.Orders.Commands.CreatOrder
                     if (!productsDict.TryGetValue(item.productid, out var product)) return null;
                     return new OrderItems
                     {
-                        Id = item.productid,
+                        ProductId = item.productid,
                         ProductName = product.Name,
                         Price = product.Price,
                         Quantity = item.Quantity,

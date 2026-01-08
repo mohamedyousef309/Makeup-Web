@@ -65,14 +65,14 @@ namespace Application_Layer.CQRS.Orders.Commands.CreatOrder
         public async Task<IEnumerable<OutOfStockEvent>> ProcessStockReductionAsync(IEnumerable<OrderItems> items, CancellationToken CT ) 
         {
             var events = new List<OutOfStockEvent>();
-            var productsIds = items.Select(x => x.Id).ToList();
+            var productsIds = items.Select(x => x.ProductId).ToList();
 
-            var products = await productRepo.GetByCriteriaQueryable(p => productsIds.Contains(p.Id))
+            var products = await productRepo.GetByCriteriaQueryable(p => productsIds.Contains(p.Id)).AsTracking()
                 .ToListAsync(CT);
 
             foreach (var item in items)
             {
-                var product = products.FirstOrDefault(p => p.Id == item.Id);
+                var product = products.FirstOrDefault(p => p.Id == item.ProductId);
 
                 if (product == null)
                 {

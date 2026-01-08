@@ -39,6 +39,7 @@ namespace Makeup_Web.Controllers
         {
             return View();
         }
+        // Products/GetAllProducts
         public async Task<IActionResult> GetAllProducts(int pageIndex = 1, int pageSize = 10, string? sortBy = "id", string? sortDir = "asc", string? search = null)
         {
             var result = await _mediator.Send(new GetAllProductsQuery(pageSize, pageIndex, sortBy, sortDir, search));

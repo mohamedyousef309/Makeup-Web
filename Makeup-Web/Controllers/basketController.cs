@@ -1,6 +1,7 @@
 ﻿using Application_Layer.CQRS.Basket.Commands.CreateOrUpdateBasket;
 using Application_Layer.CQRS.Basket.Commands.DeletBasket;
 using Application_Layer.CQRS.Basket.Quries.GetUserBsaket;
+using Domain_Layer.Entites.Basket;
 using Domain_Layer.ViewModels.Basket;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Makeup_Web.Controllers
 {
-    public class basketController : Controller
+    public class basketController : BaseController
     {
         private readonly IMediator mediator;
 
@@ -22,13 +23,13 @@ namespace Makeup_Web.Controllers
             return View();
         }
 
-        public IActionResult AddToBasket() 
-        {
-            return View( new AddToBasketViewModle());
-        }
+        //public IActionResult AddToBasket() 
+        //{
+        //    return View( new AddToBasketViewModle());
+        //}
 
         [HttpPost]
-        public async Task<IActionResult> AddToBasket(AddToBasketViewModle Modle)
+        public async Task<IActionResult> AddToBasket([FromForm] AddToBasketViewModle Modle)
         {
 
             var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -40,7 +41,6 @@ namespace Makeup_Web.Controllers
 
             int userId = int.Parse(userIdStr);
 
-            Modle.UserId = userId;
 
             if (!ModelState.IsValid)
             {
@@ -48,7 +48,7 @@ namespace Makeup_Web.Controllers
             }
 
             var userIdFromClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var result = await mediator.Send(new CreateOrUpdateBasketOrchestrator(Modle.UserId,Modle.ProductId,Modle.Quantity));
+            var result = await mediator.Send(new CreateOrUpdateBasketOrchestrator(userId, Modle.ProductId,Modle.ProductName,Modle.ProductPrice,Modle.Quantity));
 
             if (!result.IsSuccess)
             {
@@ -57,19 +57,28 @@ namespace Makeup_Web.Controllers
             }
 
             TempData["SuccessMessage"] = "Product added to basket successfully!";
-            return RedirectToAction("Index"); 
+            return RedirectToAction("GetAllProducts", "Products"); 
         }
 
-        public async Task<IActionResult> GetUserBasketByUserid(int userid) 
+        public async Task<IActionResult> GetUserBasketByUserid() // /basket/GetUserBasketByUserid
         {
-            var basketResult =  await mediator.Send(new GetUserBsaketQuery(userid));
+           
+
+            if (!TryGetUserId(out var userId))
+            {
+                return RedirectToAction("Login", "Authantication");
+            }
+
+
+            var basketResult =  await mediator.Send(new GetUserBsaketQuery(userId));
             if (basketResult.IsSuccess)
             {
-                return Ok(basketResult.Data);
+               return View(basketResult.Data);
             }
             else
             {
-                return NotFound(new { message = basketResult.Message });
+               var basket = new UserCart { Id = userId.ToString(), Items = new List<CartItem>() };
+                return View(basketResult);
 
             }
         }

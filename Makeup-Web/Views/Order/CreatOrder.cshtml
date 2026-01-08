@@ -1,0 +1,151 @@
+﻿@using Domain_Layer.ViewModels.Order
+@model CreatOrderViewModle
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Checkout - Shipping Details";
+}
+
+@section Styles {
+    <style>
+        :root {
+            --primary-pink: #df9191;
+            --dark-pink: #c27676;
+            --soft-bg: #fdf8f8;
+            --info-light: #f8e9e9;
+        }
+
+        .checkout-container {
+            padding: 80px 0;
+        }
+
+        .card-checkout {
+            border: none;
+            border-radius: 25px;
+            box-shadow: 0 15px 40px rgba(223, 145, 145, 0.1);
+            overflow: hidden;
+        }
+
+        .checkout-header {
+            background-color: var(--primary-pink);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        /* تنسيق التنبيه (Note) */
+        .note-alert {
+            background-color: var(--info-light);
+            border: none;
+            border-left: 4px solid var(--primary-pink) !important;
+            border-radius: 12px;
+            color: #444;
+        }
+
+        .form-control {
+            border-radius: 12px;
+            padding: 12px 20px;
+            border: 1px solid #eee;
+            background-color: #f9f9f9;
+        }
+
+            .form-control:focus {
+                box-shadow: 0 0 0 0.25rem rgba(223, 145, 145, 0.25);
+                border-color: var(--primary-pink);
+            }
+
+        .btn-submit-order {
+            background-color: var(--primary-pink);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 15px;
+            font-weight: 700;
+            width: 100%;
+            transition: 0.3s;
+            text-transform: uppercase;
+            margin-top: 20px;
+        }
+
+            .btn-submit-order:hover {
+                background-color: var(--dark-pink);
+                color: white;
+                transform: translateY(-3px);
+            }
+
+        .error-msg {
+            font-size: 0.85rem;
+            color: #dc3545;
+            margin-top: 5px;
+        }
+    </style>
+}
+
+<div class="container checkout-container">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card card-checkout">
+                <div class="checkout-header">
+                    <h2 class="serif mb-0">Shipping Details</h2>
+                    <p class="mb-0 opacity-75">Confirm your delivery information</p>
+                </div>
+
+                <div class="card-body p-4 p-md-5">
+
+                    @* رسالة التنبيه بالإنجليزية *@
+                    <div class="alert note-alert mb-4 shadow-sm">
+                        <div class="d-flex">
+                            <i class="bi bi-info-circle-fill me-3 fs-4" style="color: var(--dark-pink);"></i>
+                            <div>
+                                <h6 class="fw-bold mb-1">Information Note</h6>
+                                <small>
+                                    If you leave these fields empty, your order will be automatically processed using
+                                    your <strong>registered profile information</strong>.
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form asp-controller="Order" asp-action="CreatOrder" method="post">
+
+                        @* الحقول المخفية *@
+
+                        <div class="mb-4">
+                            <label asp-for="BuyerEmail" class="form-label fw-bold text-muted">Email Address</label>
+                            <input asp-for="BuyerEmail" class="form-control" placeholder="example@mail.com (Optional)" />
+                            <span asp-validation-for="BuyerEmail" class="error-msg d-block"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="PhoneNumber" class="form-label fw-bold text-muted">Phone Number</label>
+                            <input asp-for="PhoneNumber" class="form-control" placeholder="01xxxxxxxxx (Optional)" />
+                            <span asp-validation-for="PhoneNumber" class="error-msg d-block"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Address" class="form-label fw-bold text-muted">Delivery Address</label>
+                            <textarea asp-for="Address" class="form-control" rows="3" placeholder="Building, Street, City... (Optional)"></textarea>
+                            <span asp-validation-for="Address" class="error-msg d-block"></span>
+                        </div>
+
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-submit-order">
+                                <i class="bi bi-bag-check me-2"></i> Place Order Now
+                            </button>
+
+                            <a asp-controller="Basket" asp-action="GetUserBasketByUserid" class="btn btn-link mt-3 text-muted text-decoration-none">
+                                <i class="bi bi-arrow-left"></i> Return to Basket
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

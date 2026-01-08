@@ -1,0 +1,1183 @@
+﻿@using Domain_Layer.DTOs
+@using Domain_Layer.DTOs.ProductDtos
+@model PaginatedListDto<ProductDto>
+
+@{
+    ViewData["Title"] = "Luxury Shop - Pro Makeup Studio";
+    var searchTerm = Context.Request.Query["search"];
+    var sortBy = Context.Request.Query["sortBy"];
+    var sortDir = Context.Request.Query["sortDir"];
+}
+
+@section Styles {
+    <style>
+        :root {
+            --primary-pink: #d68a8a;
+            --primary-hover: #c27676;
+            --dark-bg: #0f0f0f;
+            --card-bg: #1a1a1a;
+            --input-bg: #252525;
+            --text-light: #ffffff;
+            --text-muted: #a0a0a0;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            font-family: 'Inter', sans-serif;
+            -webkit-text-size-adjust: 100%;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Header */
+        .shop-header {
+            padding: 80px 0 50px;
+            text-align: center;
+            background: linear-gradient(to bottom, #1a1a1a 0%, #0f0f0f 100%);
+            margin-bottom: 40px;
+            border-bottom: 1px solid #222;
+        }
+
+        .shop-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            background: linear-gradient(45deg, #fff 30%, var(--primary-pink) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Filter Section */
+        .filter-glass {
+            background: rgba(26, 26, 26, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            margin-top: -40px;
+            margin-bottom: 50px;
+            border: 1px solid rgba(214, 138, 138, 0.1);
+            transition: all 0.3s ease;
+            transform: translateZ(0);
+            backface-visibility: hidden;
+            perspective: 1000px;
+        }
+
+            .filter-glass:hover {
+                box-shadow: 0 10px 30px rgba(214, 138, 138, 0.1);
+                transform: translateY(-2px);
+            }
+
+        .form-control-custom {
+            background: var(--input-bg) !important;
+            border: 1px solid #333 !important;
+            color: white !important;
+            border-radius: 12px;
+            padding: 12px 18px;
+            min-height: 44px;
+        }
+
+        /* Clean Product Card */
+        .product-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            border: 1px solid #252525;
+            transition: all 0.4s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: fadeInUp 0.6s ease forwards;
+            opacity: 0;
+            transform: translateZ(0);
+            backface-visibility: hidden;
+            perspective: 1000px;
+        }
+
+            .product-card:hover {
+                border-color: var(--primary-pink);
+            }
+
+        @@media (hover: hover) and (pointer: fine) {
+            .product-card:hover {
+                transform: translateY(-8px);
+                animation: floatCard 3s ease-in-out infinite;
+            }
+        }
+
+        .img-wrapper {
+            height: 280px;
+            overflow: hidden;
+            background: #202020;
+            position: relative;
+        }
+
+            .img-wrapper.loading {
+                background: linear-gradient(90deg, #202020 25%, #2a2a2a 50%, #202020 75%);
+                background-size: 1000px 100%;
+                animation: shimmer 2s infinite linear;
+            }
+
+        .product-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+
+        .product-card:hover .product-img {
+            transform: scale(1.05);
+        }
+
+        .product-info {
+            padding: 25px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-name {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #eee;
+        }
+
+        .product-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+            height: 40px;
+            overflow: hidden;
+        }
+
+        .price-tag {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-pink);
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        /* Cart Button */
+        .btn-cart {
+            background: transparent;
+            color: var(--primary-pink);
+            border: 1.5px solid var(--primary-pink);
+            border-radius: 50px;
+            padding: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            transition: 0.3s;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-decoration: none;
+            min-height: 44px;
+            position: relative;
+            overflow: hidden;
+            transform: translateZ(0);
+            backface-visibility: hidden;
+            perspective: 1000px;
+        }
+
+            .btn-cart:hover {
+                background: var(--primary-pink);
+                color: white;
+            }
+
+        /* Quick Add Form */
+        .quick-add-form {
+            display: none;
+            margin-top: 15px;
+            animation: fadeIn 0.3s ease;
+        }
+
+            .quick-add-form.show {
+                display: block;
+            }
+
+        .quantity-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+            .quantity-input label {
+                font-size: 0.9rem;
+                color: var(--text-muted);
+            }
+
+            .quantity-input input {
+                width: 60px;
+                background: var(--input-bg);
+                border: 1px solid #333;
+                border-radius: 8px;
+                color: white;
+                padding: 8px;
+                text-align: center;
+            }
+
+        .form-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-confirm {
+            flex: 1;
+            background: var(--primary-pink);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+            .btn-confirm:hover {
+                background: var(--primary-hover);
+            }
+
+        .btn-cancel {
+            flex: 1;
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+            .btn-cancel:hover {
+                background: #333;
+                color: white;
+            }
+
+        /* Pagination */
+        .pagination .page-link {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            color: #fff;
+            margin: 0 4px;
+            border-radius: 8px;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 44px;
+        }
+
+        .pagination .page-item.active .page-link {
+            background: var(--primary-pink);
+            border-color: var(--primary-pink);
+        }
+
+        /* Animation Keyframes */
+        @@keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @@keyframes floatCard {
+            0%, 100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @@keyframes shimmer {
+            0% {
+                background-position: -1000px 0;
+            }
+
+            100% {
+                background-position: 1000px 0;
+            }
+        }
+
+        @@keyframes pulseNew {
+            0% {
+                box-shadow: 0 0 0 0 rgba(214, 138, 138, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(214, 138, 138, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(214, 138, 138, 0);
+            }
+        }
+
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @@keyframes ripple-animation {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        /* New Product Badge */
+        .new-product::before {
+            content: 'NEW';
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--primary-pink);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            z-index: 10;
+            animation: pulseNew 2s infinite;
+        }
+
+        /* Container Animation */
+        .container {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        /* Mobile filter toggle button */
+        .filter-toggle {
+            display: none;
+            background: var(--primary-pink);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 14px;
+            font-weight: 600;
+            width: 100%;
+            margin-bottom: 15px;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+            .filter-toggle:hover {
+                background: var(--primary-hover);
+            }
+
+        /* No products found styling */
+        .no-products {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+            .no-products i {
+                font-size: 4rem;
+                color: var(--primary-pink);
+                margin-bottom: 20px;
+            }
+
+            .no-products h3 {
+                color: var(--text-light);
+                margin-bottom: 15px;
+            }
+
+            .no-products p {
+                color: var(--text-muted);
+                max-width: 400px;
+                margin: 0 auto;
+            }
+
+        /* Success Message */
+        .success-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            z-index: 1000;
+            animation: slideInRight 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        @@keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @@keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+
+            to {
+                opacity: 0;
+            }
+        }
+
+        /* Responsive Media Queries */
+
+        /* Large screens (laptops) */
+        @@media (max-width: 1200px) {
+            .col-xl-3 {
+                flex: 0 0 auto;
+                width: 25%;
+            }
+        }
+
+        /* Medium screens (tablets) */
+        @@media (max-width: 992px) {
+            .shop-title {
+                font-size: 2.8rem;
+            }
+
+            .img-wrapper {
+                height: 240px;
+            }
+
+            .product-card {
+                margin-bottom: 20px;
+            }
+
+            .col-lg-4 {
+                flex: 0 0 auto;
+                width: 33.33333333%;
+            }
+        }
+
+        /* Small screens (mobile landscape/small tablets) */
+        @@media (max-width: 768px) {
+            .shop-header {
+                padding: 50px 0 30px;
+                padding-top: max(50px, env(safe-area-inset-top));
+            }
+
+            .shop-title {
+                font-size: 2.2rem;
+            }
+
+            .filter-glass {
+                margin-top: -25px;
+                margin-bottom: 30px;
+                padding: 15px;
+            }
+
+                .filter-glass .row > div {
+                    margin-bottom: 10px;
+                }
+
+                    .filter-glass .row > div:last-child {
+                        margin-bottom: 0;
+                    }
+
+            .img-wrapper {
+                height: 200px;
+            }
+
+            .product-info {
+                padding: 18px;
+            }
+
+            .product-name {
+                font-size: 1.1rem;
+            }
+
+            .price-tag {
+                font-size: 1.3rem;
+            }
+
+            .pagination .page-link {
+                padding: 8px 12px;
+                margin: 0 3px;
+                font-size: 0.9rem;
+            }
+
+            .col-md-6 {
+                flex: 0 0 auto;
+                width: 50%;
+            }
+            /* Hide filter form on mobile initially */
+            .filter-form {
+                display: none;
+            }
+
+            .filter-toggle {
+                display: flex;
+            }
+
+            .quick-add-form {
+                margin-top: 10px;
+            }
+
+            .quantity-input {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+
+                .quantity-input input {
+                    width: 100%;
+                }
+
+            .form-buttons {
+                flex-direction: column;
+                gap: 8px;
+            }
+        }
+
+        /* Extra small screens (mobile portrait) */
+        @@media (max-width: 576px) {
+            .shop-title {
+                font-size: 1.8rem;
+            }
+
+            .img-wrapper {
+                height: 180px;
+            }
+
+            .product-card {
+                border-radius: 15px;
+            }
+
+            .btn-cart {
+                padding: 10px;
+                font-size: 0.8rem;
+            }
+
+            .product-desc {
+                height: auto;
+                min-height: 40px;
+            }
+
+            .col-sm-12 {
+                flex: 0 0 auto;
+                width: 100%;
+            }
+
+            .success-message {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+                text-align: center;
+            }
+        }
+
+        /* Accessibility: reduced motion */
+        @@media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Safe area for modern mobile devices */
+        .container {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+    </style>
+}
+
+<div class="shop-header">
+    <div class="container">
+        <h1 class="shop-title">Pro Beauty Store</h1>
+        <p style="color: var(--primary-pink); font-style: italic;">Luxury Essentials for Every Artist</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="filter-glass">
+        <button type="button" class="filter-toggle" id="filterToggle">
+            <i class="bi bi-filter"></i> Filter & Sort
+        </button>
+
+        <form method="get" asp-action="GetAllProducts" class="row g-3 align-items-center filter-form" id="filterForm">
+            <div class="col-lg-5 col-md-12">
+                <div class="position-relative">
+                    <i class="bi bi-search position-absolute text-muted" style="left: 15px; top: 50%; transform: translateY(-50%);"></i>
+                    <input type="text" name="search" value="@searchTerm" class="form-control form-control-custom ps-5" placeholder="Search products...">
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <select name="sortBy" class="form-select form-control-custom">
+                    <option value="id" selected="@(sortBy == "id")">Recently Added</option>
+                    <option value="name" selected="@(sortBy == "name")">Alphabetical (A-Z)</option>
+                    <option value="price" selected="@(sortBy == "price")">Price Range</option>
+                </select>
+            </div>
+            <div class="col-lg-2 col-md-6">
+                <select name="sortDir" class="form-select form-control-custom">
+                    <option value="asc" selected="@(sortDir == "asc")">Ascending</option>
+                    <option value="desc" selected="@(sortDir == "desc")">Descending</option>
+                </select>
+            </div>
+            <div class="col-lg-2 col-md-12">
+                <button type="submit" class="btn btn-cart" style="background: var(--primary-pink); color: white;">Apply</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="row g-4 mb-5" id="productsContainer">
+        @if (Model.Items != null && Model.Items.Any())
+        {
+            var itemIndex = 0;
+            @foreach (var product in Model.Items)
+            {
+                <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12">
+                    <div class="product-card" style="--item-index: @itemIndex;" data-product-id="@product.Id">
+                        <div class="img-wrapper">
+                            @if (!string.IsNullOrEmpty(product.ImageUrl))
+                            {
+                                <img src="@product.ImageUrl" class="product-img" alt="@product.Name" loading="lazy">
+                            }
+                            else
+                            {
+                                <div class="d-flex align-items-center justify-content-center h-100 bg-dark opacity-50">
+                                    <i class="bi bi-camera-fill fs-1 text-muted"></i>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="product-info">
+                            <h3 class="product-name">@product.Name</h3>
+                            <p class="product-desc" title="@product.Description">
+                                @if (!string.IsNullOrEmpty(product.Description))
+                                {
+                                    @(product.Description.Length > 65 ? product.Description.Substring(0, 62) + "..." : product.Description)
+                                }
+                            </p>
+                            <div class="mt-auto">
+                                <span class="price-tag">$@product.Price.ToString("F2")</span>
+
+                                <!-- Quick Add Form -->
+                                <div class="quick-add-form" id="quickAddForm_@product.Id">
+                                    <div class="quantity-input">
+                                        <label for="quantity_@product.Id">Quantity:</label>
+                                        <input type="number" id="quantity_@product.Id" name="quantity" value="1" min="1" max="100" class="quantity-control">
+                                    </div>
+                                    <div class="form-buttons">
+                                        <button type="button" class="btn-confirm add-to-basket-btn" data-product-id="@product.Id">
+                                            <i class="bi bi-check-lg"></i> Confirm
+                                        </button>
+                                        <button type="button" class="btn-cancel cancel-add-btn" data-product-id="@product.Id">
+                                            <i class="bi bi-x-lg"></i> Cancel
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Add to Cart Button -->
+                                <button type="button" class="btn btn-cart show-quick-add-btn" data-product-id="@product.Id">
+                                    <i class="bi bi-cart3"></i> Add to Cart
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                itemIndex++;
+            }
+        }
+        else
+        {
+            <div class="col-12">
+                <div class="no-products">
+                    <i class="bi bi-emoji-frown"></i>
+                    <h3>No products found</h3>
+                    <p>Try adjusting your search or filter to find what you're looking for.</p>
+                    @if (!string.IsNullOrEmpty(searchTerm))
+                    {
+                        <a href="@Url.Action("GetAllProducts")" class="btn btn-cart mt-3" style="background: var(--primary-pink); color: white; width: auto; padding: 10px 30px;">
+                            Clear Search
+                        </a>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+
+    @if (Model.TotalPages > 1)
+    {
+        <nav class="pb-5 mt-4">
+            <ul class="pagination justify-content-center">
+                @if (Model.PageNumber > 1)
+                {
+                    <li class="page-item">
+                        <a class="page-link" asp-action="GetAllProducts"
+                           asp-route-pageIndex="@(Model.PageNumber - 1)"
+                           asp-route-search="@searchTerm"
+                           asp-route-sortBy="@sortBy"
+                           asp-route-sortDir="@sortDir">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                    </li>
+                }
+
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    if (i == 1 || i == Model.TotalPages || (i >= Model.PageNumber - 2 && i <= Model.PageNumber + 2))
+                    {
+                        <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                            <a class="page-link" asp-action="GetAllProducts"
+                               asp-route-pageIndex="@i"
+                               asp-route-search="@searchTerm"
+                               asp-route-sortBy="@sortBy"
+                               asp-route-sortDir="@sortDir">@i</a>
+                        </li>
+                    }
+                    else if (i == Model.PageNumber - 3 || i == Model.PageNumber + 3)
+                    {
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    }
+                }
+
+                @if (Model.PageNumber < Model.TotalPages)
+                {
+                    <li class="page-item">
+                        <a class="page-link" asp-action="GetAllProducts"
+                           asp-route-pageIndex="@(Model.PageNumber + 1)"
+                           asp-route-search="@searchTerm"
+                           asp-route-sortBy="@sortBy"
+                           asp-route-sortDir="@sortDir">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // ========== PRODUCT CARDS ANIMATION ==========
+            const productCards = document.querySelectorAll('.product-card');
+
+            productCards.forEach((card, index) => {
+                // Set CSS variable for animation delay
+                card.style.setProperty('--item-index', index);
+
+                // Add loading effect for images
+                const img = card.querySelector('.product-img');
+                const imgWrapper = card.querySelector('.img-wrapper');
+
+                if (img && img.src) {
+                    // Check if image is already loaded
+                    if (!img.complete) {
+                        imgWrapper.classList.add('loading');
+                    }
+
+                    // Remove loading class when image loads
+                    img.addEventListener('load', function() {
+                        imgWrapper.classList.remove('loading');
+                    });
+
+                    // Handle image load error
+                    img.addEventListener('error', function() {
+                        imgWrapper.classList.remove('loading');
+                        imgWrapper.innerHTML = '<div class="d-flex align-items-center justify-content-center h-100"><i class="bi bi-image fs-1 text-muted"></i></div>';
+                    });
+                }
+            });
+
+            // ========== QUICK ADD TO CART FUNCTIONALITY ==========
+
+            // Show quick add form when clicking "Add to Cart"
+            document.querySelectorAll('.show-quick-add-btn').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+
+                    const productId = this.getAttribute('data-product-id');
+                    const productCard = this.closest('.product-card');
+                    const addButton = this;
+                    const quickAddForm = document.getElementById(`quickAddForm_${productId}`);
+
+                    // Hide the add button
+                    addButton.style.display = 'none';
+
+                    // Show the quick add form
+                    quickAddForm.classList.add('show');
+
+                    // Focus on quantity input
+                    const quantityInput = document.getElementById(`quantity_${productId}`);
+                    if (quantityInput) {
+                        quantityInput.focus();
+                        quantityInput.select();
+                    }
+                });
+            });
+
+            // Cancel quick add
+            document.querySelectorAll('.cancel-add-btn').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+
+                    const productId = this.getAttribute('data-product-id');
+                    const productCard = this.closest('.product-card');
+                    const addButton = productCard.querySelector('.show-quick-add-btn');
+                    const quickAddForm = document.getElementById(`quickAddForm_${productId}`);
+
+                    // Show the add button
+                    addButton.style.display = 'flex';
+
+                    // Hide the quick add form
+                    quickAddForm.classList.remove('show');
+                });
+            });
+
+            // Confirm and add to basket
+            document.querySelectorAll('.add-to-basket-btn').forEach(button => {
+                button.addEventListener('click', async function(e) {
+                    e.preventDefault();
+
+                    const productId = this.getAttribute('data-product-id');
+                    const quantityInput = document.getElementById(`quantity_${productId}`);
+                    const quantity = quantityInput ? parseInt(quantityInput.value) : 1;
+                    const productCard = this.closest('.product-card');
+                    const addButton = productCard.querySelector('.show-quick-add-btn');
+                    const quickAddForm = document.getElementById(`quickAddForm_${productId}`);
+
+                    // Validate quantity
+                    if (quantity < 1 || quantity > 100 || isNaN(quantity)) {
+                        showMessage('Please enter a valid quantity (1-100)', 'error');
+                        quantityInput.focus();
+                        quantityInput.select();
+                        return;
+                    }
+
+                    // Create ripple effect
+                    const rect = this.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    const x = e.clientX - rect.left - size / 2;
+                    const y = e.clientY - rect.top - size / 2;
+
+                    const ripple = document.createElement('span');
+                    ripple.style.cssText = `
+                        position: absolute;
+                        border-radius: 50%;
+                        background: rgba(255, 255, 255, 0.7);
+                        transform: scale(0);
+                        animation: ripple-animation 0.6s linear;
+                        width: ${size}px;
+                        height: ${size}px;
+                        top: ${y}px;
+                        left: ${x}px;
+                        pointer-events: none;
+                        z-index: 1;
+                    `;
+
+                    this.appendChild(ripple);
+
+                    // Remove ripple after animation
+                    setTimeout(() => ripple.remove(), 600);
+
+                    // Show loading state
+                    const originalText = this.innerHTML;
+                    this.innerHTML = '<i class="bi bi-arrow-clockwise spin"></i> Adding...';
+                    this.disabled = true;
+
+                    try {
+                        // Prepare form data for AddToBasket
+                        const formData = new FormData();
+                        formData.append('ProductId', productId);
+                        formData.append('Quantity', quantity);
+
+                        // Get anti-forgery token
+                        const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+
+                        // Send POST request to AddToBasket action
+                        const response = await fetch('/AddToBasket/AddToBasket', {
+                            method: 'POST',
+                            headers: {
+                                'RequestVerificationToken': token,
+                                'Accept': 'application/json'
+                            },
+                            body: formData
+                        });
+
+                        if (response.redirected) {
+                            // If redirected to login page, follow the redirect
+                            window.location.href = response.url;
+                            return;
+                        }
+
+                        const result = await response.json();
+
+                        if (response.ok && result.success) {
+                            // Success - show success message
+                            showMessage('Product added to basket successfully!', 'success');
+
+                            // Update cart count in navbar if exists
+                            updateCartCount(1);
+
+                            // Reset the form and show add button
+                            setTimeout(() => {
+                                addButton.style.display = 'flex';
+                                quickAddForm.classList.remove('show');
+                                if (quantityInput) quantityInput.value = '1';
+                                this.innerHTML = originalText;
+                                this.disabled = false;
+                            }, 1000);
+
+                        } else {
+                            // Error from server
+                            throw new Error(result.message || 'Failed to add product to basket');
+                        }
+
+                    } catch (error) {
+                        console.error('Error adding to cart:', error);
+
+                        // Show error message
+                        showMessage(error.message || 'Failed to add product to basket. Please try again.', 'error');
+
+                        // Reset button
+                        this.innerHTML = originalText;
+                        this.disabled = false;
+                    }
+                });
+            });
+
+            // ========== MOBILE FILTER TOGGLE ==========
+            const filterToggle = document.getElementById('filterToggle');
+            const filterForm = document.getElementById('filterForm');
+
+            if (filterToggle && filterForm) {
+                const updateFilterVisibility = () => {
+                    if (window.innerWidth <= 768) {
+                        filterToggle.style.display = 'flex';
+                        filterForm.style.display = 'none';
+                    } else {
+                        filterToggle.style.display = 'none';
+                        filterForm.style.display = 'flex';
+                    }
+                };
+
+                // Initial setup
+                updateFilterVisibility();
+
+                // Toggle filter form on mobile
+                filterToggle.addEventListener('click', () => {
+                    if (filterForm.style.display === 'none' || filterForm.style.display === '') {
+                        filterForm.style.display = 'flex';
+                        filterForm.style.animation = 'fadeIn 0.3s ease';
+                        filterToggle.innerHTML = '<i class="bi bi-x"></i> Close Filters';
+                        filterToggle.style.background = '#333';
+                    } else {
+                        filterForm.style.display = 'none';
+                        filterToggle.innerHTML = '<i class="bi bi-filter"></i> Filter & Sort';
+                        filterToggle.style.background = 'var(--primary-pink)';
+                    }
+                });
+
+                // Update on resize
+                window.addEventListener('resize', updateFilterVisibility);
+            }
+
+            // ========== FORM AUTO SUBMIT ==========
+            const sortSelects = document.querySelectorAll('select[name="sortBy"], select[name="sortDir"]');
+            sortSelects.forEach(select => {
+                select.addEventListener('change', function() {
+                    this.form.submit();
+                });
+            });
+
+            // ========== HELPER FUNCTIONS ==========
+
+            // Show message function
+            function showMessage(message, type) {
+                // Remove existing messages
+                const existingMessages = document.querySelectorAll('.success-message, .error-message');
+                existingMessages.forEach(msg => msg.remove());
+
+                // Create message element
+                const messageDiv = document.createElement('div');
+                messageDiv.className = type === 'success' ? 'success-message' : 'error-message';
+                if (type === 'error') {
+                    messageDiv.style.background = '#dc3545';
+                }
+
+                messageDiv.innerHTML = `
+                    <i class="bi ${type === 'success' ? 'bi-check-circle' : 'bi-exclamation-circle'}"></i>
+                    <span>${message}</span>
+                `;
+
+                document.body.appendChild(messageDiv);
+
+                // Remove message after 3 seconds
+                setTimeout(() => {
+                    if (messageDiv.parentNode) {
+                        messageDiv.remove();
+                    }
+                }, 3000);
+            }
+
+            // Update cart count function
+            function updateCartCount(increment = 1) {
+                const cartCount = document.querySelector('.cart-count');
+                if (cartCount) {
+                    const currentCount = parseInt(cartCount.textContent) || 0;
+                    cartCount.textContent = currentCount + increment;
+                    cartCount.classList.add('pulse');
+                    setTimeout(() => cartCount.classList.remove('pulse'), 1000);
+                }
+            }
+
+            // Check for TempData success message
+            @if (TempData["SuccessMessage"] != null)
+            {
+                    <text>
+                    showMessage('@TempData["SuccessMessage"]', 'success');
+                    </text>
+            }
+
+            // ========== ADDITIONAL STYLES ==========
+            const additionalStyles = document.createElement('style');
+            additionalStyles.textContent = `
+                .spin {
+                    animation: spin 0.6s linear infinite;
+                }
+
+                @@keyframes spin {
+                    from { transform: rotate(0deg); }
+                    to { transform: rotate(360deg); }
+                }
+
+                .cart-count.pulse {
+                    animation: pulse 0.5s ease-in-out;
+                }
+
+                @@keyframes pulse {
+                    0% { transform: scale(1); }
+                    50% { transform: scale(1.2); }
+                    100% { transform: scale(1); }
+                }
+
+                .error-message {
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: #dc3545;
+                    color: white;
+                    padding: 15px 25px;
+                    border-radius: 10px;
+                    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+                    z-index: 1000;
+                    animation: slideInRight 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                }
+
+                /* Better focus styles for accessibility */
+                .btn-cart:focus,
+                .page-link:focus,
+                .form-control-custom:focus,
+                .form-select:focus,
+                .quantity-control:focus {
+                    outline: 2px solid var(--primary-pink);
+                    outline-offset: 2px;
+                    box-shadow: 0 0 0 3px rgba(214, 138, 138, 0.2);
+                }
+
+                /* Product card focus state */
+                .product-card:focus-within {
+                    border-color: var(--primary-pink);
+                    box-shadow: 0 0 0 2px rgba(214, 138, 138, 0.3);
+                }
+
+                /* Smooth scrolling */
+                html {
+                    scroll-behavior: smooth;
+                }
+            `;
+            document.head.appendChild(additionalStyles);
+
+            // ========== PERFORMANCE OPTIMIZATIONS ==========
+            // Debounce resize events
+            let resizeTimeout;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(() => {
+                    if (filterToggle && filterForm) {
+                        updateFilterVisibility();
+                    }
+                }, 250);
+            });
+
+            // ========== VIEWPORT AWARE ANIMATIONS ==========
+            if ('IntersectionObserver' in window) {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.style.opacity = '1';
+                            entry.target.style.transform = 'translateY(0)';
+                        }
+                    });
+                }, {
+                    threshold: 0.1,
+                    rootMargin: '50px'
+                });
+
+                // Observe all product cards for viewport entry
+                document.querySelectorAll('.product-card').forEach(card => {
+                    observer.observe(card);
+                });
+            }
+
+            // Quantity input validation
+            document.querySelectorAll('.quantity-control').forEach(input => {
+                input.addEventListener('input', function() {
+                    let value = parseInt(this.value);
+                    if (isNaN(value) || value < 1) {
+                        this.value = 1;
+                    } else if (value > 100) {
+                        this.value = 100;
+                    }
+                });
+
+                input.addEventListener('blur', function() {
+                    if (this.value === '' || parseInt(this.value) < 1) {
+                        this.value = 1;
+                    }
+                });
+            });
+        });
+    </script>
+}

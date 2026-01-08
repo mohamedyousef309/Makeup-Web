@@ -24,8 +24,7 @@ namespace Infastructure_Layer.Data.Configurations
               .IsRequired()
               .HasMaxLength(200);
 
-            builder.Property(oi => oi.PictureUrl)
-                   .IsRequired();
+           
 
             builder.Property(oi => oi.Quantity)
                    .IsRequired();
