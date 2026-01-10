@@ -29,6 +29,7 @@ namespace Application_Layer.CQRS.Orders.Quries.GetAllOrders
         }
         public async Task<RequestRespones<PaginatedListDto<OrderToReturnDto>>> Handle(GetAllOrdersQuery request, CancellationToken cancellationToken)
         {
+
             var orders = genaricRepository.GetAll().Select(x=>new OrderToReturnDto 
             {
                 orderid=x.Id,

@@ -18,10 +18,7 @@ namespace Domain_Layer.ViewModels.Basket
         [Range(1, 100, ErrorMessage = "Quantity must be between 1 and 100.")]
         public int NewQuantity { get; set; }
 
-        [Required(ErrorMessage = "ProductName is required.")]
-        public string ProductName { get; set; }
-        [Required(ErrorMessage = "ProductPrice is required.")]
-        public decimal ProductPrice { get; set; }
+       
 
     }
 }

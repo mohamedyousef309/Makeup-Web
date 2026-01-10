@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Domain_Layer.Entites.Order;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,6 +18,7 @@ namespace Domain_Layer.Entites.Authantication
         public bool EmailConfirmed { get; set; } = false;
         public int FailedLoginAttempts { get; set; } = 0;
         public DateTime? LockoutEnd { get; set; }
+        public IEnumerable<Order.Order?> UserOrders { get; set; } = new HashSet<Order.Order?>();
 
         public IEnumerable<UserRole> UserRoles { get; set; } = new HashSet<UserRole>();
 

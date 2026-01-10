@@ -58,7 +58,11 @@ namespace Infastructure_Layer.Data.Configurations.AuthanticationConfiguration
             builder.HasIndex(u => u.Username)
                    .IsUnique();
 
-
+            builder.HasMany(x => x.UserOrders)
+                   .WithOne(x => x.User)
+                   .HasForeignKey(x => x.UserId)
+                   .IsRequired() 
+                   .OnDelete(DeleteBehavior.Cascade); 
 
             builder.HasMany(x=>x.UserRoles).WithOne(x=>x.user).HasForeignKey(x=>x.Userid).OnDelete(DeleteBehavior.Cascade); 
             

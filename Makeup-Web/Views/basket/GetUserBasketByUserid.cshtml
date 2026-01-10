@@ -8,7 +8,6 @@
     decimal total = subTotal + shipping;
 }
 
-@* أضف هذا السطر لضمان وجود التوكن الخاص بالحماية *@
 @Html.AntiForgeryToken()
 
 @section Styles {
@@ -21,6 +20,8 @@
             --input-bg: #252525;
             --text-light: #ffffff;
             --text-muted: #a0a0a0;
+            --accent-gold: #c5a059;
+            --danger-red: #ff4d4d;
         }
 
         body {
@@ -30,7 +31,7 @@
         }
 
         .basket-header {
-            padding: 80px 0 40px;
+            padding: 60px 0 30px;
             text-align: center;
             background: linear-gradient(to bottom, #1a1a1a 0%, #0f0f0f 100%);
             margin-bottom: 30px;
@@ -39,33 +40,31 @@
 
         .basket-title {
             font-family: 'Playfair Display', serif;
-            font-size: 3.2rem;
+            font-size: 2.8rem;
             font-weight: 800;
             text-transform: uppercase;
             background: linear-gradient(45deg, #fff 30%, var(--primary-pink) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-        }
-
-        .basket-container {
-            max-width: 1200px;
-            margin: 0 auto;
+            letter-spacing: 2px;
         }
 
         .basket-item {
             background: var(--card-bg);
             border-radius: 16px;
-            padding: 24px;
+            padding: 20px;
             margin-bottom: 20px;
             border: 1px solid #252525;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
-            gap: 24px;
+            gap: 20px;
+            position: relative;
         }
 
         .item-image {
-            width: 120px;
-            height: 120px;
+            width: 130px;
+            height: 130px;
             border-radius: 12px;
             object-fit: cover;
             border: 1px solid #333;
@@ -75,65 +74,96 @@
             flex: 1;
         }
 
-        .item-name {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: var(--text-light);
+        /* تنسيق رأس المنتج (الاسم + زر الحذف) */
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
         }
 
+        .item-name {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        /* زر الحذف */
+        .btn-remove {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            padding: 5px;
+        }
+
+            .btn-remove:hover {
+                color: var(--danger-red);
+                transform: scale(1.1);
+            }
+
         .item-price {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             font-weight: 700;
-            color: var(--primary-pink);
-            margin: 10px 0;
+            color: var(--accent-gold);
+            margin-bottom: 15px;
         }
 
         .quantity-controls {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 15px;
+            background: var(--input-bg);
+            padding: 5px 12px;
+            border-radius: 10px;
+            border: 1px solid #333;
         }
 
         .qty-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
-            background: var(--input-bg);
-            border: 1px solid #333;
-            color: var(--text-light);
+            background: transparent;
+            border: none;
+            color: var(--primary-pink);
+            font-size: 1.2rem;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .qty-value {
-            min-width: 40px;
-            text-align: center;
-            font-weight: bold;
         }
 
         .summary-card {
             background: var(--card-bg);
             border-radius: 20px;
-            padding: 32px;
+            padding: 30px;
             border: 1px solid #252525;
             position: sticky;
             top: 100px;
         }
 
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .total-row {
+            border-top: 1px solid #333;
+            padding-top: 20px;
+            font-weight: 800;
+            font-size: 1.4rem;
+        }
+
         .btn-checkout {
             background: var(--primary-pink);
             color: white;
-            border: none;
             border-radius: 12px;
-            padding: 15px;
+            padding: 16px;
             width: 100%;
-            font-weight: bold;
-            cursor: pointer;
-            text-decoration: none;
             display: block;
             text-align: center;
+            text-decoration: none;
+            font-weight: 700;
+            border: none;
+        }
+
+        .empty-basket {
+            text-align: center;
+            padding: 100px 20px;
         }
     </style>
 }
@@ -144,31 +174,42 @@
     </div>
 </div>
 
-<div class="container basket-container">
+<div class="container mb-5" id="basket-content">
     @if (Model != null && Model.items != null && Model.items.Any())
     {
         <div class="row">
             <div class="col-lg-8">
                 @foreach (var item in Model.items)
                 {
-                    <div class="basket-item" id="item-@item.productid">
-                        <img src="@(string.IsNullOrEmpty(item.PictureUrl) ? "/Files/Images/default-product.jpg" : item.PictureUrl)" class="item-image" alt="@item.ProductName">
+                    <div class="basket-item" id="item-row-@item.productid">
+                        <img src="@(string.IsNullOrEmpty(item.PictureUrl) ? "/Files/Images/default-product.jpg" : item.PictureUrl)" class="item-image">
 
                         <div class="item-details">
-                            <h3 class="item-name" id="name-@item.productid">@item.ProductName</h3>
-                            @* تم التأكد من وجود data-value لحمل الرقم الصافي للسعر *@
-                            <div class="item-price" id="price-@item.productid" data-value="@item.Price">@item.Price.ToString("F2") $</div>
-
-                            <div class="quantity-controls">
-                                <button type="button" class="qty-btn" onclick="updateQuantity(@item.productid, -1)">
-                                    <i class="bi bi-dash-lg">-</i>
-                                </button>
-                                <span class="qty-value" id="qty-@item.productid">@item.Quantity</span>
-                                <button type="button" class="qty-btn" onclick="updateQuantity(@item.productid, 1)">
-                                    <i class="bi bi-plus-lg">+</i>
+                            <div class="item-header">
+                                <h3 class="item-name">@item.ProductName</h3>
+                                <button type="button" class="btn-remove" onclick="removeItem('@item.productid')" title="Remove Item">
+                                    <i class="bi bi-trash3" style="font-size: 1.2rem;"></i>
                                 </button>
                             </div>
-                            <div class="mt-2 text-muted">Total: @((item.Price * item.Quantity).ToString("F2")) $</div>
+
+                            <div class="item-price">
+                                <span id="unit-price-@item.productid">@item.Price.ToString("F2")</span> $
+                            </div>
+
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="quantity-controls">
+                                    <button type="button" class="qty-btn" onclick="updateQuantity('@item.productid', -1)">-</button>
+                                    <span class="qty-value" id="qty-@item.productid">@item.Quantity</span>
+                                    <button type="button" class="qty-btn" onclick="updateQuantity('@item.productid', 1)">+</button>
+                                </div>
+
+                                <div class="text-end">
+                                    <small class="text-muted d-block">Subtotal</small>
+                                    <span class="fw-bold" style="color: var(--text-light)" id="item-total-@item.productid">
+                                        @((item.Price * item.Quantity).ToString("F2")) $
+                                    </span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 }
@@ -176,68 +217,121 @@
 
             <div class="col-lg-4">
                 <div class="summary-card">
-                    <h3>Order Summary</h3>
-                    <div class="d-flex justify-content-between mb-3">
-                        <span>Subtotal</span>
-                        <span>@subTotal.ToString("F2") $</span>
+                    <h3 class="mb-4">Order Summary</h3>
+                    <div class="summary-row">
+                        <span class="text-muted">Subtotal</span>
+                        <span id="summary-subtotal">@subTotal.ToString("F2") $</span>
                     </div>
-                    <div class="d-flex justify-content-between mb-3">
-                        <strong>Total</strong>
-                        <strong style="color: var(--primary-pink); font-size: 1.5rem;">@total.ToString("F2") $</strong>
+                    <div class="summary-row total-row">
+                        <span>Total</span>
+                        <span id="summary-total" style="color: var(--primary-pink)">@total.ToString("F2") $</span>
                     </div>
-                    <a asp-controller="Order" asp-action="CreatOrder" class="btn-checkout">Checkout Now</a>
+
+                    <a asp-controller="Order" asp-action="CreatOrder" class="btn-checkout mt-3">Create Order</a>
                 </div>
             </div>
+        </div>
+    }
+    else
+    {
+        <div class="empty-basket">
+            <i class="bi bi-bag-x" style="font-size: 4rem; color: var(--primary-pink)"></i>
+            <h2 class="mt-4">Your bag is currently empty</h2>
+
+            <a asp-controller="Products"
+               asp-action="GetAllProducts"
+               class="btn-checkout d-inline-block mt-4"
+               style="width: auto; padding: 15px 40px;">
+                Continue Shopping
+            </a>
         </div>
     }
 </div>
 
 @section Scripts {
     <script>
+        // دالة تحديث الكمية (كما كانت مع بعض التحسينات)
         async function updateQuantity(productId, change) {
             const qtyElement = document.getElementById(`qty-${productId}`);
-            const nameElement = document.getElementById(`name-${productId}`);
-            const priceElement = document.getElementById(`price-${productId}`);
+            const itemRow = document.getElementById(`item-row-${productId}`);
+            if (!qtyElement) return;
 
-            // حل مشكلة الـ 21: تحويل النص لرقم باستخدام Number() لضمان الجمع الحسابي وليس النصي
-            let currentQty = Number(qtyElement.innerText.trim());
+            let currentQty = parseInt(qtyElement.innerText);
             let updatedQty = currentQty + change;
+            if (updatedQty < 1) return;
 
-            // منع الكمية من النزول تحت 1 أو تخطي 100
-            if (updatedQty < 1 || updatedQty > 100) return;
-
-            // تعطيل الأزرار مؤقتاً لمنع النقر المزدوج العشوائي
-            const buttons = document.querySelectorAll(`#item-${productId} .qty-btn`);
-            buttons.forEach(btn => btn.style.pointerEvents = 'none');
+            itemRow.style.opacity = "0.5";
+            itemRow.style.pointerEvents = "none";
 
             try {
                 const response = await fetch('@Url.Action("UpdateProductQunaty", "basket")', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ""
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
                     },
-                    body: JSON.stringify({
-                        ProductId: parseInt(productId),
-                        NewQuantity: parseInt(updatedQty),
-                        ProductName: nameElement.innerText.trim(),
-                        ProductPrice: parseFloat(priceElement.getAttribute('data-value'))
-                    })
+                    body: JSON.stringify({ ProductId: parseInt(productId), NewQuantity: parseInt(updatedQty) })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    qtyElement.innerText = updatedQty;
+                    const unitPrice = parseFloat(document.getElementById(`unit-price-${productId}`).innerText);
+                    document.getElementById(`item-total-${productId}`).innerText = (unitPrice * updatedQty).toFixed(2) + " $";
+
+                    let totalSum = 0;
+                    result.items.forEach(item => {
+                        totalSum += item.price * item.quantity;
+                    });
+
+                    document.getElementById('summary-subtotal').innerText = totalSum.toFixed(2) + " $";
+                    document.getElementById('summary-total').innerText = totalSum.toFixed(2) + " $";
+                } else {
+                    alert(result.message || "Error updating quantity");
+                }
+            } catch (error) {
+                console.error("Error:", error);
+            } finally {
+                itemRow.style.opacity = "1";
+                itemRow.style.pointerEvents = "auto";
+            }
+        }
+
+        // دالة حذف منتج بالكامل
+        async function removeItem(productId) {
+            if (!confirm("Are you sure you want to remove this item from your bag?")) return;
+
+            const itemRow = document.getElementById(`item-row-${productId}`);
+            itemRow.style.opacity = "0.5";
+            itemRow.style.pointerEvents = "none";
+
+            try {
+                // نستخدم FormData لأن الـ Action يتوقع parameter بسيط من Form
+                const formData = new FormData();
+                formData.append('productId', productId);
+
+                const response = await fetch('@Url.Action("RemoveItemFromBasket", "basket")', {
+                    method: 'POST',
+                    headers: {
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    },
+                    body: formData
                 });
 
                 if (response.ok) {
-                    // التحديث نجح، نقوم بعمل Reload للصفحة ليعيد الـ Controller حساب الإجماليات
+                    // بما أن الـ Controller يرجع View("GetUserBasketByUserid")
+                    // سنقوم بإعادة تحميل الصفحة لتحديث السلة بالكامل
                     window.location.reload();
                 } else {
-                    const errorMsg = await response.text();
-                    console.error("Update failed:", errorMsg);
-                    alert("Failed to update basket. Please try again.");
-                    buttons.forEach(btn => btn.style.pointerEvents = 'auto');
+                    alert("Failed to remove item. Please try again.");
+                    itemRow.style.opacity = "1";
+                    itemRow.style.pointerEvents = "auto";
                 }
             } catch (error) {
-                console.error('Fetch Error:', error);
-                alert("Connection error.");
-                buttons.forEach(btn => btn.style.pointerEvents = 'auto');
+                console.error("Error:", error);
+                itemRow.style.opacity = "1";
+                itemRow.style.pointerEvents = "auto";
             }
         }
     </script>

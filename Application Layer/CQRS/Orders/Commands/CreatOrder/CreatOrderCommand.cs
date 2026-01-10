@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace Application_Layer.CQRS.Orders.Commands.CreatOrder
 {
-    public record CreatOrderCommand(string BuyerEmail, string PhoneNumber, string Address , IEnumerable<OrderItems> Items, decimal subTotal) : ICommand<RequestRespones<bool>>;
+    public record CreatOrderCommand(int userid,string BuyerEmail, string PhoneNumber, string Address , IEnumerable<OrderItems> Items, decimal subTotal) : ICommand<RequestRespones<bool>>;
 
     public class CreatOrderCommandHandler : IRequestHandler<CreatOrderCommand, RequestRespones<bool>>
     {
@@ -36,6 +36,7 @@ namespace Application_Layer.CQRS.Orders.Commands.CreatOrder
 
             var order = new Order
             {
+                    UserId = request.userid,
                     BuyerEmail = request.BuyerEmail,
                     PhoneNumber = request.PhoneNumber,
                     Address = request.Address,

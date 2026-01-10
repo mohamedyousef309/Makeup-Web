@@ -68,6 +68,7 @@ namespace Application_Layer.CQRS.Orders.Commands.CreatOrder
             decimal calculatedSubtotal = orderItems.Sum(i => i.Price * i.Quantity);
 
             var createOrderResult = await mediator.Send(new CreatOrderCommand(
+                userResult.Data.Id,
                 request.BuyerEmail ?? userResult.Data.Email,
                 request.PhoneNumber ?? userResult.Data.PhoneNumber,
                 request.Address ?? userResult.Data.UserAddress,

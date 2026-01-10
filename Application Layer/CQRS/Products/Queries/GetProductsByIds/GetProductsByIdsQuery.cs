@@ -34,7 +34,6 @@ namespace Application_Layer.CQRS.Products.Queries.GetProductsByIds
                      Stock = p.Stock,
                      CategoryId = p.CategoryId,
                      IsActive = p.IsActive,
-                     ProductStock = p.productStock,
                  }).ToListAsync(cancellationToken);
             if (!Products.Any())
             {

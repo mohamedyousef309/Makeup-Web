@@ -20,7 +20,6 @@ namespace Domain_Layer.Entites
 
         public bool IsActive { get; set; } = true;
 
-        public int productStock { get; set; }
 
 
         // FK to Category

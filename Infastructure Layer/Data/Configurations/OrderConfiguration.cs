@@ -39,6 +39,8 @@ namespace Infastructure_Layer.Data.Configurations
                   .HasConversion<string>()
                   .IsRequired();
 
+        
+
 
             builder.Property(x => x.subTotal)
                    .HasColumnType("decimal(10,2)")

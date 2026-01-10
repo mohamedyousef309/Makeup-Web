@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Domain_Layer.Entites.Authantication;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -25,6 +26,8 @@ namespace Domain_Layer.Entites.Order
     }
     public class Order:BaseEntity
     {
+        
+
         public string BuyerEmail { get; set; }
 
         public string PhoneNumber { get; set; } = default!;
@@ -34,9 +37,12 @@ namespace Domain_Layer.Entites.Order
 
         public decimal Deliverycost { get; set; }
 
+        public User User  { get; set; }
+        public int UserId { get; set; }
         public IEnumerable<OrderItems> Items { get; set; } = new HashSet<OrderItems>();
 
         public decimal subTotal { get; set; }
+
 
         public decimal GetTotal() => subTotal + Deliverycost;
     }

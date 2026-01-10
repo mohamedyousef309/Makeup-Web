@@ -38,7 +38,6 @@ namespace Application_Layer.CQRS.Products.Commands.CreateProduct
                     Stock = request.CreateProductDto.Stock,
                     CategoryId = request.CreateProductDto.CategoryId,
                     IsActive = true,
-                    productStock = request.CreateProductDto.Stock,
                     
                 };
 
@@ -57,7 +56,6 @@ namespace Application_Layer.CQRS.Products.Commands.CreateProduct
                 Price = product.Price,
                 Stock = product.Stock,
                 IsActive = product.IsActive,
-                ProductStock = product.productStock,
                 CategoryId = product.CategoryId,
             
                 Variants = new List<ProductVariantDto>()

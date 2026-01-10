@@ -29,30 +29,35 @@ namespace Application_Layer.CQRS
 
         }
 
-        protected IQueryable<T> ApplySearch<T>( IQueryable<T> query, string? search, Expression<Func<T, string>> propertySelector)
+        protected IQueryable<T> ApplySearch<T>(IQueryable<T> query, string? search, params Expression<Func<T, string>>[] propertySelectors)
         {
-            if (string.IsNullOrWhiteSpace(search))
+            if (string.IsNullOrWhiteSpace(search) || propertySelectors == null || propertySelectors.Length == 0)
                 return query;
 
             var term = search.Trim().ToLower();
+            var parameter = propertySelectors[0].Parameters[0];
+            Expression? aggregateExpression = null;
 
-            // نقوم بتركيب Expression Tree يدوياً لضمان أن EF Core يفهمها
-            // النتيجة ستكون مثل: x => x.Property.ToLower().Contains(term)
-
-            var parameter = propertySelector.Parameters[0];
-            var property = propertySelector.Body;
-
-            // .ToLower()
-            var toLowerMethod = typeof(string).GetMethod("ToLower", System.Type.EmptyTypes);
-            var toLowerExpression = Expression.Call(property, toLowerMethod!);
-
-            // .Contains(term)
+            var toLowerMethod = typeof(string).GetMethod("ToLower", Type.EmptyTypes);
             var containsMethod = typeof(string).GetMethod("Contains", new[] { typeof(string) });
             var searchTerm = Expression.Constant(term);
-            var containsExpression = Expression.Call(toLowerExpression, containsMethod!, searchTerm);
 
-            var lambda = Expression.Lambda<Func<T, bool>>(containsExpression, parameter);
+            foreach (var selector in propertySelectors)
+            {
+                // استخراج الحقل (Property)
+                var property = selector.Body;
 
+                // x.Property.ToLower().Contains(term)
+                var toLowerCall = Expression.Call(property, toLowerMethod!);
+                var containsCall = Expression.Call(toLowerCall, containsMethod!, searchTerm);
+
+                // دمج الشروط بـ OR
+                aggregateExpression = aggregateExpression == null
+                    ? containsCall
+                    : Expression.OrElse(aggregateExpression, containsCall);
+            }
+
+            var lambda = Expression.Lambda<Func<T, bool>>(aggregateExpression!, parameter);
             return query.Where(lambda);
         }
 

@@ -14,7 +14,7 @@ namespace Domain_Layer.DTOs.Basket
         public decimal Price { get; set; }
 
         
-        public string PictureUrl { get; set; }
+        public string? PictureUrl { get; set; }
 
 
     }

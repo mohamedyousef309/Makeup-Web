@@ -1,7 +1,9 @@
 ﻿using Application_Layer.CQRS.Basket.Commands.CreateOrUpdateBasket;
 using Application_Layer.CQRS.Basket.Commands.DeletBasket;
 using Application_Layer.CQRS.Basket.Commands.DeleteFromBasket;
+using Application_Layer.CQRS.Basket.Commands.UpdateBasketProductQuntaty;
 using Application_Layer.CQRS.Basket.Quries.GetUserBsaket;
+using Application_Layer.CQRS.Products.Commands.UpdateProduct;
 using Domain_Layer.Entites.Basket;
 using Domain_Layer.ViewModels.Basket;
 using MediatR;
@@ -90,18 +92,13 @@ namespace Makeup_Web.Controllers
             {
                 return BadRequest(ModelState);
             }
-            var UpdateProductQunatyResult = await mediator.Send(new CreateOrUpdateBasketOrchestrator(userId, Modle.ProductId, Modle.ProductName, Modle.ProductPrice, Modle.NewQuantity));
+            var UpdateProductQunatyResult = await mediator.Send(new UpdateBasketProductQuntatyCommand(userId, Modle.ProductId,  Modle.NewQuantity));
             if (!UpdateProductQunatyResult.IsSuccess)
             {
-                ModelState.AddModelError(string.Empty, UpdateProductQunatyResult.Message);
-
-                var basket = await mediator.Send(new GetUserBsaketQuery(userId));
-
-                return View("GetUserBasketByUserid", basket);
+                return BadRequest(new { message = UpdateProductQunatyResult.Message });
             }
 
-            return RedirectToAction(nameof(GetUserBasketByUserid));
-
+            return Ok(UpdateProductQunatyResult.Data);
         }
 
         public async Task<IActionResult> GetUserBasketByUserid() // /basket/GetUserBasketByUserid

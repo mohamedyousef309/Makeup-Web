@@ -1,7 +1,269 @@
-﻿
+﻿@using Domain_Layer.DTOs
+@using Domain_Layer.DTOs.OrderDTOs
+@model PaginatedListDto<OrderToReturnDto>
+
 @{
-    ViewData["Title"] = "GetUserOrders";
+    ViewData["Title"] = "My Orders - Pro Makeup Studio";
+    var searchTerm = Context.Request.Query["search"];
+    var sortBy = Context.Request.Query["sortBy"];
+    var sortDir = Context.Request.Query["sortDir"];
 }
 
-<h1>GetUserOrders</h1>
+@section Styles {
+    <style>
+        :root {
+            --primary-pink: #d68a8a;
+            --primary-hover: #c27676;
+            --dark-bg: #0f0f0f;
+            --card-bg: #1a1a1a;
+            --input-bg: #252525;
+            --text-light: #ffffff;
+            --text-muted: #a0a0a0;
+        }
 
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .orders-header {
+            padding: 40px 0 20px;
+            text-align: center;
+        }
+
+        .orders-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            color: var(--text-light);
+            margin-bottom: 5px;
+        }
+
+        /* إصلاح مشكلة ظهور الجدول باللون الأبيض */
+        .orders-table {
+            background: var(--card-bg) !important;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #333;
+        }
+
+        .table {
+            margin-bottom: 0 !important;
+            color: var(--text-light) !important;
+            background-color: transparent !important;
+        }
+
+        /* إجبار الصفوف والخلايا على الخلفية الغامقة */
+        .table td, .table th {
+            background-color: var(--card-bg) !important; 
+            color: var(--text-light) !important;
+            border-bottom: 1px solid #333 !important;
+            padding: 15px 12px;
+        }
+
+        .orders-table thead th {
+            background: #252525 !important;
+            color: var(--primary-pink) !important;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            border-bottom: 2px solid var(--primary-pink) !important;
+        }
+
+        /* تنسيق النصوص لتكون واضحة */
+        .order-id {
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            color: var(--primary-pink) !important; /* لون وردي للـ ID لتمييزه */
+        }
+
+        .order-email {
+            color: var(--text-light) !important;
+            font-weight: 500;
+        }
+
+        .order-date {
+            color: var(--text-muted) !important;
+        }
+
+        /* Filter Section */
+        .filter-glass {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid #333;
+        }
+
+        .form-control-custom {
+            background: var(--input-bg) !important;
+            border: 1px solid #333 !important;
+            color: white !important;
+            border-radius: 8px;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-badge.pending { background: rgba(255, 167, 38, 0.15); color: #FFA726; border: 1px solid #FFA726; }
+        .status-badge.shipped { background: rgba(102, 187, 106, 0.15); color: #66BB6A; border: 1px solid #66BB6A; }
+        .status-badge.delivered { background: rgba(38, 166, 154, 0.15); color: #26A69A; border: 1px solid #26A69A; }
+        .status-badge.cancelled { background: rgba(239, 83, 80, 0.15); color: #EF5350; border: 1px solid #EF5350; }
+
+        .btn-view {
+            border: 1px solid var(--primary-pink);
+            color: var(--primary-pink);
+            padding: 5px 15px;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .btn-view:hover {
+            background: var(--primary-pink);
+            color: white;
+        }
+
+        /* Responsive Mobile Labels */
+        @@media (max-width: 768px) {
+            .table thead { display: none; }
+            .table tr { display: block; margin-bottom: 1rem; border: 1px solid #333; }
+            .table td { 
+                display: flex; 
+                justify-content: space-between; 
+                text-align: right; 
+                border-bottom: 1px solid #222 !important;
+            }
+            .table td::before {
+                content: attr(data-label);
+                font-weight: bold;
+                color: var(--primary-pink);
+                float: left;
+            }
+        }
+    </style>
+}
+
+<div class="orders-header">
+    <div class="container">
+        <h1 class="orders-title">My Orders</h1>
+        <p style="color: var(--primary-pink)">Track your professional purchases</p>
+    </div>
+</div>
+
+<div class="container">
+    @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+    {
+        <div class="alert alert-danger bg-dark text-light border-danger">
+            @ViewBag.ErrorMessage
+        </div>
+    }
+    else if (Model == null || !Model.Items.Any())
+    {
+        <div class="text-center py-5" style="background: var(--card-bg); border-radius: 12px;">
+            <i class="bi bi-box-seam" style="font-size: 3rem; color: var(--primary-pink)"></i>
+            <h3 class="mt-3">No Orders Found</h3>
+            <a href="@Url.Action("GetAllProducts", "Products")" class="btn-view d-inline-block mt-3">Explore Products</a>
+        </div>
+    }
+    else
+    {
+        <div class="filter-glass">
+            <form method="get" asp-action="GetUserOrders" class="row g-3">
+                <div class="col-md-5">
+                    <input type="text" name="search" value="@searchTerm" class="form-control form-control-custom" placeholder="Search by email or status...">
+                </div>
+                <div class="col-md-3">
+                    <select name="sortBy" class="form-select form-control-custom">
+                        <option value="id" selected="@(sortBy == "id")">Order ID</option>
+                        <option value="orderDate" selected="@(sortBy == "orderDate")">Order Date</option>
+                        <option value="status" selected="@(sortBy == "status")">Status</option>
+                        <option value="BuyerEmail" selected="@(sortBy == "BuyerEmail")">Email</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select name="sortDir" class="form-select form-control-custom">
+                        <option value="asc" selected="@(sortDir == "asc")">Asc</option>
+                        <option value="desc" selected="@(sortDir == "desc")">Desc</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn w-100" style="background: var(--primary-pink); color: white;">Filter</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="table-responsive orders-table mb-4">
+            <table class="table align-middle">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Email</th>
+                        <th>Order Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var order in Model.Items)
+                    {
+                        <tr>
+                            <td data-label="Order ID">
+                                <span class="order-id">#@order.orderid</span>
+                            </td>
+                            <td data-label="Email">
+                                <span class="order-email">@order.BuyerEmail</span>
+                            </td>
+                            <td data-label="Order Date">
+                                <span class="order-date">@order.orderDate.ToString("MMM dd, yyyy HH:mm")</span>
+                            </td>
+                            <td data-label="Status">
+                                <span class="status-badge @order.status.ToLower()">@order.status</span>
+                            </td>
+                            <td data-label="Actions">
+                                <a href="@Url.Action("OrderDetails", "Order", new { orderId = order.orderid })" class="btn-view">
+                                    <i class="bi bi-eye"></i> Details
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (Model.TotalPages > 1)
+        {
+            <nav>
+                <ul class="pagination justify-content-center">
+                    @for (int i = 1; i <= Model.TotalPages; i++)
+                    {
+                        <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                            <a class="page-link bg-dark border-secondary text-light @(i == Model.PageNumber ? "bg-primary-pink" : "")" 
+                               href="@Url.Action("GetUserOrders", new { pageIndex = i, search = searchTerm, sortBy = sortBy, sortDir = sortDir })">@i</a>
+                        </li>
+                    }
+                </ul>
+            </nav>
+        }
+    }
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-submit on select change
+            const selects = document.querySelectorAll('.form-control-custom');
+            selects.forEach(s => {
+                if(s.tagName === 'SELECT') {
+                    s.addEventListener('change', () => s.form.submit());
+                }
+            });
+        });
+    </script>
+}
