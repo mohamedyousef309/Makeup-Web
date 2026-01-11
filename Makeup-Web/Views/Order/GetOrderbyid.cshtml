@@ -1,0 +1,313 @@
+﻿@using Domain_Layer.DTOs.OrderDTOs
+@model OrderToReturnDto
+
+@{
+    ViewData["Title"] = $"تفاصيل الطلب #{Model.orderid}";
+    var totalAmount = Model.subTotal + Model.Deliverycost;
+}
+
+@section Styles {
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-pink: #d68a8a;
+            --accent-gold: #c5a059;
+            --dark-bg: #0a0a0a;
+            --card-bg: #141414;
+            --border-color: #2a2a2a;
+            --text-main: #ffffff;
+            --text-muted: #b0b0b0;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 0.5px;
+        }
+
+        .order-header-box {
+            padding: 40px 0;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .order-id-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            color: var(--text-main);
+            margin: 10px 0;
+        }
+
+            .order-id-title span {
+                color: var(--primary-pink);
+            }
+
+        .status-pill {
+            display: inline-block;
+            padding: 10px 25px;
+            border-radius: 50px;
+            font-weight: 800;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border: 2px solid;
+        }
+
+        .status-pending {
+            color: #ffc107;
+            border-color: rgba(255, 193, 7, 0.3);
+            background: rgba(255, 193, 7, 0.05);
+        }
+
+        .status-shipped {
+            color: #0dcaf0;
+            border-color: rgba(13, 202, 240, 0.3);
+            background: rgba(13, 202, 240, 0.05);
+        }
+
+        .status-delivered {
+            color: #198754;
+            border-color: rgba(25, 135, 84, 0.3);
+            background: rgba(25, 135, 84, 0.05);
+        }
+
+        .luxury-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 30px;
+            height: 100%;
+        }
+
+        .card-label {
+            color: var(--primary-pink);
+            text-transform: uppercase;
+            font-weight: 800;
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-value {
+            font-size: 1.1rem;
+            color: var(--text-main);
+            margin-bottom: 8px;
+            display: block;
+            font-weight: 600;
+        }
+
+        .info-sub {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .items-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            margin: 50px 0 25px;
+        }
+
+        .luxury-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 15px;
+        }
+
+            .luxury-table th {
+                padding: 15px 20px;
+                color: var(--text-muted);
+                font-weight: 600;
+                text-transform: uppercase;
+                font-size: 0.8rem;
+            }
+
+        .item-row {
+            background: var(--card-bg);
+        }
+
+            .item-row td {
+                padding: 20px;
+                border-top: 1px solid var(--border-color);
+                border-bottom: 1px solid var(--border-color);
+            }
+
+                .item-row td:first-child {
+                    border-left: 1px solid var(--border-color);
+                    border-radius: 15px 0 0 15px;
+                }
+
+                .item-row td:last-child {
+                    border-right: 1px solid var(--border-color);
+                    border-radius: 0 15px 15px 0;
+                }
+
+        .product-meta h5 {
+            margin: 0;
+            font-weight: 800; /* تغميق الاسم ليكون واضحاً جداً */
+            font-size: 1.2rem;
+            color: var(--text-main);
+        }
+
+        .item-img-wrapper {
+            width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+            .item-img-wrapper img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .total-amount-box {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed var(--border-color);
+            color: var(--accent-gold);
+            font-size: 1.6rem;
+            font-weight: 800;
+        }
+
+        .btn-back-custom {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .currency {
+            font-size: 0.9rem;
+            margin-left: 5px;
+            color: var(--text-muted);
+        }
+    </style>
+}
+
+<div class="container pb-5">
+    <div class="order-header-box">
+        <div class="row align-items-center">
+            <div class="col-md-7">
+                <a href="@Url.Action("GetUserOrders", "Order")" class="btn-back-custom">
+                    <i class="bi bi-arrow-left"></i> العودة للطلبات
+                </a>
+                <h1 class="order-id-title">طلب رقم <span>#@Model.orderid</span></h1>
+                <p class="text-muted"><i class="bi bi-calendar3 me-2"></i> التاريخ: @Model.orderDate.ToString("yyyy/MM/dd | hh:mm tt")</p>
+            </div>
+            <div class="col-md-5 text-md-end">
+                @{
+                    var statusClass = Model.status.ToLower() switch
+                    {
+                        "pending" => "status-pending",
+                        "shipped" => "status-shipped",
+                        "delivered" => "status-delivered",
+                        _ => "status-default"
+                    };
+                }
+                <div class="status-pill @statusClass">@Model.status</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="luxury-card">
+                <div class="card-label"><i class="bi bi-person-badge"></i> بيانات العميل</div>
+                <div class="mb-4">
+                    <span class="info-sub">عنوان الشحن:</span>
+                    <strong class="info-value">@Model.Address</strong>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <span class="info-sub">البريد الإلكتروني:</span>
+                        <strong class="info-value">@Model.BuyerEmail</strong>
+                    </div>
+                    <div class="col-6">
+                        <span class="info-sub">رقم الهاتف:</span>
+                        <strong class="info-value">@Model.PhoneNumber</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="luxury-card">
+                <div class="card-label"><i class="bi bi-credit-card"></i> ملخص الدفع</div>
+                <div class="summary-row">
+                    <span class="text-muted">إجمالي المنتجات:</span>
+                    <span>@Model.subTotal.ToString("N2") <small class="currency">ج.م</small></span>
+                </div>
+                <div class="summary-row">
+                    <span class="text-muted">مصاريف الشحن:</span>
+                    <span>@Model.Deliverycost.ToString("N2") <small class="currency">ج.م</small></span>
+                </div>
+                <div class="summary-row total-amount-box">
+                    <span>الإجمالي الكلي:</span>
+                    <span>@totalAmount.ToString("N2") <small class="currency" style="color:var(--accent-gold)">ج.م</small></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="items-container">
+        <h3 class="items-title">المنتجات المطلوبة</h3>
+        <div class="table-responsive">
+            <table class="luxury-table">
+                <thead>
+                    <tr>
+                        <th>المنتج</th>
+                        <th>التفاصيل</th>
+                        <th class="text-center">السعر</th>
+                        <th class="text-center">الكمية</th>
+                        <th class="text-end">الإجمالي</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr class="item-row">
+                            <td style="width: 120px;">
+                                <div class="item-img-wrapper">
+                                    <img src="@(string.IsNullOrEmpty(item.PictureUrl) ? "/Files/Images/default-product.jpg" : item.PictureUrl)"
+                                         alt="@item.ProductName"
+                                         onerror="this.src='/Files/Images/default-product.jpg'">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="product-meta">
+                                    <h5>@item.ProductName</h5>
+                                    <small class="text-muted">كود: PRO-@item.ProductName.GetHashCode().ToString("X")</small>
+                                </div>
+                            </td>
+                            <td class="text-center fw-bold">
+                                @item.Price.ToString("N2") <small class="currency">ج.م</small>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-dark border border-secondary px-3 py-2">@item.Quantity</span>
+                            </td>
+                            <td class="text-end fw-bold" style="color: var(--accent-gold); font-size: 1.2rem;">
+                                @((item.Price * item.Quantity).ToString("N2")) <small class="currency">ج.م</small>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

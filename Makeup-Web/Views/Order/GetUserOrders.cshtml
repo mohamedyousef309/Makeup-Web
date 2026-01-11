@@ -227,7 +227,7 @@
                                 <span class="status-badge @order.status.ToLower()">@order.status</span>
                             </td>
                             <td data-label="Actions">
-                                <a href="@Url.Action("OrderDetails", "Order", new { orderId = order.orderid })" class="btn-view">
+                                <a href="@Url.Action("GetOrderbyid", "Order", new { orderId = order.orderid })" class="btn-view">
                                     <i class="bi bi-eye"></i> Details
                                 </a>
                             </td>

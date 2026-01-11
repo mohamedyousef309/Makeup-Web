@@ -1,5 +1,6 @@
 ﻿using Application_Layer.CQRS.Orders.Commands.CreatOrder;
 using Application_Layer.CQRS.Orders.Quries.GetAllOrdersForUser;
+using Application_Layer.CQRS.Orders.Quries.GetOrderbyid;
 using Domain_Layer.DTOs;
 using Domain_Layer.DTOs.OrderDTOs;
 using Domain_Layer.ViewModels.Order;
@@ -74,6 +75,18 @@ namespace Makeup_Web.Controllers
             }
 
             return View(result.Data);
+        }
+
+        public async Task<IActionResult> GetOrderbyid(int orderid) 
+        {
+
+            var getOrderResult = await _Mediator.Send(new GetOrderbyidQuery(orderid));
+            if (!getOrderResult.IsSuccess || getOrderResult.Data == null)
+            {
+                TempData["ErrorMessage"] = getOrderResult.Message;
+                return View(getOrderResult.Data);
+            }
+            return View(getOrderResult.Data);
         }
     }
 }
