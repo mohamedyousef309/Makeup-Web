@@ -1,0 +1,316 @@
+﻿@using Domain_Layer.DTOs
+@using Domain_Layer.DTOs.UserDTOS
+@model PaginatedListDto<UserToReturnWithRolsDTo>
+
+@{
+    ViewData["Title"] = "User Management - Admin Portal";
+    var searchTerm = Context.Request.Query["search"];
+    var sortBy = Context.Request.Query["sortBy"];
+    var sortDir = Context.Request.Query["sortDir"];
+}
+
+@section Styles {
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-pink: #d68a8a;
+            --accent-gold: #c5a059;
+            --dark-bg: #0a0a0a;
+            --card-bg: #141414;
+            --border-color: #2a2a2a;
+            --text-main: #ffffff;
+            --text-muted: #b0b0b0;
+            --success-green: #2ecc71;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .admin-header {
+            padding: 40px 0;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+
+        .admin-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+
+        .filter-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .form-control-custom {
+            background: #1a1a1a !important;
+            border: 1px solid var(--border-color) !important;
+            color: white !important;
+            border-radius: 8px;
+            padding: 10px 15px;
+        }
+
+            .form-control-custom:focus {
+                border-color: var(--primary-pink) !important;
+                box-shadow: 0 0 0 0.25 margin-bottom: 20px;
+                rem rgba(214, 138, 138, 0.25);
+            }
+
+        /* Table Styling */
+        .luxury-table-container {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            overflow: hidden;
+            padding: 10px;
+        }
+
+        .luxury-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 10px;
+        }
+
+            .luxury-table th {
+                padding: 15px 20px;
+                color: var(--text-muted);
+                text-transform: uppercase;
+                font-size: 0.75rem;
+                letter-spacing: 1px;
+                font-weight: 700;
+            }
+
+        .user-row {
+            background: #1c1c1c;
+            transition: 0.3s;
+        }
+
+            .user-row:hover {
+                background: #252525;
+                transform: scale(1.005);
+            }
+
+            .user-row td {
+                padding: 15px 20px;
+                vertical-align: middle;
+                border-top: 1px solid var(--border-color);
+                border-bottom: 1px solid var(--border-color);
+            }
+
+                .user-row td:first-child {
+                    border-left: 1px solid var(--border-color);
+                    border-radius: 12px 0 0 12px;
+                }
+
+                .user-row td:last-child {
+                    border-right: 1px solid var(--border-color);
+                    border-radius: 0 12px 12px 0;
+                }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary-pink);
+        }
+
+        /* Badges */
+        .badge-role {
+            background: rgba(214, 138, 138, 0.1);
+            color: var(--primary-pink);
+            border: 1px solid var(--primary-pink);
+            font-weight: 600;
+            padding: 5px 12px;
+            border-radius: 6px;
+            margin: 2px;
+            display: inline-block;
+            font-size: 0.75rem;
+        }
+
+        .badge-permission {
+            background: rgba(197, 160, 89, 0.1);
+            color: var(--accent-gold);
+            border: 1px solid var(--accent-gold);
+            font-weight: 600;
+            padding: 5px 12px;
+            border-radius: 6px;
+            margin: 2px;
+            display: inline-block;
+            font-size: 0.75rem;
+        }
+
+        .pagination .page-link {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: white;
+            margin: 0 3px;
+            border-radius: 8px;
+        }
+
+        .pagination .page-item.active .page-link {
+            background: var(--primary-pink);
+            border-color: var(--primary-pink);
+        }
+
+        .btn-action {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 5px 10px;
+            border-radius: 6px;
+            transition: 0.2s;
+        }
+
+            .btn-action:hover {
+                color: white;
+                border-color: var(--primary-pink);
+            }
+    </style>
+}
+
+<div class="admin-header">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="admin-title">User Management</h1>
+                <p class="text-muted m-0">Manage system users, roles, and access permissions.</p>
+            </div>
+            <button class="btn btn-outline-light" style="border-color: var(--primary-pink); color: var(--primary-pink)">
+                <i class="bi bi-person-plus-fill me-2"></i> Add New User
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="filter-card">
+        <form id="userFilterForm" method="get" class="row g-3">
+            <div class="col-md-5">
+                <div class="input-group">
+                    <span class="input-group-text bg-dark border-secondary text-muted"><i class="bi bi-search"></i></span>
+                    <input type="text" name="search" value="@searchTerm" class="form-control form-control-custom" placeholder="Search by username...">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <select name="sortBy" class="form-select form-control-custom auto-submit">
+                    <option value="id" selected="@(sortBy == "id")">Sort by ID</option>
+                    <option value="username" selected="@(sortBy == "username")">Sort by Username</option>
+                    <option value="email" selected="@(sortBy == "email")">Sort by Email</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="sortDir" class="form-select form-control-custom auto-submit">
+                    <option value="asc" selected="@(sortDir == "asc")">Ascending</option>
+                    <option value="desc" selected="@(sortDir == "desc")">Descending</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-dark w-100" style="height: 45px; border: 1px solid #444;">Filter</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="luxury-table-container">
+        <div class="table-responsive">
+            <table class="luxury-table">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Contact info</th>
+                        <th>Address</th>
+                        <th>Roles</th>
+                        <th>Permissions</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in Model.Items)
+                    {
+                        <tr class="user-row">
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <img src="@(string.IsNullOrEmpty(user.Picture) ? "/images/default-avatar.png" : user.Picture)"
+                                         class="user-avatar" alt="@user.Username">
+                                    <div>
+                                        <div class="fw-bold">@user.Username</div>
+                                        <small class="text-muted">ID: #@user.Id</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="small"><i class="bi bi-envelope me-2"></i>@user.Email</div>
+                                <div class="small text-muted"><i class="bi bi-phone me-2"></i>@user.PhoneNumber</div>
+                            </td>
+                            <td>
+                                <small class="text-muted">@user.UserAddress</small>
+                            </td>
+                            <td>
+                                @foreach (var role in user.UserRoles)
+                                {
+                                    <span class="badge-role">@role.RoleName</span>
+                                }
+                            </td>
+                            <td style="max-width: 250px;">
+                                @foreach (var perm in user.UserPermissions)
+                                {
+                                    <span class="badge-permission">@perm.PermissionName</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <div class="dropdown">
+                                    <button class="btn-action" type="button" data-bs-toggle="dropdown">
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="#"><i class="bi bi-pencil me-2"></i> Edit User</a></li>
+                                        <li><a class="dropdown-item" href="#"><i class="bi bi-shield-lock me-2"></i> Permissions</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash me-2"></i> Delete</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    @if (Model.TotalPages > 1)
+    {
+        <nav class="py-5">
+            <ul class="pagination justify-content-center">
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                        <a class="page-link shadow-none"
+                           asp-action="GetAllUsers"
+                           asp-route-pageIndex="@i"
+                           asp-route-search="@searchTerm"
+                           asp-route-sortBy="@sortBy"
+                           asp-route-sortDir="@sortDir">@i</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        // Auto submit form on dropdown change
+        document.querySelectorAll('.auto-submit').forEach(el => {
+            el.addEventListener('change', () => {
+                document.getElementById('userFilterForm').submit();
+            });
+        });
+    </script>
+}
