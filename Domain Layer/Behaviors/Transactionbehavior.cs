@@ -1,4 +1,5 @@
 ﻿
+using Domain_Layer.Interfaces.Abstraction;
 using Domain_Layer.Interfaces.ServiceInterfaces;
 using Domain_Layer.Respones;
 using MediatR;
@@ -7,7 +8,7 @@ using System.Windows.Input;
 
 namespace Domain_Layer.Behaviors
 {
-    public class TransactionBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : ICommand
+    public class TransactionBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : ICommand<TResponse>
     {
         private readonly IunitofWork unitofWork;
         private readonly ILogger<TransactionBehavior<TRequest, TResponse>> logger;

@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="Views\SuperAdaamin\SuberadminDashboard.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.11">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -26,6 +30,10 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\Files\Images\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Views\SuperAdaamin\SuberadminDashboard.cshtml" />
   </ItemGroup>
 
 </Project>

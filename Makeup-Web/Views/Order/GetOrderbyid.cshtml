@@ -2,7 +2,7 @@
 @model OrderToReturnDto
 
 @{
-    ViewData["Title"] = $"تفاصيل الطلب #{Model.orderid}";
+    ViewData["Title"] = $"Order Details #{Model.orderid}";
     var totalAmount = Model.subTotal + Model.Deliverycost;
 }
 
@@ -148,7 +148,7 @@
 
         .product-meta h5 {
             margin: 0;
-            font-weight: 800; /* تغميق الاسم ليكون واضحاً جداً */
+            font-weight: 800;
             font-size: 1.2rem;
             color: var(--text-main);
         }
@@ -190,12 +190,14 @@
             display: inline-flex;
             align-items: center;
             gap: 10px;
+            margin-bottom: 15px;
         }
 
         .currency {
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             margin-left: 5px;
             color: var(--text-muted);
+            text-transform: uppercase;
         }
     </style>
 }
@@ -205,10 +207,12 @@
         <div class="row align-items-center">
             <div class="col-md-7">
                 <a href="@Url.Action("GetUserOrders", "Order")" class="btn-back-custom">
-                    <i class="bi bi-arrow-left"></i> العودة للطلبات
+                    <i class="bi bi-arrow-left"></i> Back to Orders
                 </a>
-                <h1 class="order-id-title">طلب رقم <span>#@Model.orderid</span></h1>
-                <p class="text-muted"><i class="bi bi-calendar3 me-2"></i> التاريخ: @Model.orderDate.ToString("yyyy/MM/dd | hh:mm tt")</p>
+                <h1 class="order-id-title">Order <span>#@Model.orderid</span></h1>
+                <p class="text-muted">
+                    <i class="bi bi-calendar3 me-2"></i> Date: @Model.orderDate.ToString("MMM dd, yyyy | hh:mm tt")
+                </p>
             </div>
             <div class="col-md-5 text-md-end">
                 @{
@@ -228,18 +232,18 @@
     <div class="row g-4">
         <div class="col-lg-6">
             <div class="luxury-card">
-                <div class="card-label"><i class="bi bi-person-badge"></i> بيانات العميل</div>
+                <div class="card-label"><i class="bi bi-person-badge"></i> Customer Information</div>
                 <div class="mb-4">
-                    <span class="info-sub">عنوان الشحن:</span>
+                    <span class="info-sub">Shipping Address:</span>
                     <strong class="info-value">@Model.Address</strong>
                 </div>
                 <div class="row">
                     <div class="col-6">
-                        <span class="info-sub">البريد الإلكتروني:</span>
+                        <span class="info-sub">Email Address:</span>
                         <strong class="info-value">@Model.BuyerEmail</strong>
                     </div>
                     <div class="col-6">
-                        <span class="info-sub">رقم الهاتف:</span>
+                        <span class="info-sub">Phone Number:</span>
                         <strong class="info-value">@Model.PhoneNumber</strong>
                     </div>
                 </div>
@@ -248,34 +252,34 @@
 
         <div class="col-lg-6">
             <div class="luxury-card">
-                <div class="card-label"><i class="bi bi-credit-card"></i> ملخص الدفع</div>
+                <div class="card-label"><i class="bi bi-credit-card"></i> Payment Summary</div>
                 <div class="summary-row">
-                    <span class="text-muted">إجمالي المنتجات:</span>
-                    <span>@Model.subTotal.ToString("N2") <small class="currency">ج.م</small></span>
+                    <span class="text-muted">Subtotal:</span>
+                    <span>@Model.subTotal.ToString("N2") <small class="currency">EGP</small></span>
                 </div>
                 <div class="summary-row">
-                    <span class="text-muted">مصاريف الشحن:</span>
-                    <span>@Model.Deliverycost.ToString("N2") <small class="currency">ج.م</small></span>
+                    <span class="text-muted">Shipping Fee:</span>
+                    <span>@Model.Deliverycost.ToString("N2") <small class="currency">EGP</small></span>
                 </div>
                 <div class="summary-row total-amount-box">
-                    <span>الإجمالي الكلي:</span>
-                    <span>@totalAmount.ToString("N2") <small class="currency" style="color:var(--accent-gold)">ج.م</small></span>
+                    <span>Grand Total:</span>
+                    <span>@totalAmount.ToString("N2") <small class="currency" style="color:var(--accent-gold)">EGP</small></span>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="items-container">
-        <h3 class="items-title">المنتجات المطلوبة</h3>
+        <h3 class="items-title">Ordered Items</h3>
         <div class="table-responsive">
             <table class="luxury-table">
                 <thead>
                     <tr>
-                        <th>المنتج</th>
-                        <th>التفاصيل</th>
-                        <th class="text-center">السعر</th>
-                        <th class="text-center">الكمية</th>
-                        <th class="text-end">الإجمالي</th>
+                        <th>Product</th>
+                        <th>Details</th>
+                        <th class="text-center">Price</th>
+                        <th class="text-center">Qty</th>
+                        <th class="text-end">Total</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -292,17 +296,17 @@
                             <td>
                                 <div class="product-meta">
                                     <h5>@item.ProductName</h5>
-                                    <small class="text-muted">كود: PRO-@item.ProductName.GetHashCode().ToString("X")</small>
+                                    <small class="text-muted">SKU: PRO-@item.ProductName.GetHashCode().ToString("X")</small>
                                 </div>
                             </td>
                             <td class="text-center fw-bold">
-                                @item.Price.ToString("N2") <small class="currency">ج.م</small>
+                                @item.Price.ToString("N2") <small class="currency">EGP</small>
                             </td>
                             <td class="text-center">
                                 <span class="badge bg-dark border border-secondary px-3 py-2">@item.Quantity</span>
                             </td>
                             <td class="text-end fw-bold" style="color: var(--accent-gold); font-size: 1.2rem;">
-                                @((item.Price * item.Quantity).ToString("N2")) <small class="currency">ج.م</small>
+                                @((item.Price * item.Quantity).ToString("N2")) <small class="currency">EGP</small>
                             </td>
                         </tr>
                     }

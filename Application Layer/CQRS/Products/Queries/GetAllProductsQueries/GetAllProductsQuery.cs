@@ -19,11 +19,11 @@ namespace Application_Layer.CQRS.Products.Queries
         string? SortBy = "id",
         string? SortDir = "asc",
         string? SearchTerm = null
-    ) : IRequest<RequestRespones<PaginatedListDto<ProductDto>>>;
+    ) : IRequest<RequestRespones<PaginatedListDto<GetAllProductsDto>>>;
 
     
     public class GetAllProductsHandler : BaseQueryHandler,
-        IRequestHandler<GetAllProductsQuery, RequestRespones<PaginatedListDto<ProductDto>>>
+        IRequestHandler<GetAllProductsQuery, RequestRespones<PaginatedListDto<GetAllProductsDto>>>
     {
         private readonly IGenaricRepository<Product> _productRepo;
 
@@ -32,7 +32,7 @@ namespace Application_Layer.CQRS.Products.Queries
             _productRepo = productRepo;
         }
 
-        public async Task<RequestRespones<PaginatedListDto<ProductDto>>> Handle(
+        public async Task<RequestRespones<PaginatedListDto<GetAllProductsDto>>> Handle(
             GetAllProductsQuery request,
             CancellationToken cancellationToken)
         {
@@ -58,16 +58,19 @@ namespace Application_Layer.CQRS.Products.Queries
 
             query = ApplayPagination(query, request.PageIndex, request.PageSize);
 
-            var items = await query.Select(p => new ProductDto
+            var items = await query.Select(p => new GetAllProductsDto
             {
                 Id=p.Id,
                 Name = p.Name,
                 Price = p.Price,
                 ImageUrl=p.ImageUrl,
+                Stock = p.Stock,
+                
+            
                 Description = p.Description
             }).ToListAsync(cancellationToken);
 
-            var result = new PaginatedListDto<ProductDto>
+            var result = new PaginatedListDto<GetAllProductsDto>
             {
                 Items = items,
                 PageNumber = request.PageIndex,
@@ -75,7 +78,7 @@ namespace Application_Layer.CQRS.Products.Queries
                 TotalCount = totalCount
             };
 
-            return RequestRespones<PaginatedListDto<ProductDto>>.Success(
+            return RequestRespones<PaginatedListDto<GetAllProductsDto>>.Success(
                 result,
                 200,
                 "Products retrieved successfully."

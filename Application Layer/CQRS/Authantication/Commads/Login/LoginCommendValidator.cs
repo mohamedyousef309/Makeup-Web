@@ -7,15 +7,15 @@ using System.Threading.Tasks;
 
 namespace Application_Layer.CQRS.Authantication.Commads.Login
 {
-    public class LoginCommendValidator: AbstractValidator<LoginCommend>
+    public class LoginCommendValidator: AbstractValidator<LoginOrchestrator>
     {
         public LoginCommendValidator()
         {
-            RuleFor(x => x.email)
+            RuleFor(x => x.UserEmial)
            .NotEmpty().WithMessage("Email is required.")
            .EmailAddress().WithMessage("Invalid email format.");
 
-            RuleFor(x => x.password)
+            RuleFor(x => x.UserPassword)
                 .NotEmpty().WithMessage("Password is required.")
                 .MinimumLength(6).WithMessage("Password must be at least 6 characters long.");
         }

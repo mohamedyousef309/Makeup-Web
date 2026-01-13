@@ -1,0 +1,144 @@
+﻿@using Domain_Layer.DTOs
+@using Domain_Layer.DTOs.OrderDTOs
+@model PaginatedListDto<OrderToReturnDto>
+
+@{
+    ViewData["Title"] = "SuperAdmin Dashboard - Orders";
+}
+
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="display-6 fw-bold text-white">Orders Management</h1>
+            <p class="text-muted">Overview of all studio bookings and product orders.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <span class="badge bg-primary p-2">Total Orders: @Model.TotalCount</span>
+        </div>
+    </div>
+
+    <div class="card bg-dark border-secondary mb-4">
+        <div class="card-body">
+            <form method="get" asp-action="GetAllOrders" class="row g-3">
+                <div class="col-md-10">
+                    <input type="text" name="search" class="form-control bg-dark text-white border-secondary"
+                           placeholder="Search by Buyer Email..." value="@Context.Request.Query["search"]">
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-pink w-100">Search</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <div class="alert alert-danger">@ViewBag.ErrorMessage</div>
+    }
+
+    <div class="table-responsive shadow-sm rounded">
+        <table class="table table-dark table-hover align-middle border-secondary">
+            <thead class="table-secondary text-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Date</th>
+                    <th>Phone Number</th>
+                    <th>Subtotal</th>
+                    <th>Status</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Items != null && Model.Items.Any())
+                {
+                    foreach (var order in Model.Items)
+                    {
+                        <tr>
+                            <td class="fw-bold">#@order.orderid</td>
+                            <td>@order.orderDate.ToString("dd MMM yyyy HH:mm")</td>
+                            <td>@order.PhoneNumber</td>
+                            <td>@order.subTotal.ToString("C")</td>
+                            <td>
+                                <span class="badge @(order.status == "Pending" ? "bg-warning text-dark" : "bg-success")">
+                                    @order.status
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <a asp-controller="Order" asp-action="GetOrderbyid" asp-route-id="@order.orderid"
+                                   class="btn btn-sm btn-outline-info">
+                                    <i class="bi bi-eye"></i> Details
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-muted">No orders found.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (Model.TotalCount > Model.PageSize)
+    {
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center">
+                @{
+                    var totalPages = (int)Math.Ceiling((double)Model.TotalCount / Model.PageSize);
+                    var prevDisabled = Model.PageNumber <= 1 ? "disabled" : "";
+                    var nextDisabled = Model.PageNumber >= totalPages ? "disabled" : "";
+                }
+                <li class="page-item @prevDisabled">
+                    <a class="page-link bg-dark border-secondary text-white"
+                       href="@Url.Action("GetAllOrders", new { pageIndex = Model.PageNumber - 1, search = Context.Request.Query["search"] })">Previous</a>
+                </li>
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                        <a class="page-link @(i == Model.PageNumber ? "bg-pink border-pink" : "bg-dark border-secondary text-white")"
+                           href="@Url.Action("GetAllOrders", new { pageIndex = i, search = Context.Request.Query["search"] })">@i</a>
+                    </li>
+                }
+                <li class="page-item @nextDisabled">
+                    <a class="page-link bg-dark border-secondary text-white"
+                       href="@Url.Action("GetAllOrders", new { pageIndex = Model.PageNumber + 1, search = Context.Request.Query["search"] })">Next</a>
+                </li>
+            </ul>
+        </nav>
+    }
+</div>
+
+@section Styles {
+    <style>
+        .btn-pink {
+            background-color: var(--brand-pink);
+            color: white;
+            border: none;
+        }
+
+            .btn-pink:hover {
+                background-color: #c87a7a;
+                color: white;
+            }
+
+        .border-pink {
+            border-color: var(--brand-pink) !important;
+        }
+
+        .bg-pink {
+            background-color: var(--brand-pink) !important;
+        }
+
+        .table-dark {
+            --bs-table-bg: #161616;
+            --bs-table-border-color: #2a2a2a;
+        }
+
+        .page-link:focus {
+            box-shadow: 0 0 0 0.25rem rgba(223, 145, 145, 0.25);
+        }
+    </style>
+}

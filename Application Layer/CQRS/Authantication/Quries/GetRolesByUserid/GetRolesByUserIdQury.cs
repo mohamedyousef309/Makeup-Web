@@ -24,7 +24,7 @@ namespace Application_Layer.CQRS.Authantication.Quries.GetRolesByUserid
         }
         public async Task<RequestRespones<IEnumerable<UserRolsDTo>>> Handle(GetRolesByUserIdQury request, CancellationToken cancellationToken)
         {
-            var UserRoles = await genaricRepository.GetByIdQueryable(request.userid)
+            var UserRoles = await genaricRepository.GetByCriteriaQueryable(x=>x.UserRoles.Any(x=>x.Userid==request.userid))
                 .Select(x => new UserRolsDTo
                 {
                     RoleId = x.Id

@@ -107,6 +107,15 @@ namespace Makeup_Web.Controllers
 
         }
 
+        [HttpPost]
+        public async Task<IActionResult> Logout() 
+        {
+            Response.Cookies.Delete("AccessToken");
+            Response.Cookies.Delete("RefreshToken");
+
+            return RedirectToAction("Index", "Products");
+        }
+
         public IActionResult ForgetPassword()
         {
             return View(new ForgetPasswordViewModel());

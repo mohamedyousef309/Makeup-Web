@@ -1,4 +1,5 @@
 ﻿using Application_Layer.CQRS.Orders.Commands.CreatOrder;
+using Application_Layer.CQRS.Orders.Quries.GetAllOrders;
 using Application_Layer.CQRS.Orders.Quries.GetAllOrdersForUser;
 using Application_Layer.CQRS.Orders.Quries.GetOrderbyid;
 using Domain_Layer.DTOs;
@@ -12,11 +13,14 @@ namespace Makeup_Web.Controllers
 {
     public class OrderController : BaseController
     {
+        private readonly ILogger<OrderController> logger;
+
         public IMediator _Mediator { get; }
 
-        public OrderController(IMediator mediator)
+        public OrderController(IMediator mediator, ILogger<OrderController> logger)
         {
             _Mediator = mediator;
+            this.logger = logger;
         }
         public IActionResult Index()
         {
@@ -87,6 +91,43 @@ namespace Makeup_Web.Controllers
                 return View(getOrderResult.Data);
             }
             return View(getOrderResult.Data);
+        }
+
+        public async Task<IActionResult> GetAllOrders(int? pageIndex, int? pageSize, string? sortBy
+            , string? sortDir,
+            string? search) 
+        {
+            try
+            {
+                var GetallOrdersResult = await _Mediator.Send(new GetAllOrdersQuery(
+                pageSize ?? 10,
+                pageIndex ?? 1,
+                sortBy ?? "id",
+                sortDir ?? "desc",
+                search
+                ));
+
+                if (!GetallOrdersResult.IsSuccess || GetallOrdersResult.Data == null)
+                {
+                    ViewBag.ErrorMessage = GetallOrdersResult.Message;
+                    return View(new PaginatedListDto<OrderToReturnDto>());
+                }
+               
+                    return View(GetallOrdersResult.Data);
+
+                
+
+            }
+            catch (Exception ex)
+            {
+
+                logger.LogError(ex, "Error occurred while fetching all orders.");
+
+                ViewBag.ErrorMessage = "Something went wrong on our side. Please try again later.";
+
+                return View(new PaginatedListDto<OrderToReturnDto>());
+            }
+            
         }
     }
 }
