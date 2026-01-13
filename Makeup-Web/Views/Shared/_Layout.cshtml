@@ -15,6 +15,8 @@
             --dark-bg: #0a0a0a;
             --card-gray: #161616;
             --border-color: #2a2a2a;
+            --admin-blue: #0dcaf0;
+            --super-gold: #ffc107;
         }
 
         body {
@@ -56,7 +58,31 @@
             gap: 8px;
         }
 
-        /* تحسين شكل السلة لتناسب الحجم بجانب الاسم */
+        /* تنسيق خاص لأزرار لوحة التحكم */
+        .nav-admin-link {
+            color: var(--admin-blue) !important;
+            font-weight: 600;
+            font-size: 0.85rem;
+            border: 1px solid rgba(13, 202, 240, 0.2);
+            border-radius: 8px;
+            padding: 6px 12px !important;
+            margin-left: 10px;
+            transition: 0.3s;
+        }
+        .nav-admin-link:hover { background: rgba(13, 202, 240, 0.1); }
+
+        .nav-super-link {
+            color: var(--super-gold) !important;
+            font-weight: 600;
+            font-size: 0.85rem;
+            border: 1px solid rgba(255, 193, 7, 0.2);
+            border-radius: 8px;
+            padding: 6px 12px !important;
+            margin-left: 10px;
+            transition: 0.3s;
+        }
+        .nav-super-link:hover { background: rgba(255, 193, 7, 0.1); }
+
         .basket-link {
             color: var(--brand-pink) !important;
             font-size: 1.2rem;
@@ -115,11 +141,7 @@
                 padding: 20px;
                 border-top: 1px solid var(--border-color);
             }
-            .auth-section {
-                flex-direction: row;
-                flex-wrap: wrap;
-                margin-top: 15px;
-            }
+            .nav-admin-link, .nav-super-link { margin: 10px 0; display: inline-block; width: fit-content; }
         }
 
         .main-content { flex: 1; padding: 40px 0; }
@@ -153,6 +175,28 @@
                             }
                         </ul>
                     </li>
+
+                    @* --- منطق الأدمن والسوبر أدمن --- *@
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link nav-admin-link" href="/Admin/Index">
+                                    <i class="bi bi-speedometer2"></i> Admin Dashboard
+                                </a>
+                            </li>
+                        }
+
+                        @if (User.IsInRole("SuperAdmin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link nav-super-link" href="/SuperAdmin/Index">
+                                    <i class="bi bi-shield-check"></i> SuperAdmin Dashboard 
+                                </a>
+                            </li>
+                        }
+                    }
                 </ul>
 
                 <div class="auth-section">

@@ -35,17 +35,6 @@ namespace Application_Layer.CQRS.Orders.Quries.GetAllOrders
                 orderid=x.Id,
                 status=x.status.ToString(),
                 subTotal=x.subTotal,
-                Address=x.Address,
-                BuyerEmail=x.BuyerEmail,
-                Deliverycost=x.Deliverycost,
-                Items=x.Items.Select(it=>new OrderItemsDTo 
-                {
-                    PictureUrl=it.PictureUrl,
-                    Price=it.Price,
-                    ProductName=it.ProductName,
-                    Quantity=it.Quantity,
-
-                }).ToList(),
                 orderDate=x.orderDate,
                 PhoneNumber=x.PhoneNumber,
             }).AsQueryable();

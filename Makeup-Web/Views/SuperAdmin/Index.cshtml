@@ -1,0 +1,112 @@
+﻿@{
+    ViewData["Title"] = "Control Panel";
+}
+
+<div class="container mt-5">
+    <div class="text-center mb-5">
+        <h1 class="display-5 fw-bold text-white">SuperAdmin Control Panel</h1>
+        <p class="text-muted">Welcome back! What would you like to manage today?</p>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card bg-dark border-secondary h-100 dashboard-card shadow">
+                <div class="card-body text-center p-4">
+                    <div class="icon-box mb-3">
+                        <i class="bi bi-cart-check-fill text-info fs-1"></i>
+                    </div>
+                    <h4 class="card-title text-white">Orders</h4>
+                    <p class="text-muted small">Manage customer orders, shipping, and statuses.</p>
+                    <a href="@Url.Action("GetAllOrders", "Order")" class="btn btn-outline-info w-100">
+                        View All Orders
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card bg-dark border-secondary h-100 dashboard-card shadow">
+                <div class="card-body text-center p-4">
+                    <div class="icon-box mb-3">
+                        <i class="bi bi-people-fill text-warning fs-1"></i>
+                    </div>
+                    <h4 class="card-title text-white">Users</h4>
+                    <p class="text-muted small">Add, remove, or change roles of studio staff and clients.</p>
+
+                    @* التعديل هنا *@
+                    <a asp-controller="User" asp-action="GetAllUsers" class="btn btn-outline-warning w-100">
+                        Manage Users
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card bg-dark border-secondary h-100 dashboard-card shadow">
+                <div class="card-body text-center p-4">
+                    <div class="icon-box mb-3">
+                        <i class="bi bi-bag-heart-fill text-pink fs-1"></i>
+                    </div>
+                    <h4 class="card-title text-white">Products</h4>
+                    <p class="text-muted small">Update makeup inventory, prices, and categories.</p>
+                    <a href="/Admin/Products" class="btn btn-outline-pink w-100">
+                        Edit Products
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card bg-dark border-secondary h-100 dashboard-card shadow">
+                <div class="card-body text-center p-4">
+                    <div class="icon-box mb-3">
+                        <i class="bi bi-graph-up-arrow text-success fs-1"></i>
+                    </div>
+                    <h4 class="card-title text-white">Reports</h4>
+                    <p class="text-muted small">Analyze sales, performance, and studio revenue.</p>
+                    <a href="#" class="btn btn-outline-success w-100 disabled">Coming Soon</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        :root {
+            --brand-pink: #df9191;
+        }
+
+        .text-pink {
+            color: var(--brand-pink) !important;
+        }
+
+        .btn-outline-pink {
+            color: var(--brand-pink);
+            border-color: var(--brand-pink);
+        }
+
+            .btn-outline-pink:hover {
+                background-color: var(--brand-pink);
+                color: white;
+            }
+
+        .dashboard-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+            .dashboard-card:hover {
+                transform: translateY(-10px);
+                box-shadow: 0 10px 20px rgba(0,0,0,0.5) !important;
+                border-color: var(--brand-pink) !important;
+            }
+
+        .icon-box {
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+}
