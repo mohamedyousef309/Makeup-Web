@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infastructure_Layer.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251220220246_intialCreate3")]
-    partial class intialCreate3
+    [Migration("20260113035958_intial create")]
+    partial class intialcreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -128,17 +128,12 @@ namespace Infastructure_Layer.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PasswordSalt")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("Picture")
-                        .IsRequired()
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
@@ -205,6 +200,37 @@ namespace Infastructure_Layer.Data.Migrations
                     b.ToTable("UserRoles");
                 });
 
+            modelBuilder.Entity("Domain_Layer.Entites.Authantication.UserToken", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ExpiredDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsVerified")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserToken");
+                });
+
             modelBuilder.Entity("Domain_Layer.Entites.Category", b =>
                 {
                     b.Property<int>("Id")
@@ -254,6 +280,9 @@ namespace Infastructure_Layer.Data.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
                     b.Property<DateTimeOffset>("orderDate")
                         .HasColumnType("datetimeoffset");
 
@@ -265,6 +294,8 @@ namespace Infastructure_Layer.Data.Migrations
                         .HasColumnType("decimal(10,2)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Orders", (string)null);
                 });
@@ -278,11 +309,13 @@ namespace Infastructure_Layer.Data.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("PictureUrl")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
 
                     b.Property<string>("ProductName")
                         .IsRequired()
@@ -310,12 +343,15 @@ namespace Infastructure_Layer.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CategoryId")
+                    b.Property<int?>("CategoryId")
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -420,6 +456,28 @@ namespace Infastructure_Layer.Data.Migrations
                     b.Navigation("user");
                 });
 
+            modelBuilder.Entity("Domain_Layer.Entites.Authantication.UserToken", b =>
+                {
+                    b.HasOne("Domain_Layer.Entites.Authantication.User", "User")
+                        .WithMany("userTokens")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Domain_Layer.Entites.Order.Order", b =>
+                {
+                    b.HasOne("Domain_Layer.Entites.Authantication.User", "User")
+                        .WithMany("UserOrders")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Domain_Layer.Entites.Order.OrderItems", b =>
                 {
                     b.HasOne("Domain_Layer.Entites.Order.Order", "order")
@@ -436,8 +494,7 @@ namespace Infastructure_Layer.Data.Migrations
                     b.HasOne("Domain_Layer.Entites.Category", "Category")
                         .WithMany("Products")
                         .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Category");
                 });
@@ -465,11 +522,15 @@ namespace Infastructure_Layer.Data.Migrations
 
             modelBuilder.Entity("Domain_Layer.Entites.Authantication.User", b =>
                 {
+                    b.Navigation("UserOrders");
+
                     b.Navigation("UserRoles");
 
                     b.Navigation("refreshTokens");
 
                     b.Navigation("userPermissions");
+
+                    b.Navigation("userTokens");
                 });
 
             modelBuilder.Entity("Domain_Layer.Entites.Category", b =>

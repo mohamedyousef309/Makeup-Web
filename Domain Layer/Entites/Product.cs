@@ -16,18 +16,18 @@ namespace Domain_Layer.Entites
         public decimal Price { get; set; }
 
         public int Stock { get; set; }
-        public string ImageUrl { get; set; }
+        public string? ImageUrl { get; set; } 
 
         public bool IsActive { get; set; } = true;
 
 
 
         // FK to Category
-        public int CategoryId { get; set; }
-        public Category Category { get; set; } = default!;
+        public int? CategoryId { get; set; }
+        public Category? Category { get; set; } = default!;
 
         // One-to-Many: Product → Variants
-        public IEnumerable<ProductVariant> Variants { get; set; } = new HashSet<ProductVariant>();
+        public IEnumerable<ProductVariant?> Variants { get; set; } = new HashSet<ProductVariant?>();
 
 
         public bool ReduceStock(int quantity)

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infastructure_Layer.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260107231046_AddProductidtoorder3")]
-    partial class AddProductidtoorder3
+    [Migration("20260113041844_intial create2")]
+    partial class intialcreate2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -280,6 +280,9 @@ namespace Infastructure_Layer.Data.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
                     b.Property<DateTimeOffset>("orderDate")
                         .HasColumnType("datetimeoffset");
 
@@ -291,6 +294,8 @@ namespace Infastructure_Layer.Data.Migrations
                         .HasColumnType("decimal(10,2)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Orders", (string)null);
                 });
@@ -338,7 +343,7 @@ namespace Infastructure_Layer.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CategoryId")
+                    b.Property<int?>("CategoryId")
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
@@ -346,7 +351,6 @@ namespace Infastructure_Layer.Data.Migrations
                         .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("ImageUrl")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsActive")
@@ -361,9 +365,6 @@ namespace Infastructure_Layer.Data.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("Stock")
-                        .HasColumnType("int");
-
-                    b.Property<int>("productStock")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -466,6 +467,17 @@ namespace Infastructure_Layer.Data.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Domain_Layer.Entites.Order.Order", b =>
+                {
+                    b.HasOne("Domain_Layer.Entites.Authantication.User", "User")
+                        .WithMany("UserOrders")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Domain_Layer.Entites.Order.OrderItems", b =>
                 {
                     b.HasOne("Domain_Layer.Entites.Order.Order", "order")
@@ -482,8 +494,7 @@ namespace Infastructure_Layer.Data.Migrations
                     b.HasOne("Domain_Layer.Entites.Category", "Category")
                         .WithMany("Products")
                         .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Category");
                 });
@@ -511,6 +522,8 @@ namespace Infastructure_Layer.Data.Migrations
 
             modelBuilder.Entity("Domain_Layer.Entites.Authantication.User", b =>
                 {
+                    b.Navigation("UserOrders");
+
                     b.Navigation("UserRoles");
 
                     b.Navigation("refreshTokens");

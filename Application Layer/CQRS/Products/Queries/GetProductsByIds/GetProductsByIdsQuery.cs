@@ -32,7 +32,7 @@ namespace Application_Layer.CQRS.Products.Queries.GetProductsByIds
                      Description = p.Description,
                      Price = p.Price,
                      Stock = p.Stock,
-                     CategoryId = p.CategoryId,
+                     //CategoryId = p.CategoryId,
                      IsActive = p.IsActive,
                  }).ToListAsync(cancellationToken);
             if (!Products.Any())
