@@ -5,7 +5,7 @@
 namespace Infastructure_Layer.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class AddProductidtoorder2 : Migration
+    public partial class intialcreate2 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

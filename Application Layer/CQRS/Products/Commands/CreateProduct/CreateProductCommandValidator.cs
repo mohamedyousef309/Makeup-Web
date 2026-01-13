@@ -29,8 +29,8 @@ namespace Application_Layer.CQRS.Products.Commands
             RuleFor(x => x.CreateProductDto.Stock)
                 .GreaterThanOrEqualTo(0).WithMessage("Stock cannot be negative.");
 
-            RuleFor(x => x.CreateProductDto.CategoryId)
-                .GreaterThan(0).WithMessage("CategoryId must be greater than zero.");
+            //RuleFor(x => x.CreateProductDto.CategoryId)
+            //    .GreaterThan(0).WithMessage("CategoryId must be greater than zero.");
 
            
         }
