@@ -31,6 +31,10 @@ namespace Application_Layer.CQRS.User.Quries.UserToReturnForLogin
             {
                 return RequestRespones<Domain_Layer.Entites.Authantication.User>.Fail("User not found", 404);
             }
+            if (user.IsBlocked)
+            {
+                return RequestRespones<Domain_Layer.Entites.Authantication.User>.Fail("This phone number is blocked from our system Talk to Owner or Create new Acount :).", 403);
+            }
 
             return RequestRespones<Domain_Layer.Entites.Authantication.User>.Success(user);
         }

@@ -174,15 +174,7 @@
 
         @if (Model != null)
         {
-            <div class="profile-header-card">
-                <div class="avatar-wrapper">
-                    @* افتراض وجود صورة أو عرض صورة افتراضية *@
-                    <img src="/images/default-avatar.png" class="profile-avatar" alt="User Avatar">
-                </div>
-                <h1 class="profile-name">@Model.Username</h1>
-                <span class="profile-id">Member ID: #@Model.Id</span>
-            </div>
-
+           
             <div class="row g-4">
                 <div class="col-md-6">
                     <div class="info-card">
@@ -216,8 +208,8 @@
                 <a asp-action="EditUserProfile" asp-route-userid="@Model.Id" class="btn-luxury-edit">
                     <i class="bi bi-pencil-square me-2"></i> Edit Profile
                 </a>
-                <a asp-action="GetAllUsers" class="btn-luxury-outline">
-                    <i class="bi bi-arrow-left me-2"></i> Back to Directory
+                <a  href="javascript:history.back()" class="btn-luxury-outline">
+                    <i class="bi bi-arrow-left me-2"></i> Back 
                 </a>
             </div>
         }

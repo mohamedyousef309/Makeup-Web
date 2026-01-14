@@ -9,8 +9,12 @@
     var sortDir = Context.Request.Query["sortDir"];
 }
 
+@* إضافة الـ Token هنا لضمان عمل عمليات الـ POST بأمان *@
+@Html.AntiForgeryToken()
+
 @section Styles {
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <style>
         :root {
             --primary-pink: #d68a8a;
@@ -21,6 +25,7 @@
             --text-main: #ffffff;
             --text-muted: #888888;
             --success-green: #2ecc71;
+            --error-red: #e74c3c;
         }
 
         body {
@@ -29,7 +34,18 @@
             font-family: 'Inter', sans-serif;
         }
 
-        /* Header Section */
+        /* ستايل السطر المحظور */
+        .user-row.is-blocked {
+            opacity: 0.5;
+            filter: grayscale(0.8);
+            border-left: 4px solid var(--error-red) !important;
+            pointer-events: none; /* لمنع التفاعل مع السطر بعد الحظر */
+        }
+
+            .user-row.is-blocked .btn-action {
+                display: none; /* إخفاء قائمة الإجراءات للمحظورين */
+            }
+
         .admin-header {
             padding: 40px 0;
             border-bottom: 1px solid var(--border-color);
@@ -42,7 +58,6 @@
             margin-bottom: 10px;
         }
 
-        /* Filter Card & Search */
         .filter-card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -64,17 +79,11 @@
                 box-shadow: 0 0 0 0.25rem rgba(214, 138, 138, 0.25);
             }
 
-        /* Table Styling */
         .luxury-table-container {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 20px;
-            overflow: visible !important;
             padding: 10px;
-        }
-
-        .table-responsive {
-            overflow: visible !important;
         }
 
         .luxury-table {
@@ -150,11 +159,6 @@
                 color: white;
                 border-color: var(--primary-pink);
             }
-
-        .dropdown-menu-dark {
-            background-color: #1a1a1a;
-            border: 1px solid var(--border-color);
-        }
     </style>
 }
 
@@ -177,10 +181,8 @@
         <form id="userFilterForm" method="get" class="row g-3">
             <div class="col-md-5">
                 <div class="input-group">
-                    <span class="input-group-text"><i class="bi bi-search"></i></span>
-                    <input type="text" name="search" value="@searchTerm"
-                           class="form-control form-control-custom"
-                           placeholder="Search by username or email...">
+                    <span class="input-group-text bg-transparent border-secondary text-muted"><i class="bi bi-search"></i></span>
+                    <input type="text" name="search" value="@searchTerm" class="form-control form-control-custom" placeholder="Search by username or email...">
                 </div>
             </div>
             <div class="col-md-3">
@@ -219,11 +221,10 @@
                     {
                         foreach (var user in Model.Items)
                         {
-                            <tr class="user-row">
+                            <tr class="user-row" id="row-@user.Id">
                                 <td>
                                     <div class="d-flex align-items-center gap-3">
-                                        <img src="@(string.IsNullOrEmpty(user.Picture) ? "/images/default-avatar.png" : user.Picture)"
-                                             class="user-avatar" alt="@user.Username">
+                                        <img src="@(string.IsNullOrEmpty(user.Picture) ? "/images/default-avatar.png" : user.Picture)" class="user-avatar" alt="@user.Username">
                                         <div>
                                             <div class="fw-bold text-white">@user.Username</div>
                                             <small class="text-muted">ID: #@user.Id</small>
@@ -235,9 +236,7 @@
                                     <div class="small text-muted"><i class="bi bi-phone me-2"></i>@user.PhoneNumber</div>
                                 </td>
                                 <td>
-                                    <small class="text-muted d-inline-block text-truncate" style="max-width: 150px;">
-                                        @user.UserAddress
-                                    </small>
+                                    <small class="text-muted d-inline-block text-truncate" style="max-width: 150px;">@user.UserAddress</small>
                                 </td>
                                 <td>
                                     @foreach (var role in user.UserRoles)
@@ -247,11 +246,10 @@
                                 </td>
                                 <td class="text-end">
                                     <div class="dropdown">
-                                        <button class="btn-action" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <button class="btn-action" type="button" data-bs-toggle="dropdown">
                                             <i class="bi bi-three-dots-vertical"></i>
                                         </button>
                                         <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end shadow-lg">
-                                            @* التعديل هنا: الربط مع الأكشن الجديد وتمرير الـ Id *@
                                             <li>
                                                 <a class="dropdown-item" asp-action="EditUserProfile" asp-route-userid="@user.Id">
                                                     <i class="bi bi-pencil me-2"></i> Edit Profile
@@ -259,12 +257,22 @@
                                             </li>
                                             <li><a class="dropdown-item" href="#"><i class="bi bi-shield-lock me-2"></i> Manage Roles</a></li>
                                             <li><hr class="dropdown-divider border-secondary"></li>
-                                            <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash me-2"></i> Delete User</a></li>
+                                            <li>
+                                                <button type="button" class="dropdown-item text-danger" onclick="confirmBlock(@user.Id, '@user.Username')">
+                                                    <i class="bi bi-slash-circle me-2"></i> Block User
+                                                </button>
+                                            </li>
                                         </ul>
                                     </div>
                                 </td>
                             </tr>
                         }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center py-5 text-muted">No users found matching your criteria.</td>
+                        </tr>
                     }
                 </tbody>
             </table>
@@ -278,8 +286,7 @@
                 @for (int i = 1; i <= Model.TotalPages; i++)
                 {
                     <li class="page-item @(i == Model.PageNumber ? "active" : "")">
-                        <a class="page-link shadow-none"
-                           asp-action="GetAllUsers"
+                        <a class="page-link shadow-none" asp-action="GetAllUsers"
                            asp-route-pageIndex="@i"
                            asp-route-search="@searchTerm"
                            asp-route-sortBy="@sortBy"
@@ -292,11 +299,72 @@
 </div>
 
 @section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        // التقديم التلقائي للفلاتر عند تغيير خيارات الترتيب
         document.querySelectorAll('.auto-submit').forEach(el => {
             el.addEventListener('change', () => {
                 document.getElementById('userFilterForm').submit();
             });
         });
+
+        // وظيفة الـ Block باستخدام AJAX المطور
+        function confirmBlock(userId, username) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: `You are about to block "${username}". This will restrict their access.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d68a8a',
+                cancelButtonColor: '#2a2a2a',
+                confirmButtonText: 'Yes, Block them!',
+                background: '#141414',
+                color: '#fff'
+            }).then((result) => {
+                if (result.isConfirmed) {
+
+                    // جلب التوكن من الصفحة
+                    var token = $('input[name="__RequestVerificationToken"]').val();
+
+                    $.ajax({
+                        url: '@Url.Action("BlockUser", "User")', // توليد المسار الصحيح
+                        type: 'POST',
+                        data: {
+                            id: userId,
+                            __RequestVerificationToken: token // إرسال التوكن مع الطلب
+                        },
+                        success: function (response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    title: 'Blocked!',
+                                    text: response.message,
+                                    icon: 'success',
+                                    background: '#141414',
+                                    color: '#fff'
+                                });
+
+                                // تطبيق تأثير الحظر على السطر
+                                const row = document.getElementById(`row-${userId}`);
+                                if (row) {
+                                    row.classList.add('is-blocked');
+                                }
+                            } else {
+                                Swal.fire({
+                                    title: 'Action Failed',
+                                    text: response.message,
+                                    icon: 'error',
+                                    background: '#141414',
+                                    color: '#fff'
+                                });
+                            }
+                        },
+                        error: function (xhr) {
+                            console.error(xhr.responseText);
+                            Swal.fire('Error', 'Could not communicate with the server.', 'error');
+                        }
+                    });
+                }
+            });
+        }
     </script>
 }

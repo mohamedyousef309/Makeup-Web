@@ -1,4 +1,5 @@
-﻿using Application_Layer.CQRS.User.Commands.EditUserProfile;
+﻿using Application_Layer.CQRS.User.Commands.BlockUser;
+using Application_Layer.CQRS.User.Commands.EditUserProfile;
 using Application_Layer.CQRS.User.Quries.GetAllUsers;
 using Application_Layer.CQRS.User.Quries.GetUserEmailbyUserid;
 using AspNetCoreGeneratedDocument;
@@ -120,6 +121,28 @@ namespace Makeup_Web.Controllers
             }
 
             return RedirectToAction("Index", "Products");
+
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> BlockUser(int id) 
+        {
+            try
+            {
+                var BlockUserResult = await mediator.Send(new BlockUserCommand(id));
+                if (!BlockUserResult.IsSuccess)
+                {
+                    return Json(new { success = false, message = BlockUserResult.Message });
+                }
+
+                return Json(new { success = true, message = "User has been blocked successfully!" });
+
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
 
         }
     }

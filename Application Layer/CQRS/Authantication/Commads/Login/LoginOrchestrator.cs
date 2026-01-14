@@ -38,7 +38,7 @@ namespace Application_Layer.CQRS.Authantication.Commads.Login
 
             if (!user.IsSuccess)
             {
-                return RequestRespones<AuthModleDto>.Fail("User not found", 404);
+                return RequestRespones<AuthModleDto>.Fail(user.Message, 404);
             }
 
            

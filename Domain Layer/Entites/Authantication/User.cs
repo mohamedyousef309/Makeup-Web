@@ -18,6 +18,8 @@ namespace Domain_Layer.Entites.Authantication
         public bool EmailConfirmed { get; set; } = false;
         public int FailedLoginAttempts { get; set; } = 0;
         public DateTime? LockoutEnd { get; set; }
+
+        public bool IsBlocked { get; set; } = false;
         public IEnumerable<Order.Order?> UserOrders { get; set; } = new HashSet<Order.Order?>();
 
         public IEnumerable<UserRole> UserRoles { get; set; } = new HashSet<UserRole>();
