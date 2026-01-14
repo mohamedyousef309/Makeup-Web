@@ -1,4 +1,4 @@
-﻿@* @model IEnumerable<Domain_Layer.Entites.Product>
+﻿@model IEnumerable<Domain_Layer.Entites.Product>
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -11,7 +11,6 @@
 
 @section Styles {
     <style>
-        /* الأنماط الخاصة بالصفحة الرئيسية فقط */
         .full-page {
             min-height: 100vh;
             display: flex;
@@ -140,12 +139,6 @@
             display: none;
         }
 
-        @@keyframes fadeIn {
-            to {
-                opacity: 1;
-            }
-        }
-
         @@keyframes bounce {
             0%, 20%, 50%, 80%, 100% {
                 transform: translateX(-50%) translateY(0);
@@ -202,10 +195,10 @@
 
     <div class="row w-100 align-items-center">
         <div class="col-lg-6 visuals-area">
-            <img src="~/Files/Images/Lip-glass.png" class="floating-product img-brushes" alt="Brushes" data-speed="0.3">
-            <img src="~/Files/Images/lipstick.png" class="floating-product img-lipstick" alt="Lipstick" data-speed="0.5">
-            <img src="~/Files/Images/smear.png" class="floating-product img-smear" alt="Smear" data-speed="0.4">
-            <img src="~/Files/Images/powder.png" class="floating-product img-powder" alt="Powder" data-speed="0.2">
+            <img src="~/Files/Images/Lip-glass.png" class="floating-product img-brushes" data-speed="0.3">
+            <img src="~/Files/Images/lipstick.png" class="floating-product img-lipstick" data-speed="0.5">
+            <img src="~/Files/Images/smear.png" class="floating-product img-smear" data-speed="0.4">
+            <img src="~/Files/Images/powder.png" class="floating-product img-powder" data-speed="0.2">
         </div>
 
         <div class="col-lg-5 offset-lg-1 px-5">
@@ -216,8 +209,11 @@
                 <p class="tagline">creativity & professional</p>
                 <p class="description">@description</p>
 
-                @* Changed Button to Anchor with Tag Helpers *@
-@*                 <a asp-controller="Products" asp-action="GetAllProducts" class="btn btn-view">VIEW PROJECT</a>
+                <a asp-controller="Products"
+                   asp-action="GetAllProducts"
+                   class="btn btn-view">
+                    VIEW PROJECT
+                </a>
             </div>
         </div>
     </div>
@@ -225,7 +221,7 @@
 
 @section Scripts {
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const floatingImages = document.querySelectorAll('.floating-product');
 
             window.addEventListener('scroll', () => {
@@ -252,11 +248,9 @@
 
             const viewButton = document.querySelector('.btn-view');
             if (viewButton) {
-                viewButton.addEventListener('click', function(e) {
-                    // Removed e.preventDefault() so the link works
+                viewButton.addEventListener('click', function () {
                     this.style.transform = 'scale(0.95)';
                     setTimeout(() => { this.style.transform = 'scale(1)'; }, 150);
-                    console.log('View Project clicked');
                 });
             }
 
@@ -264,15 +258,5 @@
                 document.body.style.opacity = 1;
             }, 100);
         });
-
-        let ticking = false;
-        window.addEventListener('scroll', function() {
-            if (!ticking) {
-                window.requestAnimationFrame(function() {
-                    ticking = false;
-                });
-                ticking = true;
-            }
-        });
     </script>
-} * *@
+}

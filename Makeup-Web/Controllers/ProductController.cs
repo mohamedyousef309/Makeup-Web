@@ -5,8 +5,10 @@ using Application_Layer.CQRS.Products.Commands.UpdateProduct;
 using Application_Layer.CQRS.Products.Commands.UpdateProductStock;
 using Application_Layer.CQRS.Products.Queries;
 using Application_Layer.CQRS.Products.Queries.GetProductsByIds;
+using Domain_Layer.DTOs;
 using Domain_Layer.DTOs.ProductDtos;
 using Domain_Layer.Respones;
+using Domain_Layer.ViewModels.ProductsViewModels.ListItemViewModel;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,16 +22,30 @@ namespace Makeup_Web.Controllers
 
         #region Queries (Read Operations)
 
-        
-        [HttpGet]
-        public async Task<IActionResult> Index(string? searchTerm, int pageIndex = 1, int pageSize = 10, string sortBy = "id", string sortDir = "asc")
+
+        public IActionResult Index()
         {
-            var query = new GetAllProductsQuery(pageSize, pageIndex, sortBy, sortDir, searchTerm);
-            var result = await _mediator.Send(query);
+            return View();
+        }
+        // Products/GetAllProducts
+        public async Task<IActionResult> GetAllProducts(int pageIndex = 1, int pageSize = 10, string? sortBy = "id", string? sortDir = "asc", string? search = null)
+        {
+            var result = await _mediator.Send(new GetAllProductsQuery(pageSize, pageIndex, sortBy, sortDir, search));
+
+            if (!result.IsSuccess)
+            {
+                TempData["ErrorMessage"] = result.Message;
+                return View(new PaginatedListDto<ProductListItemViewModel> { Items = new List<ProductListItemViewModel>() });
+            }
+
+
+
+
             return View(result.Data);
         }
 
-       
+
+
         [HttpGet]
         public async Task<IActionResult> Details(int id)
         {
@@ -123,20 +139,7 @@ namespace Makeup_Web.Controllers
         #region Basket Operations (السلة)
 
       
-        [HttpPost]
-        public async Task<IActionResult> AddToCart(int productId, string productName, decimal price, int quantity)
-        {
-            
-            var result = await _mediator.Send(new AddProductToCartCommand(1, productId, productName, price, quantity));
-            return Json(result);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> RemoveFromCart(int productId)
-        {
-            var result = await _mediator.Send(new Application_Layer.CQRS.Products.Commands.RemoveProductFromBasket.RemoveProductFromBasketCommand(1, productId));
-            return Json(result);
-        }
+     
 
         #endregion
     }
