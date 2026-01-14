@@ -1,5 +1,5 @@
-﻿@using Domain_Layer.ViewModels.ProductsViewModels.CreateProductsViewModel
-@model CreateProductViewModel
+﻿@using Domain_Layer.DTOs.ProductDtos
+@model CreateProductDto
 
 @{
     ViewData["Title"] = "Create New Product - Pro Makeup Studio";
@@ -23,38 +23,40 @@
             background-color: var(--dark-bg);
             color: var(--text-light);
             font-family: 'Inter', sans-serif;
+            line-height: 1.6;
         }
 
         /* Header */
         .create-header {
-            padding: 50px 0 30px;
+            padding: 60px 0 40px;
             text-align: center;
             background: linear-gradient(to bottom, #1a1a1a 0%, #0f0f0f 100%);
-            margin-bottom: 30px;
+            margin-bottom: 40px;
             border-bottom: 1px solid #222;
         }
 
         .create-title {
             font-family: 'Playfair Display', serif;
-            font-size: 2.2rem;
+            font-size: 2.5rem;
             font-weight: 800;
             text-transform: uppercase;
             background: linear-gradient(45deg, #fff 30%, var(--primary-pink) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
         }
 
-        /* Form Container */
+        /* Form Card */
         .form-container {
             background: var(--card-bg);
             border-radius: 15px;
             border: 1px solid #252525;
-            padding: 30px;
-            max-width: 800px;
-            margin: 0 auto;
+            padding: 40px;
+            max-width: 950px;
+            margin: 0 auto 50px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
         }
 
-        /* Form Groups */
         .form-group {
             margin-bottom: 25px;
         }
@@ -62,8 +64,11 @@
         .form-label {
             color: var(--text-light);
             font-weight: 600;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             display: block;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .form-control-custom {
@@ -71,453 +76,252 @@
             border: 1px solid #333 !important;
             color: white !important;
             border-radius: 10px;
-            padding: 12px 18px;
-            min-height: 44px;
+            padding: 14px 20px;
             width: 100%;
-            transition: border-color 0.3s ease;
+            transition: all 0.3s ease;
         }
 
             .form-control-custom:focus {
                 border-color: var(--primary-pink) !important;
-                box-shadow: 0 0 0 3px rgba(214, 138, 138, 0.1) !important;
+                box-shadow: 0 0 0 4px rgba(214, 138, 138, 0.1) !important;
                 outline: none;
             }
 
-            .form-control-custom.error {
-                border-color: var(--error-color) !important;
-            }
-
-        /* Validation Messages */
-        .validation-summary {
-            background: rgba(255, 107, 107, 0.1);
-            border: 1px solid var(--error-color);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 25px;
+        select.form-control-custom {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23d68a8a' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 1.2rem center;
+            background-size: 16px 12px;
         }
 
-            .validation-summary ul {
-                list-style: none;
-                padding-left: 0;
-                margin-bottom: 0;
-            }
-
-            .validation-summary li {
-                color: var(--error-color);
-                font-size: 0.9rem;
-                margin-bottom: 5px;
-            }
-
-        .field-validation-error {
-            color: var(--error-color);
-            font-size: 0.85rem;
-            margin-top: 5px;
-            display: block;
-        }
-
-        /* Variants Section */
+        /* Variants Styling */
         .variants-section {
             border: 1px solid #333;
-            border-radius: 10px;
-            padding: 20px;
-            margin-top: 30px;
-        }
-
-        .variants-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
+            border-radius: 12px;
+            padding: 30px;
+            margin-top: 40px;
+            background: rgba(255,255,255,0.01);
         }
 
         .variant-item {
-            background: rgba(37, 37, 37, 0.5);
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
+            background: #222;
             border: 1px solid #333;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            animation: fadeIn 0.4s ease;
         }
 
-        .variant-fields {
+        .variant-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 15px;
-        }
-
-        @@media (max-width: 768px) {
-            .variant-fields {
-                grid-template-columns: 1fr;
-            }
+            grid-template-columns: 1fr 1fr 120px;
+            gap: 20px;
         }
 
         /* Buttons */
-        .btn-primary {
+        .btn-luxury {
             background: var(--primary-pink);
             color: white;
             border: none;
-            border-radius: 8px;
-            padding: 12px 30px;
-            font-weight: 600;
-            font-size: 1rem;
-            transition: background 0.2s ease;
-            min-height: 44px;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+            border-radius: 10px;
+            padding: 16px 45px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            transition: 0.3s;
+            cursor: pointer;
         }
 
-            .btn-primary:hover {
+            .btn-luxury:hover {
                 background: var(--primary-hover);
+                transform: translateY(-3px);
+                box-shadow: 0 10px 20px rgba(214, 138, 138, 0.2);
             }
 
-        .btn-secondary {
-            background: #333;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 12px 30px;
+        .btn-add-variant {
+            background: transparent;
+            color: var(--primary-pink);
+            border: 2px dashed #444;
+            padding: 12px;
+            border-radius: 10px;
+            width: 100%;
+            transition: 0.3s;
             font-weight: 600;
-            transition: background 0.2s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
         }
 
-            .btn-secondary:hover {
-                background: #444;
+            .btn-add-variant:hover {
+                border-color: var(--primary-pink);
+                background: rgba(214, 138, 138, 0.05);
             }
 
-        .btn-danger {
-            background: #dc3545;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            padding: 8px 15px;
+        .remove-variant {
+            color: #ff6b6b;
+            cursor: pointer;
             font-size: 0.85rem;
-            transition: background 0.2s ease;
+            margin-top: 10px;
+            display: inline-block;
+            transition: 0.2s;
         }
 
-            .btn-danger:hover {
-                background: #c82333;
+            .remove-variant:hover {
+                color: #ff8787;
             }
 
-        .btn-add {
-            background: #28a745;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            padding: 8px 15px;
-            font-size: 0.85rem;
-            transition: background 0.2s ease;
-        }
-
-            .btn-add:hover {
-                background: #218838;
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
             }
 
-        /* Toast Messages */
-        .toast-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 9999;
-        }
-
-        /* Action Buttons */
-        .action-buttons {
-            display: flex;
-            gap: 15px;
-            margin-top: 30px;
-            justify-content: flex-end;
-        }
-
-        /* Responsive */
-        @@media (max-width: 768px) {
-            .create-title {
-                font-size: 1.8rem;
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
-
-            .form-container {
-                padding: 20px;
-            }
-
-            .action-buttons {
-                flex-direction: column;
-            }
-
-                .action-buttons .btn {
-                    width: 100%;
-                }
         }
     </style>
 }
 
-<!-- Toast Messages -->
-<div class="toast-container">
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <div class="toast show align-items-center text-white bg-success border-0">
-            <div class="d-flex">
-                <div class="toast-body">
-                    <i class="bi bi-check-circle me-2"></i>
-                    @TempData["SuccessMessage"]
-                </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-            </div>
-        </div>
-    }
-
-    @if (TempData["ErrorMessage"] != null)
-    {
-        <div class="toast show align-items-center text-white bg-danger border-0">
-            <div class="d-flex">
-                <div class="toast-body">
-                    <i class="bi bi-exclamation-circle me-2"></i>
-                    @TempData["ErrorMessage"]
-                </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-            </div>
-        </div>
-    }
-</div>
-
 <div class="create-header">
     <div class="container">
         <h1 class="create-title">Create New Product</h1>
-        <p style="color: var(--primary-pink); font-style: italic;">Add a new product to your luxury collection</p>
+        <p class="text-muted" style="letter-spacing: 2px;">LUXURY INVENTORY MANAGEMENT</p>
     </div>
 </div>
 
 <div class="container">
     <div class="form-container">
-        @if (!ViewData.ModelState.IsValid)
-        {
-            <div class="validation-summary">
-                <div asp-validation-summary="All" class="text-danger"></div>
-            </div>
-        }
-
-        <form asp-action="Create" method="post" id="createProductForm">
+        <form asp-action="Create" asp-controller="Products" method="post" id="createProductForm">
             @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-4"></div>
 
             <div class="row">
-                <!-- Basic Information -->
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label asp-for="Name" class="form-label">Product Name *</label>
-                        <input asp-for="Name" class="form-control-custom" placeholder="Enter product name" />
-                        <span asp-validation-for="Name" class="field-validation-error"></span>
+                        <label asp-for="Name" class="form-label">Product Title *</label>
+                        <input asp-for="Name" class="form-control-custom" placeholder="e.g. Silk Foundation" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
                     </div>
 
                     <div class="form-group">
-                        <label asp-for="Price" class="form-label">Price *</label>
+                        <label asp-for="Price" class="form-label">Price (EGP) *</label>
                         <input asp-for="Price" type="number" step="0.01" class="form-control-custom" placeholder="0.00" />
-                        <span asp-validation-for="Price" class="field-validation-error"></span>
+                        <span asp-validation-for="Price" class="text-danger"></span>
                     </div>
 
                     <div class="form-group">
-                        <label asp-for="CategoryId" class="form-label">Category ID *</label>
-                        <input asp-for="CategoryId" type="number" class="form-control-custom" placeholder="Enter category ID" />
-                        <span asp-validation-for="CategoryId" class="field-validation-error"></span>
+                        <label asp-for="CategoryId" class="form-label">Collection / Category *</label>
+                        <div class="position-relative">
+                            <select asp-for="CategoryId" id="categoryLookup" class="form-control-custom">
+                                <option value="">-- Synchronizing Categories --</option>
+                            </select>
+                            <div id="categoryLoader" class="spinner-border spinner-border-sm text-pink position-absolute" style="right: 45px; top: 18px; display: none;"></div>
+                        </div>
+                        <span asp-validation-for="CategoryId" class="text-danger"></span>
                     </div>
                 </div>
 
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label asp-for="Stock" class="form-label">Stock *</label>
-                        <input asp-for="Stock" type="number" class="form-control-custom" placeholder="Enter stock quantity" />
-                        <span asp-validation-for="Stock" class="field-validation-error"></span>
+                        <label asp-for="Stock" class="form-label">Base Inventory *</label>
+                        <input asp-for="Stock" type="number" class="form-control-custom" placeholder="0" />
+                        <span asp-validation-for="Stock" class="text-danger"></span>
                     </div>
 
                     <div class="form-group">
-                        <label asp-for="Description" class="form-label">Description</label>
-                        <textarea asp-for="Description" class="form-control-custom" rows="3" placeholder="Enter product description"></textarea>
-                        <span asp-validation-for="Description" class="field-validation-error"></span>
+                        <label asp-for="Description" class="form-label">Product Narrative</label>
+                        <textarea asp-for="Description" class="form-control-custom" rows="5" placeholder="Describe the essence of this product..."></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
                     </div>
                 </div>
             </div>
 
-            <!-- Variants Section -->
             <div class="variants-section">
-                <div class="variants-header">
-                    <h5 style="margin: 0; color: var(--text-light);">Product Variants</h5>
-                    <button type="button" class="btn btn-add" id="addVariantBtn">
-                        <i class="bi bi-plus-circle me-1"></i> Add Variant
-                    </button>
-                </div>
+                <h5 class="text-white mb-4"><i class="bi bi-stars me-2 text-pink"></i>Product Variants</h5>
 
                 <div id="variantsContainer">
-                    @for (int i = 0; i < Model.Variants.Count; i++)
-                    {
-                        <div class="variant-item" data-index="@i">
-                            <div class="variant-fields">
-                                <div>
-                                    <label class="form-label">Variant Name</label>
-                                    <input asp-for="Variants[i].VariantName" class="form-control-custom" placeholder="e.g., Color, Size" />
-                                    <span asp-validation-for="Variants[i].VariantName" class="field-validation-error"></span>
-                                </div>
-                                <div>
-                                    <label class="form-label">Variant Value</label>
-                                    <input asp-for="Variants[i].VariantValue" class="form-control-custom" placeholder="e.g., Red, Large" />
-                                    <span asp-validation-for="Variants[i].VariantValue" class="field-validation-error"></span>
-                                </div>
-                                <div>
-                                    <label class="form-label">Stock</label>
-                                    <input asp-for="Variants[i].Stock" type="number" class="form-control-custom" placeholder="0" />
-                                    <span asp-validation-for="Variants[i].Stock" class="field-validation-error"></span>
-                                </div>
-                            </div>
-                            @if (i > 0)
-                            {
-                                <div class="text-end mt-3">
-                                    <button type="button" class="btn btn-danger remove-variant-btn">
-                                        <i class="bi bi-trash me-1"></i> Remove
-                                    </button>
-                                </div>
-                            }
-                        </div>
-                    }
+                    @* سيتم إضافة الـ Variants هنا بواسطة JavaScript *@
                 </div>
+
+                <button type="button" class="btn-add-variant mt-2" id="addVariantBtn">
+                    <i class="bi bi-plus-circle me-2"></i>Add Specific Variant (Color, Size, etc.)
+                </button>
             </div>
 
-            <!-- Action Buttons -->
-            <div class="action-buttons">
-                <a asp-action="Index" class="btn btn-secondary">
-                    <i class="bi bi-arrow-left me-1"></i> Back to List
-                </a>
-                <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-check-circle me-1"></i> Create Product
-                </button>
+            <div class="d-flex justify-content-end gap-3 mt-5">
+                <a asp-action="Index" class="btn btn-link text-muted text-decoration-none">Discard Changes</a>
+                <button type="submit" class="btn-luxury">Save Product</button>
             </div>
         </form>
     </div>
 </div>
 
 @section Scripts {
+    <partial name="_ValidationScriptsPartial" />
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Auto-hide toast messages
-            setTimeout(function () {
-                const toasts = document.querySelectorAll('.toast');
-                toasts.forEach(toast => {
-                    const bootstrapToast = new bootstrap.Toast(toast);
-                    bootstrapToast.hide();
-                });
-            }, 3000);
 
-            // Add variant functionality
-            const addVariantBtn = document.getElementById('addVariantBtn');
+            // 1. Loading Categories
+            const categorySelect = document.getElementById('categoryLookup');
+            const categoryLoader = document.getElementById('categoryLoader');
+
+            async function loadCategories() {
+                try {
+                    categoryLoader.style.display = 'block';
+                    const response = await fetch('/Categories/GetLookupList');
+                    if (!response.ok) throw new Error();
+                    const data = await response.json();
+
+                    categorySelect.innerHTML = '<option value="">-- Select Category --</option>';
+                    data.forEach(cat => {
+                        categorySelect.add(new Option(cat.name, cat.id));
+                    });
+                } catch (e) {
+                    categorySelect.innerHTML = '<option value="">Error fetching categories</option>';
+                } finally {
+                    categoryLoader.style.display = 'none';
+                }
+            }
+            loadCategories();
+
+            // 2. Dynamic Variants Logic
             const variantsContainer = document.getElementById('variantsContainer');
-            let variantIndex = @Model.Variants.Count;
+            const addBtn = document.getElementById('addVariantBtn');
+            let variantIndex = 0;
 
-            addVariantBtn.addEventListener('click', function () {
-                const newVariant = document.createElement('div');
-                newVariant.className = 'variant-item';
-                newVariant.setAttribute('data-index', variantIndex);
-
-                newVariant.innerHTML = `
-                    <div class="variant-fields">
-                        <div>
-                            <label class="form-label">Variant Name</label>
-                            <input name="Variants[${variantIndex}].VariantName" class="form-control-custom" placeholder="e.g., Color, Size" />
-                            <span class="field-validation-error" data-valmsg-for="Variants[${variantIndex}].VariantName" data-valmsg-replace="true"></span>
+            addBtn.addEventListener('click', function () {
+                const variantHtml = `
+                    <div class="variant-item">
+                        <div class="variant-grid">
+                            <div>
+                                <label class="form-label small">Type</label>
+                                <input name="Variants[${variantIndex}].VariantName" class="form-control-custom" placeholder="e.g. Shade" required />
+                            </div>
+                            <div>
+                                <label class="form-label small">Value</label>
+                                <input name="Variants[${variantIndex}].VariantValue" class="form-control-custom" placeholder="e.g. Rose Gold" required />
+                            </div>
+                            <div>
+                                <label class="form-label small">Qty</label>
+                                <input name="Variants[${variantIndex}].Stock" type="number" class="form-control-custom" value="0" required />
+                            </div>
                         </div>
-                        <div>
-                            <label class="form-label">Variant Value</label>
-                            <input name="Variants[${variantIndex}].VariantValue" class="form-control-custom" placeholder="e.g., Red, Large" />
-                            <span class="field-validation-error" data-valmsg-for="Variants[${variantIndex}].VariantValue" data-valmsg-replace="true"></span>
-                        </div>
-                        <div>
-                            <label class="form-label">Stock</label>
-                            <input name="Variants[${variantIndex}].Stock" type="number" class="form-control-custom" placeholder="0" />
-                            <span class="field-validation-error" data-valmsg-for="Variants[${variantIndex}].Stock" data-valmsg-replace="true"></span>
-                        </div>
-                    </div>
-                    <div class="text-end mt-3">
-                        <button type="button" class="btn btn-danger remove-variant-btn">
-                            <i class="bi bi-trash me-1"></i> Remove
-                        </button>
+                        <span class="remove-variant"><i class="bi bi-x-circle me-1"></i> Remove this variant</span>
                     </div>
                 `;
-
-                variantsContainer.appendChild(newVariant);
+                variantsContainer.insertAdjacentHTML('beforeend', variantHtml);
                 variantIndex++;
-
-                // Add event listener to remove button
-                newVariant.querySelector('.remove-variant-btn').addEventListener('click', function () {
-                    newVariant.remove();
-                    reindexVariants();
-                });
             });
 
-            // Remove variant functionality for existing variants
-            document.querySelectorAll('.remove-variant-btn').forEach(btn => {
-                btn.addEventListener('click', function () {
-                    const variantItem = this.closest('.variant-item');
-                    if (variantItem) {
-                        variantItem.remove();
-                        reindexVariants();
-                    }
-                });
-            });
-
-            // Re-index variants after removal
-            function reindexVariants() {
-                const variantItems = variantsContainer.querySelectorAll('.variant-item');
-                variantIndex = 0;
-
-                variantItems.forEach((item, index) => {
-                    item.setAttribute('data-index', index);
-
-                    // Update input names
-                    const inputs = item.querySelectorAll('input');
-                    inputs[0].name = `Variants[${index}].VariantName`;
-                    inputs[1].name = `Variants[${index}].VariantValue`;
-                    inputs[2].name = `Variants[${index}].Stock`;
-
-                    // Update validation message for attributes
-                    const spans = item.querySelectorAll('.field-validation-error');
-                    spans[0].setAttribute('data-valmsg-for', `Variants[${index}].VariantName`);
-                    spans[1].setAttribute('data-valmsg-for', `Variants[${index}].VariantValue`);
-                    spans[2].setAttribute('data-valmsg-for', `Variants[${index}].Stock`);
-
-                    variantIndex = index + 1;
-                });
-            }
-
-            // Form validation
-            const form = document.getElementById('createProductForm');
-            form.addEventListener('submit', function (e) {
-                const requiredFields = form.querySelectorAll('[required]');
-                let isValid = true;
-
-                requiredFields.forEach(field => {
-                    if (!field.value.trim()) {
-                        field.classList.add('error');
-                        isValid = false;
-                    } else {
-                        field.classList.remove('error');
-                    }
-                });
-
-                if (!isValid) {
-                    e.preventDefault();
-                    alert('Please fill in all required fields.');
+            // Remove variant handle
+            variantsContainer.addEventListener('click', function(e) {
+                if (e.target.classList.contains('remove-variant') || e.target.parentElement.classList.contains('remove-variant')) {
+                    e.target.closest('.variant-item').remove();
+                    // ملاحظة: الـ Index في الـ ASP.NET Core MVC للـ Lists لازم يكون متسلسل
+                    // لكن في .NET 6+ الـ Model Binder بيقدر يتعامل مع الفجوات لو استخدمنا Index مخصص
                 }
-            });
-
-            // Clear error class on input
-            form.querySelectorAll('input, textarea').forEach(field => {
-                field.addEventListener('input', function () {
-                    this.classList.remove('error');
-                });
             });
         });
     </script>
-
-    <partial name="_ValidationScriptsPartial" />
 }

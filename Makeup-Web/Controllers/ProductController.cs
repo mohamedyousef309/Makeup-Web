@@ -1,26 +1,14 @@
 ﻿using Application_Layer.CQRS.Products.Commands;
-//using Application_Layer.CQRS.Products.Commands.Application_Layer.CQRS.Products.Commands;
+using Application_Layer.CQRS.Products.Commands.AddProductToCart;
 using Application_Layer.CQRS.Products.Commands.CreateProduct;
-using Application_Layer.CQRS.Products.Commands.Createvariants;
-using Application_Layer.CQRS.Products.Commands.RemoveProductFromBasket;
 using Application_Layer.CQRS.Products.Commands.UpdateProduct;
 using Application_Layer.CQRS.Products.Commands.UpdateProductStock;
-using Application_Layer.CQRS.Products.Commands.UpdateVariants;
 using Application_Layer.CQRS.Products.Queries;
-using Domain_Layer.DTOs;
+using Application_Layer.CQRS.Products.Queries.GetProductsByIds;
 using Domain_Layer.DTOs.ProductDtos;
-using Domain_Layer.DTOs.ProductVariantDtos;
-using Domain_Layer.ViewModels.ProductsViewModels;
-using Domain_Layer.ViewModels.ProductsViewModels.CreateProductsViewModel;
-using Domain_Layer.ViewModels.ProductsViewModels.ListItemViewModel;
-using Domain_Layer.ViewModels.ProductsViewModels.ProductsDetailsViewModel;
-using Domain_Layer.ViewModels.ProductsViewModels.ProductsVariantViewModel;
-using Domain_Layer.ViewModels.ProductsViewModels.UpdateProductsVariantViewModel;
-using Domain_Layer.ViewModels.ProductsViewModels.UpdateProductsViewModel;
+using Domain_Layer.Respones;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Makeup_Web.Controllers
 {
@@ -28,199 +16,128 @@ namespace Makeup_Web.Controllers
     {
         private readonly IMediator _mediator;
 
-        public ProductsController(IMediator mediator)
+        public ProductsController(IMediator mediator) => _mediator = mediator;
+
+        #region Queries (Read Operations)
+
+        
+        [HttpGet]
+        public async Task<IActionResult> Index(string? searchTerm, int pageIndex = 1, int pageSize = 10, string sortBy = "id", string sortDir = "asc")
         {
-            _mediator = mediator;
-        }
-
-        // =================== Products Endpoints ===================
-
-        public IActionResult Index()
-        {
-            return View();
-        }
-        // Products/GetAllProducts
-        public async Task<IActionResult> GetAllProducts(int pageIndex = 1, int pageSize = 10, string? sortBy = "id", string? sortDir = "asc", string? search = null)
-        {
-            var result = await _mediator.Send(new GetAllProductsQuery(pageSize, pageIndex, sortBy, sortDir, search));
-
-            if (!result.IsSuccess)
-            {
-                TempData["ErrorMessage"] = result.Message;
-                return View(new PaginatedListDto<ProductListItemViewModel> { Items = new List<ProductListItemViewModel>() });
-            }
-
-            
-            
-
+            var query = new GetAllProductsQuery(pageSize, pageIndex, sortBy, sortDir, searchTerm);
+            var result = await _mediator.Send(query);
             return View(result.Data);
         }
 
+       
+        [HttpGet]
         public async Task<IActionResult> Details(int id)
         {
             var result = await _mediator.Send(new GetProductByIdQuery(id));
-
-            if (!result.IsSuccess)
-            {
-                TempData["ErrorMessage"] = result.Message;
-                return RedirectToAction(nameof(Index));
-            }
-
-            var dto = result.Data;
-            var model = new ProductDetailsViewModel
-            {
-                Id = dto.Id,
-                Name = dto.Name,
-                Description = dto.Description,
-                Price = dto.Price,
-                Stock = dto.Stock,
-                IsActive = dto.IsActive,
-                Variants = dto.Variants?.Select(v => new ProductVariantViewModel
-                {
-                    Id = v.Id,
-                    VariantName = v.VariantName,
-                    VariantValue = v.VariantValue,
-                    Stock = v.Stock
-                }).ToList() ?? new List<ProductVariantViewModel>()
-            };
-
-            return View(model);
+            if (!result.IsSuccess) return NotFound();
+            return View(result.Data);
         }
 
-        public IActionResult Create() => View(new CreateProductViewModel());
-
-        [HttpPost]
-        public async Task<IActionResult> Create(CreateProductViewModel model)
+       
+        [HttpGet]
+        public async Task<IActionResult> GetMultipleByIds([FromQuery] IEnumerable<int> ids)
         {
-            if (!ModelState.IsValid) return View(model);
+            var result = await _mediator.Send(new GetProductsByIdsQuery(ids));
+            return Json(result);
+        }
 
-            var dto = new CreateProductDto
-            {
-                Name = model.Name,
-                Description = model.Description,
-                Price = model.Price,
-                Stock = model.Stock,
-                CategoryId = model.CategoryId,
-                Variants = model.Variants?.Select(v => new CreateProductVariantDto
-                {
-                    VariantName = v.VariantName,
-                    VariantValue = v.VariantValue,
-                    Stock = v.Stock
-                }).ToList() ?? new List<CreateProductVariantDto>()
-            };
+        #endregion
+
+        #region Commands (Write Operations)
+
+        
+        [HttpGet]
+        public IActionResult Create() => View();
+
+       
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(CreateProductDto dto)
+        {
+            if (!ModelState.IsValid) return View(dto);
 
             var result = await _mediator.Send(new CreateProductCommand(dto));
+            if (result.IsSuccess) return RedirectToAction(nameof(Index));
 
-            if (!result.IsSuccess)
-            {
-                ModelState.AddModelError(string.Empty, result.Message);
-                return View(model);
-            }
-
-            return RedirectToAction(nameof(Index));
+            ModelState.AddModelError("", result.Message);
+            return View(dto);
         }
 
+        
+        [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
             var result = await _mediator.Send(new GetProductByIdQuery(id));
-            if (!result.IsSuccess)
-            {
-                TempData["ErrorMessage"] = result.Message;
-                return RedirectToAction(nameof(Index));
-            }
+            if (!result.IsSuccess) return NotFound();
 
-            var dto = result.Data;
-            var model = new UpdateProductViewModel
+            
+            var updateDto = new UpdateProductDto
             {
-                Id = dto.Id,
-                Name = dto.Name,
-                Description = dto.Description,
-                Price = dto.Price,
-                Stock = dto.Stock,
-                CategoryId = dto.CategoryId,
-                IsActive = dto.IsActive,
-                Variants = dto.Variants?.Select(v => new UpdateProductVariantViewModel
-                {
-                    Id = v.Id,
-                    VariantName = v.VariantName,
-                    VariantValue = v.VariantValue,
-                    Stock = v.Stock
-                }).ToList() ?? new List<UpdateProductVariantViewModel>()
+                Id = result.Data.Id,
+                Name = result.Data.Name,
+                Description = result.Data.Description,
+                Price = result.Data.Price,
+                Stock = result.Data.Stock,
+                IsActive = result.Data.IsActive,
+                CategoryId = result.Data.CategoryId
             };
+            return View(updateDto);
+        }
 
-            return View(model);
+        
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(UpdateProductDto dto)
+        {
+            if (!ModelState.IsValid) return View(dto);
+
+            var result = await _mediator.Send(new UpdateProductCommand(dto));
+            if (result.IsSuccess) return RedirectToAction(nameof(Index));
+
+            ModelState.AddModelError("", result.Message);
+            return View(dto);
+        }
+
+       
+        [HttpPost]
+        public async Task<IActionResult> UpdateStock(int productId, int newStock)
+        {
+            var result = await _mediator.Send(new UpdateProductStockCommand(productId, newStock));
+            return Json(result);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(UpdateProductViewModel model)
-        {
-            if (!ModelState.IsValid) return View(model);
-
-            var dto = new UpdateProductDto
-            {
-                Id = model.Id,
-                Name = model.Name,
-                Description = model.Description,
-                Price = model.Price,
-                Stock = model.Stock,
-                CategoryId = model.CategoryId,
-                IsActive = model.IsActive,
-                Variants = model.Variants?.Select(v => new UpdateProductVariantDto
-                {
-                    Id = v.Id,
-                    VariantName = v.VariantName,
-                    VariantValue = v.VariantValue,
-                    Stock = v.Stock
-                }).ToList() ?? new List<UpdateProductVariantDto>()
-            };
-
-            var result = await _mediator.Send(new UpdateProductCommand(dto));
-
-            if (!result.IsSuccess)
-            {
-                ModelState.AddModelError(string.Empty, result.Message);
-                return View(model);
-            }
-
-            return RedirectToAction(nameof(Index));
-        }
-
-        [HttpDelete]
         public async Task<IActionResult> Delete(int id)
         {
             var result = await _mediator.Send(new DeleteProductCommand(id));
+            return Json(result);
+        }
 
-            if (!result.IsSuccess)
-                TempData["ErrorMessage"] = result.Message;
+        #endregion
 
-            return RedirectToAction(nameof(Index));
+        #region Basket Operations (السلة)
+
+      
+        [HttpPost]
+        public async Task<IActionResult> AddToCart(int productId, string productName, decimal price, int quantity)
+        {
+            
+            var result = await _mediator.Send(new AddProductToCartCommand(1, productId, productName, price, quantity));
+            return Json(result);
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateStock(int productId, int stock)
+        public async Task<IActionResult> RemoveFromCart(int productId)
         {
-            var result = await _mediator.Send(new UpdateProductStockCommand(productId, stock));
-
-            if (!result.IsSuccess)
-                TempData["ErrorMessage"] = result.Message;
-
-            return RedirectToAction(nameof(Index));
+            var result = await _mediator.Send(new Application_Layer.CQRS.Products.Commands.RemoveProductFromBasket.RemoveProductFromBasketCommand(1, productId));
+            return Json(result);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> RemoveFromBasket(int productId, int userId)
-        {
-            var result = await _mediator.Send(new RemoveProductFromBasketCommand(productId, userId));
-
-            if (!result.IsSuccess)
-                TempData["ErrorMessage"] = result.Message;
-
-            return RedirectToAction(nameof(Index));
-        }
-
-        // =================== ProductVariants Endpoints ===================
-
-       
-        
+        #endregion
     }
 }

@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Domain_Layer.Entites.Product>
+﻿@* @model IEnumerable<Domain_Layer.Entites.Product>
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -217,7 +217,7 @@
                 <p class="description">@description</p>
 
                 @* Changed Button to Anchor with Tag Helpers *@
-                <a asp-controller="Products" asp-action="GetAllProducts" class="btn btn-view">VIEW PROJECT</a>
+@*                 <a asp-controller="Products" asp-action="GetAllProducts" class="btn btn-view">VIEW PROJECT</a>
             </div>
         </div>
     </div>
@@ -275,4 +275,4 @@
             }
         });
     </script>
-}
+} * *@

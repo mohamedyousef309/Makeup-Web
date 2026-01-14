@@ -1,5 +1,5 @@
-﻿@using Domain_Layer.ViewModels.ProductsViewModels.UpdateProductsViewModel
-@model UpdateProductViewModel
+﻿@using Domain_Layer.DTOs.ProductDtos
+@model UpdateProductDto
 
 @{
     ViewData["Title"] = "Edit Product - Pro Makeup Studio";
@@ -15,9 +15,6 @@
             --input-bg: #252525;
             --text-light: #ffffff;
             --text-muted: #a0a0a0;
-            --error-color: #ff6b6b;
-            --success-color: #51cf66;
-            --warning-color: #ff922b;
         }
 
         body {
@@ -26,7 +23,6 @@
             font-family: 'Inter', sans-serif;
         }
 
-        /* Header */
         .edit-header {
             padding: 50px 0 30px;
             text-align: center;
@@ -45,39 +41,16 @@
             -webkit-text-fill-color: transparent;
         }
 
-        /* Form Container */
         .form-container {
             background: var(--card-bg);
             border-radius: 15px;
             border: 1px solid #252525;
-            padding: 30px;
+            padding: 40px;
             max-width: 900px;
-            margin: 0 auto;
+            margin: 0 auto 50px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
-        /* Product Status Badge */
-        .status-badge {
-            display: inline-block;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-left: 15px;
-        }
-
-        .status-active {
-            background: rgba(81, 207, 102, 0.2);
-            color: var(--success-color);
-            border: 1px solid var(--success-color);
-        }
-
-        .status-inactive {
-            background: rgba(255, 107, 107, 0.2);
-            color: var(--error-color);
-            border: 1px solid var(--error-color);
-        }
-
-        /* Form Groups */
         .form-group {
             margin-bottom: 25px;
         }
@@ -87,6 +60,9 @@
             font-weight: 600;
             margin-bottom: 8px;
             display: block;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
         }
 
         .form-control-custom {
@@ -94,10 +70,9 @@
             border: 1px solid #333 !important;
             color: white !important;
             border-radius: 10px;
-            padding: 12px 18px;
-            min-height: 44px;
+            padding: 14px 18px;
             width: 100%;
-            transition: border-color 0.3s ease;
+            transition: all 0.3s ease;
         }
 
             .form-control-custom:focus {
@@ -106,658 +81,146 @@
                 outline: none;
             }
 
-            .form-control-custom:disabled {
-                background: #2a2a2a !important;
-                color: #888 !important;
-                cursor: not-allowed;
-            }
-
-            .form-control-custom.error {
-                border-color: var(--error-color) !important;
-            }
-
-        /* Switch Toggle */
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 60px;
-            height: 30px;
-            margin-left: 15px;
+        select.form-control-custom {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23d68a8a' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 16px 12px;
         }
 
-            .switch input {
-                opacity: 0;
-                width: 0;
-                height: 0;
-            }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #444;
-            transition: .4s;
-            border-radius: 30px;
-        }
-
-            .slider:before {
-                position: absolute;
-                content: "";
-                height: 22px;
-                width: 22px;
-                left: 4px;
-                bottom: 4px;
-                background-color: white;
-                transition: .4s;
-                border-radius: 50%;
-            }
-
-        input:checked + .slider {
-            background-color: var(--primary-pink);
-        }
-
-        input:focus + .slider {
-            box-shadow: 0 0 1px var(--primary-pink);
-        }
-
-        input:checked + .slider:before {
-            transform: translateX(30px);
-        }
-
-        /* Variants Section */
-        .variants-section {
-            border: 1px solid #333;
-            border-radius: 10px;
-            padding: 20px;
-            margin-top: 30px;
-            position: relative;
-        }
-
-        .variants-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .variant-item {
-            background: rgba(37, 37, 37, 0.5);
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-            border: 1px solid #333;
-            transition: border-color 0.3s ease;
-        }
-
-            .variant-item:hover {
-                border-color: var(--primary-pink);
-            }
-
-        .variant-fields {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr auto;
-            gap: 15px;
-            align-items: end;
-        }
-
-        @@media (max-width: 992px) {
-            .variant-fields {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-
-        @@media (max-width: 576px) {
-            .variant-fields {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Validation Messages */
-        .validation-summary {
-            background: rgba(255, 107, 107, 0.1);
-            border: 1px solid var(--error-color);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 25px;
-        }
-
-            .validation-summary ul {
-                list-style: none;
-                padding-left: 0;
-                margin-bottom: 0;
-            }
-
-            .validation-summary li {
-                color: var(--error-color);
-                font-size: 0.9rem;
-                margin-bottom: 5px;
-            }
-
-        .field-validation-error {
-            color: var(--error-color);
-            font-size: 0.85rem;
-            margin-top: 5px;
-            display: block;
-        }
-
-        /* Buttons */
-        .btn-primary {
+        .btn-update {
             background: var(--primary-pink);
             color: white;
             border: none;
             border-radius: 8px;
-            padding: 12px 30px;
-            font-weight: 600;
-            font-size: 1rem;
-            transition: background 0.2s ease;
-            min-height: 44px;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+            padding: 15px 45px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.3s;
+            cursor: pointer;
         }
 
-            .btn-primary:hover {
+            .btn-update:hover {
                 background: var(--primary-hover);
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(214, 138, 138, 0.3);
             }
 
-        .btn-secondary {
-            background: #333;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 12px 30px;
-            font-weight: 600;
-            transition: background 0.2s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-            .btn-secondary:hover {
-                background: #444;
-            }
-
-        .btn-danger {
-            background: #dc3545;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            padding: 8px 15px;
+        .text-danger {
             font-size: 0.85rem;
-            transition: background 0.2s ease;
-            min-height: 44px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-            .btn-danger:hover {
-                background: #c82333;
-            }
-
-        .btn-warning {
-            background: var(--warning-color);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            padding: 8px 15px;
-            font-size: 0.85rem;
-            transition: background 0.2s ease;
-        }
-
-            .btn-warning:hover {
-                background: #e67700;
-            }
-
-        .btn-add {
-            background: #28a745;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            padding: 8px 15px;
-            font-size: 0.85rem;
-            transition: background 0.2s ease;
-        }
-
-            .btn-add:hover {
-                background: #218838;
-            }
-
-        /* Toast Messages */
-        .toast-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 9999;
-        }
-
-        /* Action Buttons */
-        .action-buttons {
-            display: flex;
-            gap: 15px;
-            margin-top: 30px;
-            justify-content: space-between;
-        }
-
-            .action-buttons .left-buttons,
-            .action-buttons .right-buttons {
-                display: flex;
-                gap: 15px;
-            }
-
-        /* Product ID Display */
-        .product-id-display {
-            background: rgba(214, 138, 138, 0.1);
-            border: 1px solid var(--primary-pink);
-            border-radius: 8px;
-            padding: 10px 15px;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        /* Responsive */
-        @@media (max-width: 768px) {
-            .edit-title {
-                font-size: 1.8rem;
-            }
-
-            .form-container {
-                padding: 20px;
-            }
-
-            .action-buttons {
-                flex-direction: column;
-                gap: 10px;
-            }
-
-                .action-buttons .left-buttons,
-                .action-buttons .right-buttons {
-                    width: 100%;
-                }
-
-                    .action-buttons .left-buttons .btn,
-                    .action-buttons .right-buttons .btn {
-                        width: 100%;
-                    }
+            margin-top: 5px;
+            display: block;
         }
     </style>
 }
 
-<!-- Toast Messages -->
-<div class="toast-container">
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <div class="toast show align-items-center text-white bg-success border-0">
-            <div class="d-flex">
-                <div class="toast-body">
-                    <i class="bi bi-check-circle me-2"></i>
-                    @TempData["SuccessMessage"]
-                </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-            </div>
-        </div>
-    }
-
-    @if (TempData["ErrorMessage"] != null)
-    {
-        <div class="toast show align-items-center text-white bg-danger border-0">
-            <div class="d-flex">
-                <div class="toast-body">
-                    <i class="bi bi-exclamation-circle me-2"></i>
-                    @TempData["ErrorMessage"]
-                </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-            </div>
-        </div>
-    }
-</div>
-
 <div class="edit-header">
     <div class="container">
-        <h1 class="edit-title">Edit Product</h1>
-        <p style="color: var(--primary-pink); font-style: italic;">Update product information and variants</p>
+        <h1 class="edit-title">Refine Product</h1>
+        <p class="text-muted">Modifying: <span class="text-white">@Model.Name</span></p>
     </div>
 </div>
 
 <div class="container">
     <div class="form-container">
-        <div class="product-id-display">
-            <i class="bi bi-tag" style="color: var(--primary-pink);"></i>
-            <span>Product ID: <strong>@Model.Id</strong></span>
-            <span class="status-badge @(Model.IsActive ? "status-active" : "status-inactive")">
-                <i class="bi bi-circle-fill me-1" style="font-size: 0.6rem;"></i>
-                @(Model.IsActive ? "Active" : "Inactive")
-            </span>
-        </div>
-
-        @if (!ViewData.ModelState.IsValid)
-        {
-            <div class="validation-summary">
-                <div asp-validation-summary="All" class="text-danger"></div>
-            </div>
-        }
-
-        <form asp-action="Edit" method="post" id="editProductForm">
+        @* توجيه الفورم بدقة للأكشن والكنترولر *@
+        <form asp-action="Edit" asp-controller="Products" method="post">
             @Html.AntiForgeryToken()
+
+            @* الحقل المخفي للـ ID لضمان وصوله للـ UpdateProductDto *@
             <input type="hidden" asp-for="Id" />
 
             <div class="row">
-                <!-- Basic Information -->
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label asp-for="Name" class="form-label">Product Name *</label>
-                        <input asp-for="Name" class="form-control-custom" placeholder="Enter product name" />
-                        <span asp-validation-for="Name" class="field-validation-error"></span>
+                        <label asp-for="Name" class="form-label">Product Name</label>
+                        <input asp-for="Name" class="form-control-custom" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
                     </div>
 
                     <div class="form-group">
-                        <label asp-for="Price" class="form-label">Price *</label>
-                        <input asp-for="Price" type="number" step="0.01" class="form-control-custom" placeholder="0.00" />
-                        <span asp-validation-for="Price" class="field-validation-error"></span>
+                        <label asp-for="Price" class="form-label">Price (EGP)</label>
+                        <input asp-for="Price" type="number" step="0.01" class="form-control-custom" />
+                        <span asp-validation-for="Price" class="text-danger"></span>
                     </div>
 
                     <div class="form-group">
-                        <label asp-for="CategoryId" class="form-label">Category ID *</label>
-                        <input asp-for="CategoryId" type="number" class="form-control-custom" placeholder="Enter category ID" />
-                        <span asp-validation-for="CategoryId" class="field-validation-error"></span>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label d-flex align-items-center">
-                            Active Status
-                            <label class="switch ms-3">
-                                <input type="checkbox" asp-for="IsActive" />
-                                <span class="slider"></span>
-                            </label>
-                        </label>
-                        <small class="text-muted">Toggle to activate/deactivate the product</small>
+                        <label asp-for="CategoryId" class="form-label">Product Category</label>
+                        <div class="position-relative">
+                            <select asp-for="CategoryId" id="categoryLookup" class="form-control-custom">
+                                <option value="">-- Loading --</option>
+                            </select>
+                            <div id="categoryLoader" class="spinner-border spinner-border-sm text-pink position-absolute" style="right: 40px; top: 18px; display: none;"></div>
+                        </div>
+                        <span asp-validation-for="CategoryId" class="text-danger"></span>
                     </div>
                 </div>
 
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label asp-for="Stock" class="form-label">Stock *</label>
-                        <input asp-for="Stock" type="number" class="form-control-custom" placeholder="Enter stock quantity" />
-                        <span asp-validation-for="Stock" class="field-validation-error"></span>
+                        <label asp-for="Stock" class="form-label">Inventory Count</label>
+                        <input asp-for="Stock" type="number" class="form-control-custom" />
+                        <span asp-validation-for="Stock" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mt-4 mb-4">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" asp-for="IsActive" id="activeToggle">
+                            <label class="form-check-label ms-2" for="activeToggle">Display in Store</label>
+                        </div>
                     </div>
 
                     <div class="form-group">
                         <label asp-for="Description" class="form-label">Description</label>
-                        <textarea asp-for="Description" class="form-control-custom" rows="4" placeholder="Enter product description"></textarea>
-                        <span asp-validation-for="Description" class="field-validation-error"></span>
+                        <textarea asp-for="Description" class="form-control-custom" rows="5"></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
                     </div>
                 </div>
             </div>
 
-            <!-- Variants Section -->
-            <div class="variants-section">
-                <div class="variants-header">
-                    <h5 style="margin: 0; color: var(--text-light);">
-                        <i class="bi bi-layers me-2"></i>Product Variants
-                        <small class="text-muted ms-2">(@Model.Variants.Count variant(s))</small>
-                    </h5>
-                    <button type="button" class="btn btn-add" id="addVariantBtn">
-                        <i class="bi bi-plus-circle me-1"></i> Add Variant
-                    </button>
-                </div>
+            @* ملخص الأخطاء من الـ Server-side *@
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-4"></div>
 
-                <div id="variantsContainer">
-                    @if (Model.Variants != null && Model.Variants.Any())
-                    {
-                        @for (int i = 0; i < Model.Variants.Count; i++)
-                        {
-                            <div class="variant-item" data-index="@i">
-                                <input type="hidden" asp-for="Variants[i].Id" />
-
-                                <div class="variant-fields">
-                                    <div>
-                                        <label class="form-label">Variant Name *</label>
-                                        <input asp-for="Variants[i].VariantName" class="form-control-custom" placeholder="e.g., Color, Size" />
-                                        <span asp-validation-for="Variants[i].VariantName" class="field-validation-error"></span>
-                                    </div>
-                                    <div>
-                                        <label class="form-label">Variant Value *</label>
-                                        <input asp-for="Variants[i].VariantValue" class="form-control-custom" placeholder="e.g., Red, Large" />
-                                        <span asp-validation-for="Variants[i].VariantValue" class="field-validation-error"></span>
-                                    </div>
-                                    <div>
-                                        <label class="form-label">Stock *</label>
-                                        <input asp-for="Variants[i].Stock" type="number" class="form-control-custom" placeholder="0" min="0" />
-                                        <span asp-validation-for="Variants[i].Stock" class="field-validation-error"></span>
-                                    </div>
-                                    <div>
-                                        <label class="form-label">&nbsp;</label>
-                                        <button type="button" class="btn btn-danger remove-variant-btn w-100">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        }
-                    }
-                    else
-                    {
-                        <div class="text-center py-4">
-                            <i class="bi bi-layers fs-1 text-muted mb-3 d-block"></i>
-                            <p class="text-muted">No variants added yet. Click "Add Variant" to create one.</p>
-                        </div>
-                    }
-                </div>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="action-buttons">
-                <div class="left-buttons">
-                    <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-secondary">
-                        <i class="bi bi-eye me-1"></i> View Details
-                    </a>
-                    <a asp-action="Index" class="btn btn-secondary">
-                        <i class="bi bi-arrow-left me-1"></i> Back to List
-                    </a>
-                </div>
-                <div class="right-buttons">
-                    <button type="button" class="btn btn-warning" id="resetBtn">
-                        <i class="bi bi-arrow-clockwise me-1"></i> Reset
-                    </button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-check-circle me-1"></i> Update Product
-                    </button>
-                </div>
+            <div class="d-flex justify-content-end gap-3 mt-4">
+                <a asp-action="Index" class="btn btn-outline-secondary px-4 d-flex align-items-center">Cancel</a>
+                <button type="submit" class="btn-update">Save Changes</button>
             </div>
         </form>
     </div>
 </div>
 
 @section Scripts {
+    <partial name="_ValidationScriptsPartial" />
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Auto-hide toast messages
-            setTimeout(function () {
-                const toasts = document.querySelectorAll('.toast');
-                toasts.forEach(toast => {
-                    const bootstrapToast = new bootstrap.Toast(toast);
-                    bootstrapToast.hide();
-                });
-            }, 3000);
+            const categorySelect = document.getElementById('categoryLookup');
+            const categoryLoader = document.getElementById('categoryLoader');
+            const currentCategoryId = "@Model.CategoryId"; // القيمة الحالية من الداتا
 
-            // Add variant functionality
-            const addVariantBtn = document.getElementById('addVariantBtn');
-            const variantsContainer = document.getElementById('variantsContainer');
-            let variantIndex = @(Model.Variants?.Count ?? 0);
+            async function fetchCategories() {
+                try {
+                    categoryLoader.style.display = 'block';
+                    const response = await fetch('/Categories/GetLookupList');
+                    if (!response.ok) throw new Error();
+                    const data = await response.json();
 
-            addVariantBtn.addEventListener('click', function () {
-                const newVariant = document.createElement('div');
-                newVariant.className = 'variant-item';
-                newVariant.setAttribute('data-index', variantIndex);
-
-                newVariant.innerHTML = `
-                    <input type="hidden" name="Variants[${variantIndex}].Id" value="0" />
-                    <div class="variant-fields">
-                        <div>
-                            <label class="form-label">Variant Name *</label>
-                            <input name="Variants[${variantIndex}].VariantName" class="form-control-custom" placeholder="e.g., Color, Size" required />
-                            <span class="field-validation-error" data-valmsg-for="Variants[${variantIndex}].VariantName" data-valmsg-replace="true"></span>
-                        </div>
-                        <div>
-                            <label class="form-label">Variant Value *</label>
-                            <input name="Variants[${variantIndex}].VariantValue" class="form-control-custom" placeholder="e.g., Red, Large" required />
-                            <span class="field-validation-error" data-valmsg-for="Variants[${variantIndex}].VariantValue" data-valmsg-replace="true"></span>
-                        </div>
-                        <div>
-                            <label class="form-label">Stock *</label>
-                            <input name="Variants[${variantIndex}].Stock" type="number" class="form-control-custom" placeholder="0" min="0" required />
-                            <span class="field-validation-error" data-valmsg-for="Variants[${variantIndex}].Stock" data-valmsg-replace="true"></span>
-                        </div>
-                        <div>
-                            <label class="form-label">&nbsp;</label>
-                            <button type="button" class="btn btn-danger remove-variant-btn w-100">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                `;
-
-                // Remove the "no variants" message if it exists
-                const emptyMessage = variantsContainer.querySelector('.text-center');
-                if (emptyMessage) {
-                    emptyMessage.remove();
-                }
-
-                variantsContainer.appendChild(newVariant);
-                variantIndex++;
-
-                // Add event listener to remove button
-                newVariant.querySelector('.remove-variant-btn').addEventListener('click', function () {
-                    newVariant.remove();
-                    reindexVariants();
-
-                    // Show empty message if no variants left
-                    if (variantsContainer.children.length === 0) {
-                        variantsContainer.innerHTML = `
-                            <div class="text-center py-4">
-                                <i class="bi bi-layers fs-1 text-muted mb-3 d-block"></i>
-                                <p class="text-muted">No variants added yet. Click "Add Variant" to create one.</p>
-                            </div>
-                        `;
-                    }
-                });
-            });
-
-            // Remove variant functionality for existing variants
-            document.querySelectorAll('.remove-variant-btn').forEach(btn => {
-                btn.addEventListener('click', function () {
-                    const variantItem = this.closest('.variant-item');
-                    if (variantItem) {
-                        variantItem.remove();
-                        reindexVariants();
-
-                        // Show empty message if no variants left
-                        if (variantsContainer.children.length === 0) {
-                            variantsContainer.innerHTML = `
-                                <div class="text-center py-4">
-                                    <i class="bi bi-layers fs-1 text-muted mb-3 d-block"></i>
-                                    <p class="text-muted">No variants added yet. Click "Add Variant" to create one.</p>
-                                </div>
-                            `;
+                    categorySelect.innerHTML = '<option value="">-- Choose Category --</option>';
+                    data.forEach(cat => {
+                        const option = new Option(cat.name, cat.id);
+                        if (cat.id == currentCategoryId) {
+                            option.selected = true;
                         }
-                    }
-                });
-            });
-
-            // Re-index variants after removal
-            function reindexVariants() {
-                const variantItems = variantsContainer.querySelectorAll('.variant-item');
-                variantIndex = 0;
-
-                variantItems.forEach((item, index) => {
-                    item.setAttribute('data-index', index);
-
-                    // Update input names
-                    const inputs = item.querySelectorAll('input');
-                    inputs[0].name = `Variants[${index}].Id`;
-                    inputs[1].name = `Variants[${index}].VariantName`;
-                    inputs[2].name = `Variants[${index}].VariantValue`;
-                    inputs[3].name = `Variants[${index}].Stock`;
-
-                    // Update validation message for attributes
-                    const spans = item.querySelectorAll('.field-validation-error');
-                    if (spans.length > 0) {
-                        spans[0].setAttribute('data-valmsg-for', `Variants[${index}].VariantName`);
-                        spans[1].setAttribute('data-valmsg-for', `Variants[${index}].VariantValue`);
-                        spans[2].setAttribute('data-valmsg-for', `Variants[${index}].Stock`);
-                    }
-
-                    variantIndex = index + 1;
-                });
-            }
-
-            // Reset form
-            document.getElementById('resetBtn').addEventListener('click', function () {
-                if (confirm('Are you sure you want to reset all changes? This cannot be undone.')) {
-                    location.reload();
+                        categorySelect.add(option);
+                    });
+                } catch (error) {
+                    categorySelect.innerHTML = '<option value="">Error loading list</option>';
+                } finally {
+                    categoryLoader.style.display = 'none';
                 }
-            });
-
-            // Form validation
-            const form = document.getElementById('editProductForm');
-            form.addEventListener('submit', function (e) {
-                const requiredFields = form.querySelectorAll('[required]');
-                let isValid = true;
-
-                requiredFields.forEach(field => {
-                    if (!field.value.trim()) {
-                        field.classList.add('error');
-                        isValid = false;
-                    } else {
-                        field.classList.remove('error');
-                    }
-                });
-
-                // Check stock values
-                const stockInputs = form.querySelectorAll('input[name*="Stock"]');
-                stockInputs.forEach(input => {
-                    const value = parseInt(input.value);
-                    if (value < 0) {
-                        input.classList.add('error');
-                        isValid = false;
-                        alert('Stock values cannot be negative.');
-                    }
-                });
-
-                if (!isValid) {
-                    e.preventDefault();
-                    alert('Please fill in all required fields correctly.');
-                }
-            });
-
-            // Clear error class on input
-            form.querySelectorAll('input, textarea, select').forEach(field => {
-                field.addEventListener('input', function () {
-                    this.classList.remove('error');
-                });
-            });
-
-            // Price formatting
-            const priceInput = document.querySelector('input[name="Price"]');
-            if (priceInput) {
-                priceInput.addEventListener('blur', function () {
-                    let value = parseFloat(this.value);
-                    if (!isNaN(value)) {
-                        this.value = value.toFixed(2);
-                    }
-                });
             }
+            fetchCategories();
         });
     </script>
-
-    <partial name="_ValidationScriptsPartial" />
 }
