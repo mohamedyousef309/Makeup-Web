@@ -1,51 +1,51 @@
-﻿using Domain_Layer.DTOs._ِCategoryDtos;
-using Domain_Layer.Entites;
-using Domain_Layer.Interfaces.Repositryinterfaces;
-using Domain_Layer.Respones;
-using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿    using Domain_Layer.DTOs._ِCategoryDtos;
+    using Domain_Layer.Entites;
+    using Domain_Layer.Interfaces.Repositryinterfaces;
+    using Domain_Layer.Respones;
+    using MediatR;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
 
-namespace Application_Layer.CQRS.Caegories.Queries.GetCAtegoryById
-{
-    public record GetCategoryByIdQuery(int Id)
-         : IRequest<RequestRespones<CategoryDto>>;
-    public class GetCategoryByIdHandler
-       : IRequestHandler<GetCategoryByIdQuery, RequestRespones<CategoryDto>>
+    namespace Application_Layer.CQRS.Caegories.Queries.GetCAtegoryById
     {
-        private readonly IGenaricRepository<Category> _categoryRepo;
-
-        public GetCategoryByIdHandler(IGenaricRepository<Category> categoryRepo)
+        public record GetCategoryByIdQuery(int Id)
+             : IRequest<RequestRespones<CategoryDto>>;
+        public class GetCategoryByIdHandler
+           : IRequestHandler<GetCategoryByIdQuery, RequestRespones<CategoryDto>>
         {
-            _categoryRepo = categoryRepo;
-        }
+            private readonly IGenaricRepository<Category> _categoryRepo;
 
-        public async Task<RequestRespones<CategoryDto>> Handle(GetCategoryByIdQuery request, CancellationToken cancellationToken)
-        {
-            try
+            public GetCategoryByIdHandler(IGenaricRepository<Category> categoryRepo)
             {
-                var category = await _categoryRepo.GetByCriteriaAsync(c => c.Id == request.Id);
-
-
-                if (category == null)
-                    return RequestRespones<CategoryDto>.Fail("Category not found.", 404);
-
-                var dto = new CategoryDto
-                {
-                    Id = category.Id,
-                    Name = category.Name,
-                    Description = category.Description
-                };
-
-                return RequestRespones<CategoryDto>.Success(dto, 200, "Category retrieved successfully.");
+                _categoryRepo = categoryRepo;
             }
-            catch (Exception ex)
+
+            public async Task<RequestRespones<CategoryDto>> Handle(GetCategoryByIdQuery request, CancellationToken cancellationToken)
             {
-                return RequestRespones<CategoryDto>.Fail($"Error: {ex.Message}", 500);
+                try
+                {
+                    var category = await _categoryRepo.GetByCriteriaAsync(c => c.Id == request.Id);
+
+
+                    if (category == null)
+                        return RequestRespones<CategoryDto>.Fail("Category not found.", 404);
+
+                    var dto = new CategoryDto
+                    {
+                        Id = category.Id,
+                        Name = category.Name,
+                        Description = category.Description
+                    };
+
+                    return RequestRespones<CategoryDto>.Success(dto, 200, "Category retrieved successfully.");
+                }
+                catch (Exception ex)
+                {
+                    return RequestRespones<CategoryDto>.Fail($"Error: {ex.Message}", 500);
+                }
             }
         }
     }
-}
