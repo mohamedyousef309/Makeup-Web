@@ -11,6 +11,10 @@ namespace Application_Layer.CQRS.User.Commands.EditUserProfile
     {
         public EditUserProfileCommnadValidator()
         {
+            RuleFor(x => x.userid)
+            .NotEmpty().WithMessage("User ID is required.")
+            .GreaterThan(0).WithMessage("Invalid User ID.");
+
             RuleFor(x => x.Username)
             .NotEmpty().WithMessage("Username is required.")
             .MinimumLength(3).WithMessage("Username must be at least 3 characters.")

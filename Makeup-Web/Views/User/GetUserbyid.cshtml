@@ -1,0 +1,225 @@
+﻿@using Domain_Layer.DTOs.UserDTOS
+@model UserToreturn
+
+@{
+    ViewData["Title"] = "User Profile Details";
+}
+
+@section Styles {
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-pink: #d68a8a;
+            --accent-gold: #c5a059;
+            --dark-bg: #0a0a0a;
+            --card-bg: #141414;
+            --border-color: #2a2a2a;
+            --text-main: #ffffff;
+            --text-muted: #888888;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .profile-container {
+            max-width: 900px;
+            margin: 50px auto;
+        }
+
+        /* Profile Header */
+        .profile-header-card {
+            background: linear-gradient(145deg, #1a1a1a, #141414);
+            border: 1px solid var(--border-color);
+            border-radius: 25px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .profile-header-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--primary-pink);
+        }
+
+        .avatar-wrapper {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            padding: 5px;
+            background: linear-gradient(45deg, var(--primary-pink), var(--accent-gold));
+        }
+
+        .profile-avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--card-bg);
+        }
+
+        .profile-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            margin-bottom: 5px;
+        }
+
+        .profile-id {
+            color: var(--primary-pink);
+            font-weight: 600;
+            letter-spacing: 2px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        /* Info Grid */
+        .info-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 25px;
+            height: 100%;
+            transition: 0.3s;
+        }
+
+        .info-card:hover {
+            border-color: var(--primary-pink);
+            transform: translateY(-5px);
+        }
+
+        .info-label {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-label i {
+            color: var(--primary-pink);
+            font-size: 1rem;
+        }
+
+        .info-value {
+            font-size: 1.1rem;
+            font-weight: 500;
+            word-break: break-all;
+        }
+
+        /* Action Buttons */
+        .action-area {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 40px;
+        }
+
+        .btn-luxury-edit {
+            background: var(--primary-pink);
+            color: white;
+            padding: 12px 35px;
+            border-radius: 12px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: 0.3s;
+            border: none;
+        }
+
+        .btn-luxury-edit:hover {
+            background: #c27a7a;
+            box-shadow: 0 8px 20px rgba(214, 138, 138, 0.3);
+            color: white;
+        }
+
+        .btn-luxury-outline {
+            background: transparent;
+            color: white;
+            padding: 12px 35px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .btn-luxury-outline:hover {
+            border-color: var(--text-muted);
+            background: rgba(255,255,255,0.05);
+            color: white;
+        }
+    </style>
+}
+
+<div class="container">
+    <div class="profile-container">
+        
+        @if (ViewBag.ErrorMessage != null)
+        {
+            <div class="alert alert-danger border-0 rounded-4" style="background: rgba(231, 76, 60, 0.1); color: #e74c3c;">
+                <i class="bi bi-exclamation-triangle me-2"></i> @ViewBag.ErrorMessage
+            </div>
+        }
+
+        @if (Model != null)
+        {
+            <div class="profile-header-card">
+                <div class="avatar-wrapper">
+                    @* افتراض وجود صورة أو عرض صورة افتراضية *@
+                    <img src="/images/default-avatar.png" class="profile-avatar" alt="User Avatar">
+                </div>
+                <h1 class="profile-name">@Model.Username</h1>
+                <span class="profile-id">Member ID: #@Model.Id</span>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="info-card">
+                        <div class="info-label">
+                            <i class="bi bi-envelope-at"></i> Email Address
+                        </div>
+                        <div class="info-value">@Model.Email</div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="info-card">
+                        <div class="info-label">
+                            <i class="bi bi-phone"></i> Phone Number
+                        </div>
+                        <div class="info-value">@(string.IsNullOrEmpty(Model.PhoneNumber) ? "Not Provided" : Model.PhoneNumber)</div>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="info-card">
+                        <div class="info-label">
+                            <i class="bi bi-geo-alt"></i> Home Address
+                        </div>
+                        <div class="info-value">@(string.IsNullOrEmpty(Model.UserAddress) ? "No address on file" : Model.UserAddress)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-area">
+                <a asp-action="EditUserProfile" asp-route-userid="@Model.Id" class="btn-luxury-edit">
+                    <i class="bi bi-pencil-square me-2"></i> Edit Profile
+                </a>
+                <a asp-action="GetAllUsers" class="btn-luxury-outline">
+                    <i class="bi bi-arrow-left me-2"></i> Back to Directory
+                </a>
+            </div>
+        }
+    </div>
+</div>

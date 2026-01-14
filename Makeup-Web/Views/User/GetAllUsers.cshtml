@@ -19,7 +19,7 @@
             --card-bg: #141414;
             --border-color: #2a2a2a;
             --text-main: #ffffff;
-            --text-muted: #888888; /* تم تفتيح اللون قليلاً للوضوح */
+            --text-muted: #888888;
             --success-green: #2ecc71;
         }
 
@@ -53,38 +53,28 @@
 
         .form-control-custom {
             background: #1a1a1a !important;
-            border: 1px solid #444 !important; /* حدود أوضح */
+            border: 1px solid #444 !important;
             color: white !important;
             border-radius: 8px;
             padding: 10px 15px;
         }
-
-            .form-control-custom::placeholder {
-                color: #666 !important; /* لون أوضح للـ placeholder */
-            }
 
             .form-control-custom:focus {
                 border-color: var(--primary-pink) !important;
                 box-shadow: 0 0 0 0.25rem rgba(214, 138, 138, 0.25);
             }
 
-        .input-group-text {
-            background: #1a1a1a !important;
-            border-color: #444 !important;
-            color: var(--primary-pink) !important;
-        }
-
-        /* Table Styling - Fixed Dropdown Visibility */
+        /* Table Styling */
         .luxury-table-container {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 20px;
-            overflow: visible !important; /* منع قص القوائم المنسدلة */
+            overflow: visible !important;
             padding: 10px;
         }
 
         .table-responsive {
-            overflow: visible !important; /* مهم جداً للـ dropdown */
+            overflow: visible !important;
         }
 
         .luxury-table {
@@ -137,7 +127,6 @@
             border: 2px solid var(--primary-pink);
         }
 
-        /* Badges & Actions */
         .badge-role {
             background: rgba(214, 138, 138, 0.1);
             color: var(--primary-pink);
@@ -165,7 +154,6 @@
         .dropdown-menu-dark {
             background-color: #1a1a1a;
             border: 1px solid var(--border-color);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
     </style>
 }
@@ -243,7 +231,7 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="small mb-1"><i class="bi bi-envelope me-2 text-pink"></i>@user.Email</div>
+                                    <div class="small mb-1"><i class="bi bi-envelope me-2" style="color: var(--primary-pink);"></i>@user.Email</div>
                                     <div class="small text-muted"><i class="bi bi-phone me-2"></i>@user.PhoneNumber</div>
                                 </td>
                                 <td>
@@ -259,11 +247,16 @@
                                 </td>
                                 <td class="text-end">
                                     <div class="dropdown">
-                                        <button class="btn-action" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-boundary="viewport">
+                                        <button class="btn-action" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                             <i class="bi bi-three-dots-vertical"></i>
                                         </button>
                                         <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end shadow-lg">
-                                            <li><a class="dropdown-item" href="#"><i class="bi bi-pencil me-2"></i> Edit Profile</a></li>
+                                            @* التعديل هنا: الربط مع الأكشن الجديد وتمرير الـ Id *@
+                                            <li>
+                                                <a class="dropdown-item" asp-action="EditUserProfile" asp-route-userid="@user.Id">
+                                                    <i class="bi bi-pencil me-2"></i> Edit Profile
+                                                </a>
+                                            </li>
                                             <li><a class="dropdown-item" href="#"><i class="bi bi-shield-lock me-2"></i> Manage Roles</a></li>
                                             <li><hr class="dropdown-divider border-secondary"></li>
                                             <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash me-2"></i> Delete User</a></li>
@@ -300,7 +293,6 @@
 
 @section Scripts {
     <script>
-        // Auto submit form on dropdown change
         document.querySelectorAll('.auto-submit').forEach(el => {
             el.addEventListener('change', () => {
                 document.getElementById('userFilterForm').submit();

@@ -1,0 +1,226 @@
+﻿@model Domain_Layer.ViewModels.User.EditUserViewModle
+
+@{
+    ViewData["Title"] = "Edit User Profile";
+}
+
+@section Styles {
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-pink: #d68a8a;
+            --accent-gold: #c5a059;
+            --dark-bg: #0a0a0a;
+            --card-bg: #141414;
+            --border-color: #2a2a2a;
+            --text-main: #ffffff;
+            --text-muted: #888888;
+            --error-red: #e74c3c;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .edit-container {
+            max-width: 800px;
+            margin: 60px auto;
+        }
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            color: var(--text-main);
+            margin-bottom: 10px;
+        }
+
+        .luxury-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+        }
+
+        .form-label {
+            color: var(--primary-pink);
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .form-control-custom {
+            background: #1a1a1a !important;
+            border: 1px solid #444 !important;
+            color: white !important;
+            border-radius: 10px;
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+        }
+
+            .form-control-custom:focus {
+                border-color: var(--primary-pink) !important;
+                box-shadow: 0 0 0 0.25rem rgba(214, 138, 138, 0.15);
+                background: #222 !important;
+            }
+
+        .input-group-text-custom {
+            background: #1a1a1a;
+            border: 1px solid #444;
+            color: var(--primary-pink);
+            border-radius: 10px 0 0 10px;
+        }
+
+        .btn-save {
+            background: var(--primary-pink);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.3s;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+            .btn-save:hover {
+                background: #c27a7a;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(214, 138, 138, 0.3);
+            }
+
+        .btn-back {
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            padding: 12px 30px;
+            border-radius: 10px;
+            text-decoration: none;
+            display: inline-block;
+            transition: 0.3s;
+            text-align: center;
+        }
+
+            .btn-back:hover {
+                color: white;
+                border-color: var(--primary-pink);
+            }
+
+        .text-danger {
+            color: var(--error-red) !important;
+            font-size: 0.8rem;
+            margin-top: 5px;
+        }
+
+        .validation-summary-errors {
+            background: rgba(231, 76, 60, 0.1);
+            border: 1px solid var(--error-red);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            color: var(--error-red);
+        }
+
+            .validation-summary-errors ul {
+                margin: 0;
+                padding-left: 20px;
+            }
+    </style>
+}
+
+<div class="container">
+    <div class="edit-container">
+
+        <div class="header-section">
+            <h1 class="header-title">Edit User Profile</h1>
+            <p class="text-muted">Update account information and contact details</p>
+        </div>
+
+        <div class="luxury-card">
+            <form asp-action="EditUserProfile" method="post">
+                @* مهم جداً لإرسال الـ ID للأكشن *@
+                <input type="hidden" asp-for="Userid" />
+
+                @if (!ViewData.ModelState.IsValid || ViewBag.ErrorMessage != null)
+                {
+                    <div asp-validation-summary="All" class="text-danger mb-4">
+                        @if (ViewBag.ErrorMessage != null)
+                        {
+                            <span>@ViewBag.ErrorMessage</span>
+                        }
+                    </div>
+                }
+
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <label asp-for="Username" class="form-label"></label>
+                        <div class="input-group">
+                            <span class="input-group-text input-group-text-custom"><i class="bi bi-person"></i></span>
+                            <input asp-for="Username" class="form-control form-control-custom" placeholder="Enter username" />
+                        </div>
+                        <span asp-validation-for="Username" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Email" class="form-label"></label>
+                        <div class="input-group">
+                            <span class="input-group-text input-group-text-custom"><i class="bi bi-envelope"></i></span>
+                            <input asp-for="Email" class="form-control form-control-custom" placeholder="email@example.com" />
+                        </div>
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="PhoneNumber" class="form-label"></label>
+                        <div class="input-group">
+                            <span class="input-group-text input-group-text-custom"><i class="bi bi-phone"></i></span>
+                            <input asp-for="PhoneNumber" class="form-control form-control-custom" placeholder="01xxxxxxxxx" />
+                        </div>
+                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="UserAddress" class="form-label"></label>
+                        <div class="input-group">
+                            <span class="input-group-text input-group-text-custom"><i class="bi bi-geo-alt"></i></span>
+                            <input asp-for="UserAddress" class="form-control form-control-custom" placeholder="Full Address" />
+                        </div>
+                        <span asp-validation-for="UserAddress" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-12 mt-5">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <button type="submit" class="btn btn-save">
+                                    <i class="bi bi-check2-circle me-2"></i> Save Changes
+                                </button>
+                            </div>
+                            <div class="col-md-4">
+                                <a asp-action="GetAllUsers" class="btn btn-back w-100 mt-2 mt-md-0">
+                                    Cancel
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

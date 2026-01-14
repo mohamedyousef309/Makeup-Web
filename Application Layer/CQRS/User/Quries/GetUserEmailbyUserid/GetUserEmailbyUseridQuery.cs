@@ -29,7 +29,9 @@ namespace Application_Layer.CQRS.User.Quries.GetUserEmailbyUserid
                     Id = x.Id,
                     Email = x.Email,
                     PhoneNumber = x.PhoneNumber,
-                    UserAddress= x.UserAddress
+                    UserAddress= x.UserAddress,
+                    Username=x.Username,
+                    
 
                 })
                 .FirstOrDefaultAsync();
