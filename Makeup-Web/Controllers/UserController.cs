@@ -141,7 +141,7 @@ namespace Makeup_Web.Controllers
             catch (Exception ex)
             {
 
-                throw;
+                return Json(new { success = false, message = "An internal error occurred." });
             }
 
         }

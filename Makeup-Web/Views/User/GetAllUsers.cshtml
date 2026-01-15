@@ -9,7 +9,7 @@
     var sortDir = Context.Request.Query["sortDir"];
 }
 
-@* إضافة الـ Token هنا لضمان عمل عمليات الـ POST بأمان *@
+@* توكن الحماية *@
 @Html.AntiForgeryToken()
 
 @section Styles {
@@ -34,17 +34,13 @@
             font-family: 'Inter', sans-serif;
         }
 
-        /* ستايل السطر المحظور */
+        /* حالة الحظر */
         .user-row.is-blocked {
-            opacity: 0.5;
-            filter: grayscale(0.8);
+            opacity: 0.4;
+            filter: grayscale(1);
             border-left: 4px solid var(--error-red) !important;
-            pointer-events: none; /* لمنع التفاعل مع السطر بعد الحظر */
+            pointer-events: none;
         }
-
-            .user-row.is-blocked .btn-action {
-                display: none; /* إخفاء قائمة الإجراءات للمحظورين */
-            }
 
         .admin-header {
             padding: 40px 0;
@@ -58,32 +54,11 @@
             margin-bottom: 10px;
         }
 
-        .filter-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 30px;
-        }
-
-        .form-control-custom {
-            background: #1a1a1a !important;
-            border: 1px solid #444 !important;
-            color: white !important;
-            border-radius: 8px;
-            padding: 10px 15px;
-        }
-
-            .form-control-custom:focus {
-                border-color: var(--primary-pink) !important;
-                box-shadow: 0 0 0 0.25rem rgba(214, 138, 138, 0.25);
-            }
-
         .luxury-table-container {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 20px;
-            padding: 10px;
+            padding: 15px;
         }
 
         .luxury-table {
@@ -97,18 +72,18 @@
                 color: var(--text-muted);
                 text-transform: uppercase;
                 font-size: 0.75rem;
-                letter-spacing: 1px;
                 font-weight: 700;
+                letter-spacing: 1px;
             }
 
         .user-row {
             background: #1c1c1c;
-            transition: 0.3s;
+            transition: all 0.3s ease;
         }
 
             .user-row:hover {
                 background: #252525;
-                transform: scale(1.002);
+                transform: translateY(-2px);
             }
 
             .user-row td {
@@ -132,32 +107,46 @@
             width: 45px;
             height: 45px;
             border-radius: 50%;
-            object-fit: cover;
             border: 2px solid var(--primary-pink);
+            object-fit: cover;
         }
 
         .badge-role {
             background: rgba(214, 138, 138, 0.1);
             color: var(--primary-pink);
             border: 1px solid var(--primary-pink);
-            font-weight: 600;
-            padding: 5px 12px;
+            padding: 4px 10px;
             border-radius: 6px;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
+            font-weight: 600;
         }
 
-        .btn-action {
+        .btn-action-outline {
             background: transparent;
             border: 1px solid var(--border-color);
             color: var(--text-muted);
-            padding: 5px 12px;
-            border-radius: 6px;
-            transition: 0.2s;
+            padding: 6px 12px;
+            border-radius: 8px;
+            transition: 0.3s;
+            text-decoration: none;
+            font-size: 0.85rem;
         }
 
-            .btn-action:hover {
-                color: white;
+            .btn-action-outline:hover {
                 border-color: var(--primary-pink);
+                color: white;
+            }
+
+        .btn-block-user {
+            color: var(--error-red);
+            border: 1px solid rgba(231, 76, 60, 0.2);
+            background: rgba(231, 76, 60, 0.05);
+        }
+
+            .btn-block-user:hover {
+                background: var(--error-red);
+                color: white;
+                border-color: var(--error-red);
             }
     </style>
 }
@@ -167,204 +156,129 @@
         <div class="d-flex justify-content-between align-items-center">
             <div>
                 <h1 class="admin-title">User Management</h1>
-                <p class="text-muted m-0">Manage system users, roles, and access permissions.</p>
+                <p class="text-muted m-0">Admin Control Panel</p>
             </div>
-            <button class="btn btn-outline-light" style="border-color: var(--primary-pink); color: var(--primary-pink)">
-                <i class="bi bi-person-plus-fill me-2"></i> Add New User
-            </button>
+            <a href="#" class="btn btn-outline-light" style="border-color: var(--primary-pink); color: var(--primary-pink)">
+                <i class="bi bi-person-plus me-2"></i> Add User
+            </a>
         </div>
     </div>
 </div>
 
 <div class="container mb-5">
-    <div class="filter-card shadow-sm">
-        <form id="userFilterForm" method="get" class="row g-3">
-            <div class="col-md-5">
-                <div class="input-group">
-                    <span class="input-group-text bg-transparent border-secondary text-muted"><i class="bi bi-search"></i></span>
-                    <input type="text" name="search" value="@searchTerm" class="form-control form-control-custom" placeholder="Search by username or email...">
-                </div>
-            </div>
-            <div class="col-md-3">
-                <select name="sortBy" class="form-select form-control-custom auto-submit">
-                    <option value="id" selected="@(sortBy == "id")">Sort by ID</option>
-                    <option value="username" selected="@(sortBy == "username")">Sort by Username</option>
-                    <option value="email" selected="@(sortBy == "email")">Sort by Email</option>
-                </select>
-            </div>
-            <div class="col-md-2">
-                <select name="sortDir" class="form-select form-control-custom auto-submit">
-                    <option value="asc" selected="@(sortDir == "asc")">Ascending</option>
-                    <option value="desc" selected="@(sortDir == "desc")">Descending</option>
-                </select>
-            </div>
-            <div class="col-md-2">
-                <button type="submit" class="btn btn-dark w-100 fw-bold" style="height: 48px; border: 1px solid #444;">Apply</button>
-            </div>
-        </form>
-    </div>
-
-    <div class="luxury-table-container">
+    <div class="luxury-table-container shadow">
         <div class="table-responsive">
             <table class="luxury-table">
                 <thead>
                     <tr>
                         <th>User Details</th>
-                        <th>Contact info</th>
-                        <th>Address</th>
+                        <th>Contact Info</th>
                         <th>Roles</th>
                         <th class="text-end">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @if (Model.Items != null && Model.Items.Any())
+                    @foreach (var user in Model.Items)
                     {
-                        foreach (var user in Model.Items)
-                        {
-                            <tr class="user-row" id="row-@user.Id">
-                                <td>
-                                    <div class="d-flex align-items-center gap-3">
-                                        <img src="@(string.IsNullOrEmpty(user.Picture) ? "/images/default-avatar.png" : user.Picture)" class="user-avatar" alt="@user.Username">
-                                        <div>
-                                            <div class="fw-bold text-white">@user.Username</div>
-                                            <small class="text-muted">ID: #@user.Id</small>
-                                        </div>
+                        <tr class="user-row" id="row-@user.Id">
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <img src="@(string.IsNullOrEmpty(user.Picture) ? "/images/default-avatar.png" : user.Picture)" class="user-avatar">
+                                    <div>
+                                        <div class="fw-bold text-white">@user.Username</div>
+                                        <small class="text-muted">ID: #@user.Id</small>
                                     </div>
-                                </td>
-                                <td>
-                                    <div class="small mb-1"><i class="bi bi-envelope me-2" style="color: var(--primary-pink);"></i>@user.Email</div>
-                                    <div class="small text-muted"><i class="bi bi-phone me-2"></i>@user.PhoneNumber</div>
-                                </td>
-                                <td>
-                                    <small class="text-muted d-inline-block text-truncate" style="max-width: 150px;">@user.UserAddress</small>
-                                </td>
-                                <td>
-                                    @foreach (var role in user.UserRoles)
-                                    {
-                                        <span class="badge-role me-1">@role.RoleName</span>
-                                    }
-                                </td>
-                                <td class="text-end">
-                                    <div class="dropdown">
-                                        <button class="btn-action" type="button" data-bs-toggle="dropdown">
-                                            <i class="bi bi-three-dots-vertical"></i>
-                                        </button>
-                                        <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end shadow-lg">
-                                            <li>
-                                                <a class="dropdown-item" asp-action="EditUserProfile" asp-route-userid="@user.Id">
-                                                    <i class="bi bi-pencil me-2"></i> Edit Profile
-                                                </a>
-                                            </li>
-                                            <li><a class="dropdown-item" href="#"><i class="bi bi-shield-lock me-2"></i> Manage Roles</a></li>
-                                            <li><hr class="dropdown-divider border-secondary"></li>
-                                            <li>
-                                                <button type="button" class="dropdown-item text-danger" onclick="confirmBlock(@user.Id, '@user.Username')">
-                                                    <i class="bi bi-slash-circle me-2"></i> Block User
-                                                </button>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </td>
-                            </tr>
-                        }
-                    }
-                    else
-                    {
-                        <tr>
-                            <td colspan="5" class="text-center py-5 text-muted">No users found matching your criteria.</td>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="small text-white-50"><i class="bi bi-envelope me-2"></i>@user.Email</div>
+                                <div class="small text-muted"><i class="bi bi-geo-alt me-2"></i>@user.UserAddress</div>
+                            </td>
+                            <td>
+                                @foreach (var role in user.UserRoles)
+                                {
+                                    <span class="badge-role me-1">@role.RoleName</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a asp-action="EditUserProfile" asp-route-userid="@user.Id" class="btn-action-outline">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <button type="button" class="btn-action-outline btn-block-user"
+                                            onclick="confirmBlock(@user.Id, '@user.Username')">
+                                        <i class="bi bi-slash-circle"></i> Block
+                                    </button>
+                                </div>
+                            </td>
                         </tr>
                     }
                 </tbody>
             </table>
         </div>
     </div>
-
-    @if (Model.TotalPages > 1)
-    {
-        <nav class="py-5">
-            <ul class="pagination justify-content-center">
-                @for (int i = 1; i <= Model.TotalPages; i++)
-                {
-                    <li class="page-item @(i == Model.PageNumber ? "active" : "")">
-                        <a class="page-link shadow-none" asp-action="GetAllUsers"
-                           asp-route-pageIndex="@i"
-                           asp-route-search="@searchTerm"
-                           asp-route-sortBy="@sortBy"
-                           asp-route-sortDir="@sortDir">@i</a>
-                    </li>
-                }
-            </ul>
-        </nav>
-    }
 </div>
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        // التقديم التلقائي للفلاتر عند تغيير خيارات الترتيب
-        document.querySelectorAll('.auto-submit').forEach(el => {
-            el.addEventListener('change', () => {
-                document.getElementById('userFilterForm').submit();
-            });
-        });
-
-        // وظيفة الـ Block باستخدام AJAX المطور
-        function confirmBlock(userId, username) {
-            Swal.fire({
+        async function confirmBlock(userId, username) {
+            const result = await Swal.fire({
                 title: 'Are you sure?',
-                text: `You are about to block "${username}". This will restrict their access.`,
+                text: `You are about to block user: ${username}`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d68a8a',
                 cancelButtonColor: '#2a2a2a',
-                confirmButtonText: 'Yes, Block them!',
+                confirmButtonText: 'Yes, Block User',
                 background: '#141414',
                 color: '#fff'
-            }).then((result) => {
-                if (result.isConfirmed) {
-
-                    // جلب التوكن من الصفحة
-                    var token = $('input[name="__RequestVerificationToken"]').val();
-
-                    $.ajax({
-                        url: '@Url.Action("BlockUser", "User")', // توليد المسار الصحيح
-                        type: 'POST',
-                        data: {
-                            id: userId,
-                            __RequestVerificationToken: token // إرسال التوكن مع الطلب
-                        },
-                        success: function (response) {
-                            if (response.success) {
-                                Swal.fire({
-                                    title: 'Blocked!',
-                                    text: response.message,
-                                    icon: 'success',
-                                    background: '#141414',
-                                    color: '#fff'
-                                });
-
-                                // تطبيق تأثير الحظر على السطر
-                                const row = document.getElementById(`row-${userId}`);
-                                if (row) {
-                                    row.classList.add('is-blocked');
-                                }
-                            } else {
-                                Swal.fire({
-                                    title: 'Action Failed',
-                                    text: response.message,
-                                    icon: 'error',
-                                    background: '#141414',
-                                    color: '#fff'
-                                });
-                            }
-                        },
-                        error: function (xhr) {
-                            console.error(xhr.responseText);
-                            Swal.fire('Error', 'Could not communicate with the server.', 'error');
-                        }
-                    });
-                }
             });
+
+            if (!result.isConfirmed) return;
+
+            // جلب التوكن
+            const tokenElement = document.querySelector('input[name="__RequestVerificationToken"]');
+            if (!tokenElement) {
+                console.error("CSRF Token not found!");
+                return;
+            }
+
+            try {
+                const response = await fetch('@Url.Action("BlockUser", "User")', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'RequestVerificationToken': tokenElement.value
+                    },
+                    body: new URLSearchParams({ id: userId })
+                });
+
+                if (!response.ok) throw new Error('Network response was not ok');
+
+                const data = await response.json();
+
+                if (data.success) {
+                    await Swal.fire({
+                        title: 'Success!',
+                        text: data.message,
+                        icon: 'success',
+                        background: '#141414',
+                        color: '#fff'
+                    });
+
+                    // إضافة ستايل الحظر للسطر
+                    const targetRow = document.getElementById(`row-${userId}`);
+                    if (targetRow) {
+                        targetRow.classList.add('is-blocked');
+                    }
+                } else {
+                    Swal.fire('Error', data.message, 'error');
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                Swal.fire('Error', 'Something went wrong with the server', 'error');
+            }
         }
     </script>
 }
