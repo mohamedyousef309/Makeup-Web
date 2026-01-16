@@ -123,6 +123,7 @@ namespace Makeup_Web.Controllers
 
         
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
             var result = await _mediator.Send(new DeleteCategoryCommand(id));
