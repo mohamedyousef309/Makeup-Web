@@ -68,7 +68,10 @@
             margin-left: 10px;
             transition: 0.3s;
         }
-        .nav-admin-link:hover { background: rgba(13, 202, 240, 0.1); }
+
+            .nav-admin-link:hover {
+                background: rgba(13, 202, 240, 0.1);
+            }
 
         .nav-super-link {
             color: var(--super-gold) !important;
@@ -80,7 +83,10 @@
             margin-left: 10px;
             transition: 0.3s;
         }
-        .nav-super-link:hover { background: rgba(255, 193, 7, 0.1); }
+
+            .nav-super-link:hover {
+                background: rgba(255, 193, 7, 0.1);
+            }
 
         .basket-link {
             color: var(--brand-pink) !important;
@@ -120,8 +126,15 @@
             text-decoration: none;
         }
 
-        .btn-login { color: var(--brand-pink); border: 1px solid var(--brand-pink); }
-        .btn-register { background-color: var(--brand-pink); color: white; }
+        .btn-login {
+            color: var(--brand-pink);
+            border: 1px solid var(--brand-pink);
+        }
+
+        .btn-register {
+            background-color: var(--brand-pink);
+            color: white;
+        }
 
         .btn-logout {
             background: rgba(255, 77, 77, 0.1);
@@ -144,15 +157,32 @@
                 padding: 20px;
                 border-top: 1px solid var(--border-color);
             }
-            .nav-admin-link, .nav-super-link { margin: 10px 0; display: inline-block; width: fit-content; }
+
+            .nav-admin-link, .nav-super-link {
+                margin: 10px 0;
+                display: inline-block;
+                width: fit-content;
+            }
         }
 
-        .main-content { flex: 1; padding: 40px 0; }
-        .footer { padding: 25px 0; border-top: 1px solid var(--border-color); font-size: 0.8rem; background: #050505; color: #555; }
+        .main-content {
+            flex: 1;
+            padding: 40px 0;
+        }
+
+        .footer {
+            padding: 25px 0;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.8rem;
+            background: #050505;
+            color: #555;
+        }
     </style>
+
     @RenderSection("Styles", required: false)
 </head>
 <body>
+
     <nav class="navbar navbar-expand-lg navbar-dark main-navbar">
         <div class="container-fluid">
             <a class="navbar-brand" href="/">
@@ -171,11 +201,10 @@
                         </button>
                         <ul class="dropdown-menu dropdown-menu-dark">
                             <li><a class="dropdown-item" href="@Url.Action("GetAllProducts", "Products")"><i class="bi bi-bag-heart me-2"></i> All Products</a></li>
-                            
+
                             @if (User.Identity.IsAuthenticated)
                             {
                                 <li><hr class="dropdown-divider border-secondary"></li>
-                                @* الرابط الجديد: My Profile *@
                                 <li>
                                     <a class="dropdown-item" href="@Url.Action("GetUserbyid", "User")">
                                         <i class="bi bi-person-circle me-2 text-info"></i> My Profile
@@ -205,7 +234,7 @@
                         {
                             <li class="nav-item">
                                 <a class="nav-link nav-super-link" href="/SuperAdmin/Index">
-                                    <i class="bi bi-shield-check"></i> SuperAdmin Dashboard 
+                                    <i class="bi bi-shield-check"></i> SuperAdmin Dashboard
                                 </a>
                             </li>
                         }
@@ -254,7 +283,12 @@
         </div>
     </footer>
 
+    <!-- ✅ jQuery (الإضافة الوحيدة) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     @RenderSection("Scripts", required: false)
 </body>
 </html>

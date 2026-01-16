@@ -1,0 +1,623 @@
+﻿@model Domain_Layer.ViewModels.CategoriesViewModel.UpdateCategoryViewModel
+
+@{
+    ViewData["Title"] = "Edit Category";
+    Layout = "_Layout";
+}
+
+@section Styles {
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --primary-hover: linear-gradient(135deg, #5a6fd8 0%, #6a4391 100%);
+            --dark-bg: #0f172a;
+            --card-bg: #1e293b;
+            --card-border: #334155;
+            --input-bg: #475569;
+            --input-border: #64748b;
+            --text-light: #f1f5f9;
+            --text-muted: #94a3b8;
+            --accent-purple: #8b5cf6;
+            --accent-pink: #ec4899;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.2);
+            --glow: 0 0 30px rgba(139, 92, 246, 0.3);
+        }
+
+        body {
+            background: var(--dark-bg);
+            color: var(--text-light);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            background-image: radial-gradient(at 20% 20%, rgba(139, 92, 246, 0.15) 0%, transparent 50%), radial-gradient(at 80% 80%, rgba(236, 72, 153, 0.15) 0%, transparent 50%);
+        }
+
+        .edit-header {
+            padding: 60px 0 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .edit-header::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 1px;
+                background: linear-gradient(90deg, transparent, var(--accent-purple), transparent);
+            }
+
+        .edit-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2.8rem;
+            font-weight: 800;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            position: relative;
+            display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+            .edit-title::after {
+                content: '';
+                position: absolute;
+                bottom: -8px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 100px;
+                height: 4px;
+                background: var(--primary-gradient);
+                border-radius: 2px;
+                box-shadow: var(--glow);
+            }
+
+        .form-container {
+            background: var(--card-bg);
+            border-radius: 20px;
+            border: 1px solid var(--card-border);
+            padding: 50px;
+            max-width: 700px;
+            margin: 0 auto 60px;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+            .form-container::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 5px;
+                background: var(--primary-gradient);
+            }
+
+        .form-group {
+            margin-bottom: 35px;
+            position: relative;
+        }
+
+        .form-label {
+            color: var(--text-light);
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            opacity: 0.9;
+        }
+
+            .form-label i {
+                margin-right: 10px;
+                font-size: 1.2rem;
+                background: var(--primary-gradient);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+
+        .form-control-custom {
+            background: rgba(255, 255, 255, 0.05) !important;
+            border: 2px solid var(--input-border) !important;
+            color: var(--text-light) !important;
+            border-radius: 12px;
+            padding: 18px 22px;
+            width: 100%;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 1.05rem;
+            backdrop-filter: blur(10px);
+        }
+
+            .form-control-custom:hover {
+                border-color: var(--accent-purple) !important;
+                box-shadow: 0 5px 15px rgba(139, 92, 246, 0.2);
+            }
+
+            .form-control-custom:focus {
+                border-color: var(--accent-pink) !important;
+                box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.15) !important;
+                outline: none;
+                transform: translateY(-2px);
+                background: rgba(255, 255, 255, 0.08) !important;
+            }
+
+            .form-control-custom::placeholder {
+                color: var(--text-muted);
+                opacity: 0.7;
+            }
+
+        textarea.form-control-custom {
+            min-height: 150px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        .btn-update {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 20px 50px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+            .btn-update::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+                transition: 0.6s;
+            }
+
+            .btn-update:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
+                background: var(--primary-hover);
+            }
+
+                .btn-update:hover::before {
+                    left: 100%;
+                }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid var(--input-border);
+            color: var(--text-light);
+            border-radius: 12px;
+            padding: 18px 40px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+            .btn-secondary:hover {
+                background: rgba(255, 255, 255, 0.1);
+                border-color: var(--accent-purple);
+                transform: translateY(-2px);
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            }
+
+        .btn-reset {
+            background: rgba(245, 158, 11, 0.1);
+            border: 2px solid rgba(245, 158, 11, 0.3);
+            color: var(--warning);
+            border-radius: 12px;
+            padding: 18px 40px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+            .btn-reset:hover {
+                background: rgba(245, 158, 11, 0.2);
+                border-color: var(--warning);
+                transform: translateY(-2px);
+                box-shadow: 0 10px 20px rgba(245, 158, 11, 0.1);
+            }
+
+        .text-danger {
+            color: var(--danger) !important;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            display: block;
+            font-weight: 500;
+            padding-left: 5px;
+        }
+
+        .alert {
+            border-radius: 12px;
+            border: none;
+            backdrop-filter: blur(10px);
+        }
+
+        .alert-danger {
+            background: rgba(239, 68, 68, 0.1) !important;
+            border-left: 4px solid var(--danger) !important;
+            color: #fecaca !important;
+        }
+
+        .info-card {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(102, 126, 234, 0.1) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            margin-top: 30px;
+        }
+
+            .info-card .card-header {
+                background: transparent;
+                border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+                padding: 20px;
+            }
+
+            .info-card .card-body {
+                padding: 25px;
+            }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+            .info-item:last-child {
+                border-bottom: none;
+            }
+
+            .info-item i {
+                font-size: 1.3rem;
+                margin-right: 15px;
+                width: 30px;
+                text-align: center;
+            }
+
+        .category-id-badge {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            display: inline-block;
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Animations */
+        @@keyframes floatIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .form-container {
+            animation: floatIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @@keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .form-group {
+            animation: slideIn 0.5s ease-out forwards;
+            opacity: 0;
+        }
+
+            .form-group:nth-child(1) {
+                animation-delay: 0.1s;
+            }
+
+            .form-group:nth-child(2) {
+                animation-delay: 0.2s;
+            }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-gradient);
+            border-radius: 10px;
+        }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background: var(--primary-hover);
+            }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .edit-title {
+                font-size: 2.2rem;
+            }
+
+            .form-container {
+                padding: 30px 25px;
+                margin: 0 15px 40px;
+            }
+
+            .btn-update, .btn-secondary, .btn-reset {
+                width: 100%;
+                margin-bottom: 15px;
+                justify-content: center;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+        }
+
+        /* Focus effects */
+        .focus-ring {
+            transition: box-shadow 0.3s ease;
+        }
+
+        .form-control-custom:focus {
+            animation: pulse 1.5s infinite;
+        }
+
+        @@keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.15);
+            }
+
+            50% {
+                box-shadow: 0 0 0 8px rgba(236, 72, 153, 0.1);
+            }
+        }
+    </style>
+}
+
+<div class="edit-header">
+    <div class="container">
+        <h1 class="edit-title">Edit Category</h1>
+        <p class="text-muted mt-3" style="font-size: 1.1rem;">Refine and perfect your category details</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="form-container">
+        <div class="row justify-content-center">
+            <div class="col-12">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4"></div>
+
+                <form asp-action="Edit" method="post" id="editCategoryForm">
+                    @Html.AntiForgeryToken()
+
+                    <input type="hidden" asp-for="Id" />
+
+                    <div class="form-group">
+                        <label asp-for="Name" class="form-label">
+                            <i class="bi bi-tags"></i>Category Name
+                        </label>
+                        <input asp-for="Name" class="form-control-custom"
+                               placeholder="Enter a descriptive category name" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Description" class="form-label">
+                            <i class="bi bi-card-text"></i>Description
+                        </label>
+                        <textarea asp-for="Description" class="form-control-custom"
+                                  rows="5"
+                                  placeholder="Describe this category (optional)"></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-5 pt-4 border-top button-group"
+                         style="border-color: rgba(255,255,255,0.1) !important;">
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Back to List
+                        </a>
+
+                        <div class="d-flex gap-3">
+                            <button type="reset" class="btn btn-reset">
+                                <i class="bi bi-arrow-clockwise"></i> Reset
+                            </button>
+                            <button type="submit" class="btn btn-update">
+                                <i class="bi bi-check-circle"></i> Update Category
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Information Card -->
+    <div class="info-card">
+        <div class="card-header">
+            <h5 class="mb-0 d-flex align-items-center">
+                <i class="bi bi-info-circle-fill me-2" style="color: #8b5cf6;"></i>
+                Category Information
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="info-item">
+                <i class="bi bi-hash" style="color: #8b5cf6;"></i>
+                <div>
+                    <small class="text-muted d-block">Category ID</small>
+                    <span class="category-id-badge">#@Model.Id</span>
+                </div>
+            </div>
+            <div class="info-item">
+                <i class="bi bi-lightbulb" style="color: #f59e0b;"></i>
+                <div>
+                    <small class="text-muted d-block">Pro Tip</small>
+                    <span class="text-light">Use clear, descriptive names for better organization</span>
+                </div>
+            </div>
+            <div class="info-item">
+                <i class="bi bi-exclamation-triangle" style="color: #ef4444;"></i>
+                <div>
+                    <small class="text-muted d-block">Note</small>
+                    <span class="text-light">Changes are saved immediately upon update</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Auto-focus with animation
+            $('#Name').focus().addClass('focus-ring');
+
+            // Enhanced form validation
+            $('#editCategoryForm').validate({
+                rules: {
+                    Name: {
+                        required: true,
+                        maxlength: 100
+                    },
+                    Description: {
+                        maxlength: 250
+                    }
+                },
+                messages: {
+                    Name: {
+                        required: "Category name is required",
+                        maxlength: "Maximum 100 characters allowed"
+                    },
+                    Description: {
+                        maxlength: "Maximum 250 characters allowed"
+                    }
+                },
+                errorElement: 'span',
+                errorClass: 'text-danger',
+                errorPlacement: function (error, element) {
+                    error.addClass('d-block mt-2');
+                    element.closest('.form-group').append(error);
+                },
+                highlight: function (element) {
+                    $(element).addClass('is-invalid').removeClass('is-valid');
+                    $(element).closest('.form-group').find('.form-control-custom').addClass('border-danger');
+                },
+                unhighlight: function (element) {
+                    $(element).removeClass('is-invalid').addClass('is-valid');
+                    $(element).closest('.form-group').find('.form-control-custom').removeClass('border-danger');
+                },
+                submitHandler: function (form) {
+                    // Show loading state
+                    const submitBtn = $(form).find('button[type="submit"]');
+                    const originalText = submitBtn.html();
+                    submitBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span> Updating...');
+
+                    // Submit form
+                    form.submit();
+                }
+            });
+
+            // Toast notifications
+            @if (TempData["SuccessMessage"] != null)
+            {
+                    <text>
+                    showNotification('success', '@TempData["SuccessMessage"]');
+                    </text>
+            }
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                    <text>
+                    showNotification('error', '@TempData["ErrorMessage"]');
+                    </text>
+            }
+
+            // Input effects
+            $('.form-control-custom').on('focus', function() {
+                $(this).parent().addClass('focused');
+            }).on('blur', function() {
+                $(this).parent().removeClass('focused');
+            });
+
+            // Reset button with confirmation
+            $('.btn-reset').on('click', function(e) {
+                e.preventDefault();
+                if (confirm('Are you sure you want to reset all changes?')) {
+                    $('#editCategoryForm')[0].reset();
+                    $('.form-control-custom').removeClass('is-valid is-invalid');
+                    $('.text-danger').remove();
+                    $('#Name').focus();
+                }
+            });
+        });
+
+        function showNotification(type, message) {
+            const notification = $(`
+                <div class="position-fixed top-0 end-0 p-3" style="z-index: 9999">
+                    <div class="toast align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'} border-0" role="alert">
+                        <div class="d-flex">
+                            <div class="toast-body">
+                                <i class="bi ${type === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill'} me-2"></i>
+                                ${message}
+                            </div>
+                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                        </div>
+                    </div>
+                </div>
+            `);
+
+            $('body').append(notification);
+            const toast = new bootstrap.Toast(notification.find('.toast')[0]);
+            toast.show();
+
+            // Remove after hiding
+            notification.find('.toast')[0].addEventListener('hidden.bs.toast', function () {
+                notification.remove();
+            });
+        }
+    </script>
+}
