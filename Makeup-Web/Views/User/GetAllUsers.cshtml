@@ -4,17 +4,14 @@
 
 @{
     ViewData["Title"] = "User Management - Admin Portal";
-    var searchTerm = Context.Request.Query["search"];
-    var sortBy = Context.Request.Query["sortBy"];
-    var sortDir = Context.Request.Query["sortDir"];
 }
 
-@* توكن الحماية *@
 @Html.AntiForgeryToken()
 
 @section Styles {
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <style>
         :root {
             --primary-pink: #d68a8a;
@@ -26,6 +23,7 @@
             --text-muted: #888888;
             --success-green: #2ecc71;
             --error-red: #e74c3c;
+            --warning-orange: #e67e22;
         }
 
         body {
@@ -34,12 +32,9 @@
             font-family: 'Inter', sans-serif;
         }
 
-        /* حالة الحظر */
         .user-row.is-blocked {
-            opacity: 0.4;
-            filter: grayscale(1);
             border-left: 4px solid var(--error-red) !important;
-            pointer-events: none;
+            background: rgba(231, 76, 60, 0.02) !important;
         }
 
         .admin-header {
@@ -51,7 +46,6 @@
         .admin-title {
             font-family: 'Playfair Display', serif;
             font-size: 2.2rem;
-            margin-bottom: 10px;
         }
 
         .luxury-table-container {
@@ -67,15 +61,6 @@
             border-spacing: 0 10px;
         }
 
-            .luxury-table th {
-                padding: 15px 20px;
-                color: var(--text-muted);
-                text-transform: uppercase;
-                font-size: 0.75rem;
-                font-weight: 700;
-                letter-spacing: 1px;
-            }
-
         .user-row {
             background: #1c1c1c;
             transition: all 0.3s ease;
@@ -85,23 +70,6 @@
                 background: #252525;
                 transform: translateY(-2px);
             }
-
-            .user-row td {
-                padding: 15px 20px;
-                vertical-align: middle;
-                border-top: 1px solid var(--border-color);
-                border-bottom: 1px solid var(--border-color);
-            }
-
-                .user-row td:first-child {
-                    border-left: 1px solid var(--border-color);
-                    border-radius: 12px 0 0 12px;
-                }
-
-                .user-row td:last-child {
-                    border-right: 1px solid var(--border-color);
-                    border-radius: 0 12px 12px 0;
-                }
 
         .user-avatar {
             width: 45px;
@@ -118,7 +86,12 @@
             padding: 4px 10px;
             border-radius: 6px;
             font-size: 0.7rem;
-            font-weight: 600;
+        }
+
+        .badge-role-admin {
+            background: rgba(197, 160, 89, 0.1);
+            color: var(--accent-gold);
+            border: 1px solid var(--accent-gold);
         }
 
         .btn-action-outline {
@@ -128,8 +101,7 @@
             padding: 6px 12px;
             border-radius: 8px;
             transition: 0.3s;
-            text-decoration: none;
-            font-size: 0.85rem;
+            cursor: pointer;
         }
 
             .btn-action-outline:hover {
@@ -137,42 +109,77 @@
                 color: white;
             }
 
-        .btn-block-user {
-            color: var(--error-red);
-            border: 1px solid rgba(231, 76, 60, 0.2);
-            background: rgba(231, 76, 60, 0.05);
+        .btn-promote-admin:hover {
+            background: var(--accent-gold);
+            color: black;
+            border-color: var(--accent-gold);
         }
 
-            .btn-block-user:hover {
-                background: var(--error-red);
+        .btn-remove-admin:hover {
+            background: var(--warning-orange);
+            color: white;
+            border-color: var(--warning-orange);
+        }
+
+        .btn-block-user:hover {
+            background: var(--error-red);
+            color: white;
+            border-color: var(--error-red);
+        }
+
+        .btn-unblock-user {
+            color: var(--success-green);
+            border-color: rgba(46, 204, 113, 0.2);
+        }
+
+            .btn-unblock-user:hover {
+                background: var(--success-green);
                 color: white;
-                border-color: var(--error-red);
             }
+
+        .form-control-luxury {
+            background: #1c1c1c;
+            border: 1px solid var(--border-color);
+            color: white;
+            border-radius: 8px;
+        }
     </style>
 }
 
 <div class="admin-header">
-    <div class="container">
-        <div class="d-flex justify-content-between align-items-center">
-            <div>
-                <h1 class="admin-title">User Management</h1>
-                <p class="text-muted m-0">Admin Control Panel</p>
-            </div>
-            <a href="#" class="btn btn-outline-light" style="border-color: var(--primary-pink); color: var(--primary-pink)">
-                <i class="bi bi-person-plus me-2"></i> Add User
-            </a>
+    <div class="container d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="admin-title">User Management</h1>
+            <p class="text-muted m-0">Control permissions and access levels</p>
         </div>
+        <button class="btn btn-outline-light" style="border-color: var(--primary-pink); color: var(--primary-pink)">
+            <i class="bi bi-person-plus me-2"></i> Add User
+        </button>
     </div>
 </div>
 
 <div class="container mb-5">
+    <div class="row g-3 mb-4">
+        <div class="col-md-8">
+            <input type="text" id="nameSearchInput" class="form-control form-control-luxury p-3"
+                   placeholder="Search by username or email..." onkeyup="applyFrontEndFilters()">
+        </div>
+        <div class="col-md-4">
+            <select id="statusFilter" class="form-select form-control-luxury p-3" onchange="applyFrontEndFilters()">
+                <option value="all">All Statuses</option>
+                <option value="active">Active Only</option>
+                <option value="blocked">Blocked Only</option>
+            </select>
+        </div>
+    </div>
+
     <div class="luxury-table-container shadow">
         <div class="table-responsive">
-            <table class="luxury-table">
+            <table class="luxury-table" id="usersTable">
                 <thead>
                     <tr>
                         <th>User Details</th>
-                        <th>Contact Info</th>
+                        <th>Contact & Address</th>
                         <th>Roles</th>
                         <th class="text-end">Actions</th>
                     </tr>
@@ -180,35 +187,65 @@
                 <tbody>
                     @foreach (var user in Model.Items)
                     {
-                        <tr class="user-row" id="row-@user.Id">
+                        var isAdmin = user.UserRoles.Any(r => r.RoleName == "Admin");
+
+                        <tr class="user-row @(user.IsBlocked ? "is-blocked" : "")" id="row-@user.Id">
                             <td>
                                 <div class="d-flex align-items-center gap-3">
                                     <img src="@(string.IsNullOrEmpty(user.Picture) ? "/images/default-avatar.png" : user.Picture)" class="user-avatar">
                                     <div>
-                                        <div class="fw-bold text-white">@user.Username</div>
+                                        <div class="fw-bold text-white username-text">@user.Username</div>
                                         <small class="text-muted">ID: #@user.Id</small>
                                     </div>
                                 </div>
                             </td>
-                            <td>
+                            <td class="email-text">
                                 <div class="small text-white-50"><i class="bi bi-envelope me-2"></i>@user.Email</div>
                                 <div class="small text-muted"><i class="bi bi-geo-alt me-2"></i>@user.UserAddress</div>
                             </td>
                             <td>
                                 @foreach (var role in user.UserRoles)
                                 {
-                                    <span class="badge-role me-1">@role.RoleName</span>
+                                    <span class="badge-role @(role.RoleName == "Admin" ? "badge-role-admin" : "") me-1">
+                                        @role.RoleName
+                                    </span>
                                 }
                             </td>
                             <td class="text-end">
                                 <div class="d-flex justify-content-end gap-2">
-                                    <a asp-action="EditUserProfile" asp-route-userid="@user.Id" class="btn-action-outline">
+                                    <a asp-action="EditUserProfile" asp-route-userid="@user.Id" class="btn-action-outline" title="Edit Profile">
                                         <i class="bi bi-pencil"></i>
                                     </a>
-                                    <button type="button" class="btn-action-outline btn-block-user"
-                                            onclick="confirmBlock(@user.Id, '@user.Username')">
-                                        <i class="bi bi-slash-circle"></i> Block
-                                    </button>
+
+                                    @if (isAdmin)
+                                    {
+                                        <button type="button" class="btn-action-outline btn-remove-admin" title="Remove Admin Role"
+                                                data-user-id="@user.Id" data-username="@user.Username">
+                                            <i class="bi bi-shield-slash"></i>
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button type="button" class="btn-action-outline btn-promote-admin" title="Promote to Admin"
+                                                data-user-id="@user.Id" data-username="@user.Username">
+                                            <i class="bi bi-shield-check"></i>
+                                        </button>
+                                    }
+
+                                    @if (user.IsBlocked)
+                                    {
+                                        <button type="button" class="btn-action-outline btn-unblock-user" title="Unblock"
+                                                onclick="confirmUnblock(@user.Id, '@user.Username')">
+                                            <i class="bi bi-unlock"></i>
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button type="button" class="btn-action-outline btn-block-user" title="Block"
+                                                onclick="confirmBlock(@user.Id, '@user.Username')">
+                                            <i class="bi bi-slash-circle"></i>
+                                        </button>
+                                    }
                                 </div>
                             </td>
                         </tr>
@@ -221,63 +258,106 @@
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        async function confirmBlock(userId, username) {
+        // 1. Filtering Logic
+        function applyFrontEndFilters() {
+            const searchText = document.getElementById('nameSearchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const rows = document.querySelectorAll('#usersTable tbody .user-row');
+
+            rows.forEach(row => {
+                const username = row.querySelector('.username-text').innerText.toLowerCase();
+                const email = row.querySelector('.email-text').innerText.toLowerCase();
+                const isBlocked = row.classList.contains('is-blocked');
+
+                const matchesSearch = username.includes(searchText) || email.includes(searchText);
+                let matchesStatus = (statusFilter === 'all') ||
+                                   (statusFilter === 'blocked' && isBlocked) ||
+                                   (statusFilter === 'active' && !isBlocked);
+
+                row.style.display = (matchesSearch && matchesStatus) ? '' : 'none';
+            });
+        }
+
+        // Generic Ajax Handler for Roles
+        async function handleRoleChange(url, userId, title, confirmText, color) {
             const result = await Swal.fire({
-                title: 'Are you sure?',
-                text: `You are about to block user: ${username}`,
-                icon: 'warning',
+                title: title,
+                icon: 'question',
                 showCancelButton: true,
-                confirmButtonColor: '#d68a8a',
-                cancelButtonColor: '#2a2a2a',
-                confirmButtonText: 'Yes, Block User',
+                confirmButtonColor: color,
+                confirmButtonText: confirmText,
                 background: '#141414',
                 color: '#fff'
             });
 
-            if (!result.isConfirmed) return;
-
-            // جلب التوكن
-            const tokenElement = document.querySelector('input[name="__RequestVerificationToken"]');
-            if (!tokenElement) {
-                console.error("CSRF Token not found!");
-                return;
+            if (result.isConfirmed) {
+                const token = $('input[name="__RequestVerificationToken"]').val();
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'RequestVerificationToken': token,
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: new URLSearchParams({ userId: userId })
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        Swal.fire({ icon: 'success', title: 'Done!', text: data.message, background: '#141414', color: '#fff', timer: 1500, showConfirmButton: false })
+                            .then(() => location.reload());
+                    } else {
+                        Swal.fire({ icon: 'error', title: 'Error', text: data.message, background: '#141414', color: '#fff' });
+                    }
+                } catch (e) {
+                    Swal.fire('Error', 'Server communication failed', 'error');
+                }
             }
+        }
 
-            try {
+        // Event Listeners for Dynamic Buttons
+        document.addEventListener('click', function(e) {
+            const promoteBtn = e.target.closest('.btn-promote-admin');
+            const removeBtn = e.target.closest('.btn-remove-admin');
+
+            if (promoteBtn) {
+                handleRoleChange('@Url.Action("GiveUserRoleAdmin", "SuperAdmin")', promoteBtn.dataset.userId,
+                    `Promote ${promoteBtn.dataset.username}?`, 'Yes, Promote', '#c5a059');
+            }
+            if (removeBtn) {
+                handleRoleChange('@Url.Action("RemoveUserRoleAdmin", "SuperAdmin")', removeBtn.dataset.userId,
+                    `Remove Admin from ${removeBtn.dataset.username}?`, 'Yes, Revoke', '#e67e22');
+            }
+        });
+
+        // Block/Unblock Functions
+        async function confirmBlock(id, name) {
+            const token = $('input[name="__RequestVerificationToken"]').val();
+            const res = await Swal.fire({ title: 'Block User?', text: name, icon: 'warning', showCancelButton: true, confirmButtonColor: '#e74c3c' });
+            if (res.isConfirmed) {
                 const response = await fetch('@Url.Action("BlockUser", "User")', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'RequestVerificationToken': tokenElement.value
-                    },
-                    body: new URLSearchParams({ id: userId })
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'RequestVerificationToken': token },
+                    body: new URLSearchParams({ id: id })
                 });
-
-                if (!response.ok) throw new Error('Network response was not ok');
-
                 const data = await response.json();
+                if(data.success) location.reload();
+            }
+        }
 
-                if (data.success) {
-                    await Swal.fire({
-                        title: 'Success!',
-                        text: data.message,
-                        icon: 'success',
-                        background: '#141414',
-                        color: '#fff'
-                    });
-
-                    // إضافة ستايل الحظر للسطر
-                    const targetRow = document.getElementById(`row-${userId}`);
-                    if (targetRow) {
-                        targetRow.classList.add('is-blocked');
-                    }
-                } else {
-                    Swal.fire('Error', data.message, 'error');
-                }
-            } catch (error) {
-                console.error("Error:", error);
-                Swal.fire('Error', 'Something went wrong with the server', 'error');
+        async function confirmUnblock(id, name) {
+            const token = $('input[name="__RequestVerificationToken"]').val();
+            const res = await Swal.fire({ title: 'Unblock User?', text: name, icon: 'question', showCancelButton: true, confirmButtonColor: '#2ecc71' });
+            if (res.isConfirmed) {
+                const response = await fetch('@Url.Action("UnblockUser", "User")', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'RequestVerificationToken': token },
+                    body: new URLSearchParams({ id: id })
+                });
+                const data = await response.json();
+                if(data.success) location.reload();
             }
         }
     </script>

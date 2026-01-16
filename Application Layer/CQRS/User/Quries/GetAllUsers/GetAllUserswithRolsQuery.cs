@@ -35,7 +35,9 @@ namespace Application_Layer.CQRS.User.Quries.GetAllUsers
                 Email = x.Email,
                 PhoneNumber = x.PhoneNumber,
                 Picture = x.Picture,
+                IsBlocked= x.IsBlocked,
                 UserAddress = x.UserAddress,
+                
                 UserPermissions = x.userPermissions.Select(UP => new UserPermissionsDTo
                 {
                     PermissionId = UP.Id,

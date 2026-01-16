@@ -16,7 +16,7 @@ namespace Domain_Layer.DTOs.UserDTOS
         public string PhoneNumber { get; set; } = default!;
         public string Picture { get; set; } = default!;
         public string UserAddress { get; set; } = default!;
-
+        public bool IsBlocked { get; set; }
         public IEnumerable<UserRolsDTo> UserRoles { get; set; } = new HashSet<UserRolsDTo>();
 
 

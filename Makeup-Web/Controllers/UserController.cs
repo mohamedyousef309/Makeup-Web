@@ -1,5 +1,6 @@
 ﻿using Application_Layer.CQRS.User.Commands.BlockUser;
 using Application_Layer.CQRS.User.Commands.EditUserProfile;
+using Application_Layer.CQRS.User.Commands.UnBlockUser;
 using Application_Layer.CQRS.User.Quries.GetAllUsers;
 using Application_Layer.CQRS.User.Quries.GetUserEmailbyUserid;
 using AspNetCoreGeneratedDocument;
@@ -144,6 +145,24 @@ namespace Makeup_Web.Controllers
                 return Json(new { success = false, message = "An internal error occurred." });
             }
 
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UnblockUser(int id)
+        {
+            try
+            {
+                var UnblockUserResult = await mediator.Send(new UnBlockUserCommand(id));
+                if (!UnblockUserResult.IsSuccess)
+                {
+                    return Json(new { success = false, message = UnblockUserResult.Message });
+                }
+                return Json(new { success = true, message = "User has been unblocked successfully!" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "An internal error occurred." });
+            }
         }
     }
 }
