@@ -3,7 +3,8 @@
     using Domain_Layer.Interfaces.Repositryinterfaces;
     using Domain_Layer.Respones;
     using MediatR;
-    using System;
+using Microsoft.EntityFrameworkCore;
+using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
@@ -27,20 +28,19 @@
             {
                 try
                 {
-                    var category = await _categoryRepo.GetByCriteriaAsync(c => c.Id == request.Id);
+                  var category= await _categoryRepo.GetByCriteriaQueryable(x=>x.Id==request.Id).Select(x => new CategoryDto
+                  {
+                      Id = x.Id,
+                      Name = x.Name,
+                      Description = x.Description
+                  }).FirstOrDefaultAsync(cancellationToken);
 
 
-                    if (category == null)
+                if (category == null)
                         return RequestRespones<CategoryDto>.Fail("Category not found.", 404);
 
-                    var dto = new CategoryDto
-                    {
-                        Id = category.Id,
-                        Name = category.Name,
-                        Description = category.Description
-                    };
 
-                    return RequestRespones<CategoryDto>.Success(dto, 200, "Category retrieved successfully.");
+                    return RequestRespones<CategoryDto>.Success(category, 200, "Category retrieved successfully.");
                 }
                 catch (Exception ex)
                 {

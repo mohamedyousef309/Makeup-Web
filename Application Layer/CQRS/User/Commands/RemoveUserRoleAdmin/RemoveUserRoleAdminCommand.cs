@@ -1,4 +1,5 @@
-﻿using Domain_Layer.Entites.Authantication;
+﻿using Domain_Layer.Constants;
+using Domain_Layer.Entites.Authantication;
 using Domain_Layer.Interfaces.Abstraction;
 using Domain_Layer.Interfaces.Repositryinterfaces;
 using Domain_Layer.Respones;
@@ -36,12 +37,10 @@ namespace Application_Layer.CQRS.User.Commands.RemoveUserRoleAdmin
 
                 if (userRoleEntry == null)
                 {
-                    return RequestRespones<bool>.Fail("NO user was Found", 404);
+                    return RequestRespones<bool>.Fail("User is not Admin", 400);
                 }
 
-                userRoleEntry.Roleid = 3;
-
-                genaricRepository.SaveInclude(userRoleEntry, nameof(userRoleEntry.Roleid));
+                genaricRepository.Delete(userRoleEntry);
 
                 await genaricRepository.SaveChanges();
 

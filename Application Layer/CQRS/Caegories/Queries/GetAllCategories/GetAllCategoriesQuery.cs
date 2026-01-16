@@ -1,20 +1,23 @@
-﻿using Domain_Layer.DTOs._ِCategoryDtos;
+﻿using Domain_Layer.DTOs;
+using Domain_Layer.DTOs._ِCategoryDtos;
 using Domain_Layer.Entites;
 using Domain_Layer.Interfaces.Repositryinterfaces;
 using Domain_Layer.Respones;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Application_Layer.CQRS.Caegories.Queries.GetAllCategories
 {
     public record GetAllCategoriesQuery()
-         : IRequest<RequestRespones<List<CategoryDto>>>;
+         : IRequest<RequestRespones<PaginatedListDto<CategoryDto>>>;
     public class GetAllCategoriesHandler
-      : IRequestHandler<GetAllCategoriesQuery, RequestRespones<List<CategoryDto>>>
+      : BaseQueryHandler,IRequestHandler<GetAllCategoriesQuery, RequestRespones<PaginatedListDto<CategoryDto>>>
     {
         private readonly IGenaricRepository<Category> _categoryRepo;
 
@@ -23,24 +26,36 @@ namespace Application_Layer.CQRS.Caegories.Queries.GetAllCategories
             _categoryRepo = categoryRepo;
         }
 
-        public async Task<RequestRespones<List<CategoryDto>>> Handle(GetAllCategoriesQuery request, CancellationToken cancellationToken)
+        public async Task<RequestRespones<PaginatedListDto<CategoryDto>>> Handle(GetAllCategoriesQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                var categories = _categoryRepo.GetAll().ToList();
+                var categories = _categoryRepo.GetAll().AsQueryable();
 
-                var dtoList = categories.Select(c => new CategoryDto
+
+                categories = ApplayPagination(categories, 1, 20);
+
+                var count = await categories.CountAsync();
+
+                var result= new PaginatedListDto<CategoryDto> 
                 {
-                    Id = c.Id,
-                    Name = c.Name,
-                    Description = c.Description
-                }).ToList();
+                    Items =await  categories.Select(x => new CategoryDto
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        Description = x.Description,
+                    }).ToListAsync(),
+                    PageSize = 20,
+                    PageNumber = 1,
+                    TotalCount = count
+                };
+              
 
-                return RequestRespones<List<CategoryDto>>.Success(dtoList, 200, "Categories loaded successfully.");
+                return RequestRespones<PaginatedListDto<CategoryDto>>.Success(result, 200, "Categories loaded successfully.");
             }
             catch (Exception ex)
             {
-                return RequestRespones<List<CategoryDto>>.Fail($"Error: {ex.Message}", 500);
+                return RequestRespones<PaginatedListDto<CategoryDto>>.Fail($"Error: {ex.Message}", 500);
             }
         }
     }

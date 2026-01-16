@@ -33,14 +33,8 @@ namespace Makeup_Web.Controllers
                 return View(new List<CategoryViewModel>());
             }
 
-            var model = result.Data.Select(dto => new CategoryViewModel
-            {
-                Id = dto.Id,
-                Name = dto.Name,
-                Description = dto.Description
-            }).ToList();
 
-            return View(model);
+            return View(result.Data);
         }
 
        
@@ -88,16 +82,13 @@ namespace Makeup_Web.Controllers
         public async Task<IActionResult> Edit(int id)
         {
             var result = await _mediator.Send(new GetCategoryByIdQuery(id));
-            if (!result.IsSuccess) return NotFound();
-
-            var model = new UpdateCategoryViewModel
+            if (!result.IsSuccess|| result==null) 
             {
-                Id = result.Data.Id,
-                Name = result.Data.Name,
-                Description = result.Data.Description
-            };
+                TempData["ErrorMessage"] = result?.Message?? "error while Editing";
+                return View();
+            }
+            return View(result.Data);
 
-            return View(model);
         }
 
         [HttpPost] 
@@ -118,7 +109,7 @@ namespace Makeup_Web.Controllers
             if (result.IsSuccess) return RedirectToAction(nameof(Index));
 
             ModelState.AddModelError(string.Empty, result.Message);
-            return View(model);
+            return View(result.Data);
         }
 
         

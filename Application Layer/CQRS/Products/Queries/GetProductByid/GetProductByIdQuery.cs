@@ -28,13 +28,7 @@ namespace Application_Layer.CQRS.Products.Queries
             try
             {
                
-                var query = _productRepo.GetAll()
-                    .Include(p => p.Variants)
-                    .AsQueryable();
-
-                
-                var product = await query
-                    .Where(p => p.Id == request.Id)
+                var product = await _productRepo.GetAll().Where(p => p.Id == request.Id)
                     .Select(p => new ProductDto
                     {
                         Id = p.Id,
@@ -53,6 +47,9 @@ namespace Application_Layer.CQRS.Products.Queries
                         }).ToList()
                     })
                     .FirstOrDefaultAsync(cancellationToken);
+
+
+                    
 
                 if (product == null)
                     return RequestRespones<ProductDto>.Fail($"Product with Id {request.Id} not found.", 404);

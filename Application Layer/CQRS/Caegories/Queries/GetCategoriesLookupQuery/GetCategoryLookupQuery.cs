@@ -6,6 +6,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -32,7 +33,7 @@ namespace Application_Layer.CQRS.Caegories.Queries.GetCategoriesLookupQuery
         {
             try
             {
-                
+
                 if (!_cache.TryGetValue(CacheKey, out IEnumerable<CategoryLookupDto> categories))
                 {
                    
@@ -47,6 +48,11 @@ namespace Application_Layer.CQRS.Caegories.Queries.GetCategoriesLookupQuery
 
                     _cache.Set(CacheKey, categories, TimeSpan.FromHours(1));
                 }
+                if (!categories!.Any())
+                {
+                    return RequestRespones<IEnumerable<CategoryLookupDto>>.Fail("there is no categories Was Found", 404);
+                }
+
 
                 return RequestRespones<IEnumerable<CategoryLookupDto>>.Success(categories, 200, "Success");
             }

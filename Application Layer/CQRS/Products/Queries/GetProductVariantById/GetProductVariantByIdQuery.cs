@@ -29,19 +29,15 @@ namespace Application_Layer.CQRS.Products.Queries
             GetProductVariantByIdQuery request,
             CancellationToken cancellationToken)
         {
-            // 🔹 IQueryable
-            IQueryable<ProductVariant> query = _variantRepo.GetAll().AsQueryable();
+            var query = _variantRepo.GetAll().AsQueryable();
 
-            // 🔹 Filter حسب VariantId
             query = query.Where(v => v.Id == request.VariantId);
 
-            // 🔹 Filter حسب ProductId لو متوفر
             if (request.ProductId.HasValue)
             {
                 query = query.Where(v => v.ProductId == request.ProductId.Value);
             }
 
-            // 🔹 Projection لـ DTO
             var variant = await query
                 .Select(v => new ProductVariantDto
                 {

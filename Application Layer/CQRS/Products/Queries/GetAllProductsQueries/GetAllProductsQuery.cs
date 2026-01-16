@@ -58,25 +58,25 @@ namespace Application_Layer.CQRS.Products.Queries
 
             query = ApplayPagination(query, request.PageIndex, request.PageSize);
 
-            var items = await query.Select(p => new GetAllProductsDto
-            {
-                Id=p.Id,
-                Name = p.Name,
-                Price = p.Price,
-                ImageUrl=p.ImageUrl,
-                Stock = p.Stock,
-                
-            
-                Description = p.Description
-            }).ToListAsync(cancellationToken);
-
             var result = new PaginatedListDto<GetAllProductsDto>
             {
-                Items = items,
+                Items = await query
+           .Select(p => new GetAllProductsDto
+           {
+               Id = p.Id,
+               Name = p.Name,
+               Price = p.Price,
+               ImageUrl = p.ImageUrl??"",
+               Stock = p.Stock,
+               Description = p.Description
+           })
+           .ToListAsync(cancellationToken),
+
                 PageNumber = request.PageIndex,
                 PageSize = request.PageSize,
-                TotalCount = totalCount
+                TotalCount = await query.CountAsync(cancellationToken) 
             };
+
 
             return RequestRespones<PaginatedListDto<GetAllProductsDto>>.Success(
                 result,
