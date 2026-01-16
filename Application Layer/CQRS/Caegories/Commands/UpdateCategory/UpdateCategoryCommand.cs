@@ -30,12 +30,10 @@ namespace Application_Layer.CQRS.Caegories.Commands.UpdateCategory
             
                 var dto = request.UpdateCategoryDto;
 
-                // 1️⃣ هل الكاتيجوري موجود؟
                 var category = await _categoryRepo.GetByCriteriaAsync(x => x.Id == dto.Id);
                 if (category == null)
                     return RequestRespones<CategoryDto>.Fail($"Category with Id {dto.Id} not found.", 404);
 
-                // 2️⃣ عمل object جديد بالقيم الجديدة (لازم SaveInclude)
                 var updatedCategory = new Category
                 {
                     Id = dto.Id,
