@@ -1,0 +1,348 @@
+﻿@using Domain_Layer.DTOs.ProductDtos
+@model ProductDto
+
+@{
+    ViewData["Title"] = Model.Name + " | Pro Makeup Studio";
+    var isOutOfStock = Model.Stock <= 0;
+}
+
+@section Styles {
+    <style>
+        :root {
+            --accent-color: #d68a8a;
+            --deep-dark: #0a0a0a;
+            --surface-color: #161616;
+            --text-main: #ffffff;
+            --text-dim: #b0b0b0;
+            --gold-gradient: linear-gradient(135deg, #d68a8a 0%, #a36666 100%);
+        }
+
+        body {
+            background-color: var(--deep-dark);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 0.5px;
+        }
+
+        /* Breadcrumbs */
+        .breadcrumb-nav {
+            padding: 20px 0;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+            .breadcrumb-nav a {
+                color: var(--text-dim);
+                text-decoration: none;
+                transition: 0.3s;
+            }
+
+                .breadcrumb-nav a:hover {
+                    color: var(--accent-color);
+                }
+
+        /* Image Section */
+        .product-gallery {
+            position: sticky;
+            top: 40px;
+        }
+
+        .main-img-wrapper {
+            background: #111;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid #222;
+            transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+            .main-img-wrapper:hover img {
+                transform: scale(1.05);
+            }
+
+            .main-img-wrapper img {
+                width: 100%;
+                height: auto;
+                display: block;
+                transition: 0.8s;
+            }
+
+        /* Info Section */
+        .product-meta {
+            padding-left: 5%;
+        }
+
+        .brand-label {
+            color: var(--accent-color);
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .product-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            font-weight: 500;
+            line-height: 1.1;
+            margin-bottom: 20px;
+        }
+
+        .price-row {
+            display: flex;
+            align-items: baseline;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .current-price {
+            font-size: 2.2rem;
+            font-weight: 300;
+            color: #fff;
+        }
+
+        .currency {
+            font-size: 1rem;
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        .description-text {
+            color: var(--text-dim);
+            font-size: 1.05rem;
+            line-height: 1.8;
+            margin-bottom: 40px;
+            font-weight: 300;
+        }
+
+        /* Variant Styling */
+        .variant-group {
+            margin-bottom: 30px;
+        }
+
+        .variant-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 15px;
+            color: #888;
+        }
+
+        .variant-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .variant-item {
+            position: relative;
+        }
+
+            .variant-item input[type="radio"] {
+                display: none;
+            }
+
+        .variant-box {
+            border: 1px solid #333;
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.3s;
+            display: block;
+            background: rgba(255,255,255,0.03);
+        }
+
+        .variant-item input[type="radio"]:checked + .variant-box {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+            background: rgba(214, 138, 138, 0.1);
+        }
+
+        /* Purchase Section */
+        .purchase-area {
+            background: #161616;
+            padding: 30px;
+            border: 1px solid #222;
+            margin-top: 40px;
+        }
+
+        .qty-input {
+            background: transparent;
+            border: 1px solid #444;
+            color: #fff;
+            text-align: center;
+            width: 80px;
+            padding: 12px;
+            font-size: 1.1rem;
+        }
+
+        .btn-luxury-add {
+            flex-grow: 1;
+            background: var(--gold-gradient);
+            color: #fff;
+            border: none;
+            padding: 16px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: 0.4s;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .btn-luxury-add:hover:not(:disabled) {
+                transform: translateY(-3px);
+                box-shadow: 0 10px 20px rgba(214, 138, 138, 0.2);
+            }
+
+            .btn-luxury-add:disabled {
+                background: #333;
+                color: #666;
+            }
+
+        .stock-indicator {
+            font-size: 0.85rem;
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Animations */
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade {
+            animation: fadeIn 0.8s ease forwards;
+        }
+    </style>
+}
+
+<div class="container pb-5">
+    <nav class="breadcrumb-nav">
+        <a asp-controller="Products" asp-action="GetAllProducts">Store</a>
+        <span class="mx-2" style="color:#444">/</span>
+        <span style="color:var(--accent-color)">@Model.Name</span>
+    </nav>
+
+    <div class="row">
+        <div class="col-lg-6 mb-5 mb-lg-0">
+            <div class="product-gallery animate-fade">
+                <div class="main-img-wrapper">
+                    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                    {
+                        <img src="@Model.ImageUrl" alt="@Model.Name" id="mainImage" />
+                    }
+                    else
+                    {
+                        <div class="d-flex align-items-center justify-content-center" style="height: 500px">
+                            <i class="bi bi-image text-muted fs-1"></i>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="product-meta animate-fade" style="animation-delay: 0.2s">
+                <span class="brand-label">Professional Makeup</span>
+                <h1 class="product-title">@Model.Name</h1>
+
+                <div class="price-row">
+                    <span class="current-price">@Model.Price.ToString("N0")</span>
+                    <span class="currency">EGP</span>
+                </div>
+
+                <p class="description-text">
+                    @Model.Description
+                </p>
+
+                @* Variants Section *@
+                @if (Model.Variants != null && Model.Variants.Any())
+                {
+                    @foreach (var group in Model.Variants.GroupBy(v => v.VariantName))
+                    {
+                        <div class="variant-group">
+                            <h4 class="variant-title">Choose @group.Key</h4>
+                            <div class="variant-options">
+                                @foreach (var variant in group)
+                                {
+                                    <label class="variant-item">
+                                        <input type="radio" name="selected_@group.Key" value="@variant.Id" />
+                                        <span class="variant-box">@variant.VariantValue</span>
+                                    </label>
+                                }
+                            </div>
+                        </div>
+                    }
+                }
+
+                @* Purchase Form *@
+                <form asp-controller="basket" asp-action="AddToBasket" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="ProductId" value="@Model.Id" />
+                    <input type="hidden" name="ProductName" value="@Model.Name" />
+                    <input type="hidden" name="ProductPrice" value="@Model.Price" />
+
+                    <div class="purchase-area">
+                        <div class="d-flex gap-3 align-items-center">
+                            <div class="qty-control">
+                                <input type="number" name="Quantity" value="1" min="1" max="@Model.Stock" class="qty-input" />
+                            </div>
+                            <button type="submit" class="btn-luxury-add" @(isOutOfStock ? "disabled" : "")>
+                                @if (isOutOfStock)
+                                {
+                                    <span>Temporarily Unavailable</span>
+                                }
+                                else
+                                {
+                                    <span><i class="bi bi-bag-plus me-2"></i> Add to Collection</span>
+                                }
+                            </button>
+                        </div>
+
+                        <div class="stock-indicator">
+                            @if (Model.Stock > 0)
+                            {
+                                <i class="bi bi-circle-fill" style="color: var(--accent-color); font-size: 8px;"></i>
+                                <span class="text-dim">Available for immediate delivery (@Model.Stock units)</span>
+                            }
+                            else
+                            {
+                                <i class="bi bi-circle-fill" style="color: #ff4d4d; font-size: 8px;"></i>
+                                <span style="color: #ff4d4d;">Exhausted from stock</span>
+                            }
+                        </div>
+                    </div>
+                </form>
+
+                @* Minimal Footer Info *@
+                <div class="mt-5 row g-4">
+                    <div class="col-6">
+                        <div class="d-flex align-items-center gap-3">
+                            <i class="bi bi-truck fs-4 text-dim"></i>
+                            <span class="small text-dim">Secure & Fast Shipping</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="d-flex align-items-center gap-3">
+                            <i class="bi bi-patch-check fs-4 text-dim"></i>
+                            <span class="small text-dim">100% Original Product</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

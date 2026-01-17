@@ -6,9 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain_Layer.DTOs.ProductDtos
+namespace Domain_Layer.ViewModels.ProductsViewModels.UpdateProduct
 {
-    public class UpdateProductDto
+    public class UpdateProductViewModle
     {
         public int Id { get; set; }
         public string Name { get; set; } = default!;
@@ -17,10 +17,11 @@ namespace Domain_Layer.DTOs.ProductDtos
 
         public int Stock { get; set; }
         public bool IsActive { get; set; }
-        public int? CategoryId { get; set; }
+        public int CategoryId { get; set; }
 
         public IFormFile? ImageFile { get; set; }
 
 
+        public List<UpdateProductVariantDto>? Variants { get; set; }
     }
 }

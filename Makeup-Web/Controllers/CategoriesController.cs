@@ -4,7 +4,6 @@ using Application_Layer.CQRS.Caegories.Commands.UpdateCategory;
 using Application_Layer.CQRS.Caegories.Queries.GetAllCategories;
 using Application_Layer.CQRS.Caegories.Queries.GetCategoriesLookupQuery;
 using Application_Layer.CQRS.Caegories.Queries.GetCAtegoryById;
-using Application_Layer.CQRS.Caegories.Queries.GetCategoriesLookupQuery; // تم إضافة الـ namespace الجديد
 using Domain_Layer.DTOs._ِCategoryDtos;
 using Domain_Layer.ViewModels.CategoriesViewModel;
 using MediatR;

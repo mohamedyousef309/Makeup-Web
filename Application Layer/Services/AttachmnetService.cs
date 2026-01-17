@@ -38,8 +38,7 @@ namespace Application_Layer.Services
                 file.CopyTo(stream);
             }
 
-            return Path.Combine("Files", folderName, FileName).Replace("\\", "/");
-
+            return "/" + Path.Combine("Files", folderName, FileName).Replace("\\", "/");
         }
 
        public bool DeleteImage(string imagePath)

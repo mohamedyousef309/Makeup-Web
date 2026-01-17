@@ -1,4 +1,5 @@
 ﻿using Domain_Layer.ViewModels.ProductsViewModels.UpdateProductsVariantViewModel;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -10,26 +11,31 @@ namespace Domain_Layer.ViewModels.ProductsViewModels.UpdateProductsViewModel
 {
     public class UpdateProductViewModel
     {
-        [Required]
+        [Required(ErrorMessage = "Product Id is required.")]
         public int Id { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Product name is required.")]
+        [StringLength(200, ErrorMessage = "Product name must not exceed 200 characters.")]
         public string Name { get; set; } = string.Empty;
 
+        [StringLength(1000, ErrorMessage = "Description must not exceed 1000 characters.")]
         public string Description { get; set; } = string.Empty;
 
-        [Required]
+        [Required(ErrorMessage = "Product price is required.")]
+        [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than 0.")]
         public decimal Price { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Product stock is required.")]
+        [Range(0, int.MaxValue, ErrorMessage = "Stock cannot be negative.")]
         public int Stock { get; set; }
 
-        [Required]
-        public int CategoryId { get; set; }
+        public int? CategoryId { get; set; }
 
         public bool IsActive { get; set; } = true;
 
-        public List<UpdateProductVariantViewModel> Variants { get; set; } = new List<UpdateProductVariantViewModel>();
+        public IFormFile? Image { get; set; }
+
+
     }
 
 }

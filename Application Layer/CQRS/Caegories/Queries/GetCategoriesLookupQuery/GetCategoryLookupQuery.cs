@@ -1,5 +1,6 @@
 ﻿using Domain_Layer.DTOs._ِCategoryDtos;
 using Domain_Layer.Entites;
+using Domain_Layer.Interfaces.Abstraction;
 using Domain_Layer.Interfaces.Repositryinterfaces;
 using Domain_Layer.Respones;
 using MediatR;
@@ -14,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace Application_Layer.CQRS.Caegories.Queries.GetCategoriesLookupQuery
 {
-    public record GetCategoryLookupQuery() : IRequest<RequestRespones<IEnumerable<CategoryLookupDto>>>;
+    public record GetCategoryLookupQuery() : ICommand<RequestRespones<IEnumerable<CategoryLookupDto>>>;
 
     
     public class GetCategoryLookupHandler : IRequestHandler<GetCategoryLookupQuery, RequestRespones<IEnumerable<CategoryLookupDto>>>

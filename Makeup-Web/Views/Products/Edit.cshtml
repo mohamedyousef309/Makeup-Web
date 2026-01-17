@@ -1,823 +1,534 @@
-﻿@using Domain_Layer.DTOs.ProductDtos
-@model UpdateProductDto
+﻿@using Domain_Layer.ViewModels.ProductsViewModels.UpdateProductsViewModel
+@model UpdateProductViewModel
 
 @{
-    ViewData["Title"] = "Edit Product";
-    Layout = "_Layout";
+    ViewData["Title"] = "Edit Product - Pro Makeup Studio";
+
+    // هذه القائمة ستأتي من ViewBag
+    var categories = ViewBag.Categories as IEnumerable<Domain_Layer.DTOs._ِCategoryDtos.CategoryLookupDto> ??
+                     new List<Domain_Layer.DTOs._ِCategoryDtos.CategoryLookupDto>();
 }
+
+@Html.AntiForgeryToken()
 
 @section Styles {
     <style>
         :root {
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --primary-hover: linear-gradient(135deg, #5a6fd8 0%, #6a4391 100%);
-            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            --dark-bg: #0f172a;
-            --card-bg: #1e293b;
-            --card-border: #334155;
-            --input-bg: rgba(255, 255, 255, 0.05);
-            --input-border: #475569;
-            --input-focus: #8b5cf6;
-            --text-light: #f1f5f9;
-            --text-muted: #94a3b8;
-            --success: #10b981;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --info: #3b82f6;
-            --shadow-lg: 0 25px 50px rgba(0, 0, 0, 0.25);
-            --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.2);
-            --shadow-sm: 0 5px 15px rgba(0, 0, 0, 0.1);
-            --glow: 0 0 40px rgba(102, 126, 234, 0.2);
+            --primary-pink: #d68a8a;
+            --primary-hover: #c27676;
+            --dark-bg: #0f0f0f;
+            --card-bg: #1a1a1a;
+            --input-bg: #252525;
+            --text-light: #ffffff;
+            --text-muted: #a0a0a0;
+            --accent-gold: #c5a059;
+            --danger-red: #ff4d4d;
         }
 
         body {
-            background: var(--dark-bg);
+            background-color: var(--dark-bg);
             color: var(--text-light);
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            min-height: 100vh;
-            background-image: radial-gradient(at 20% 30%, rgba(102, 126, 234, 0.15) 0%, transparent 50%), radial-gradient(at 80% 70%, rgba(236, 72, 153, 0.15) 0%, transparent 50%);
+            font-family: 'Inter', sans-serif;
         }
 
         .edit-header {
-            padding: 60px 0 40px;
+            padding: 60px 0 30px;
             text-align: center;
-            position: relative;
-            overflow: hidden;
+            background: linear-gradient(to bottom, #1a1a1a 0%, #0f0f0f 100%);
+            margin-bottom: 30px;
+            border-bottom: 1px solid #222;
         }
-
-            .edit-header::before {
-                content: '';
-                position: absolute;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                height: 1px;
-                background: linear-gradient(90deg, transparent, var(--input-focus), transparent);
-            }
 
         .edit-title {
-            font-family: 'Poppins', sans-serif;
-            font-size: 2.8rem;
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
             font-weight: 800;
-            background: var(--primary-gradient);
+            text-transform: uppercase;
+            background: linear-gradient(45deg, #fff 30%, var(--primary-pink) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
-            position: relative;
-            display: inline-block;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
         }
 
-            .edit-title::after {
-                content: '';
-                position: absolute;
-                bottom: -8px;
-                left: 50%;
-                transform: translateX(-50%);
-                width: 120px;
-                height: 4px;
-                background: var(--primary-gradient);
-                border-radius: 2px;
-                box-shadow: var(--glow);
-            }
-
-        .product-card {
+        .edit-card {
             background: var(--card-bg);
-            border-radius: 25px;
-            border: 1px solid var(--card-border);
-            padding: 50px;
-            max-width: 1000px;
-            margin: 0 auto 60px;
-            box-shadow: var(--shadow-lg);
-            position: relative;
-            overflow: hidden;
-            backdrop-filter: blur(10px);
-        }
-
-            .product-card::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                height: 5px;
-                background: var(--primary-gradient);
-            }
-
-        .form-group {
-            margin-bottom: 35px;
-            position: relative;
+            border-radius: 20px;
+            padding: 40px;
+            border: 1px solid #252525;
+            max-width: 800px;
+            margin: 0 auto;
         }
 
         .form-label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: block;
             color: var(--text-light);
-            font-weight: 600;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            font-size: 0.95rem;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            opacity: 0.9;
         }
 
-            .form-label i {
-                margin-right: 12px;
-                font-size: 1.3rem;
-                background: var(--primary-gradient);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-            }
-
-        .form-control-custom {
-            background: var(--input-bg) !important;
-            border: 2px solid var(--input-border) !important;
-            color: var(--text-light) !important;
-            border-radius: 15px;
-            padding: 18px 25px;
-            width: 100%;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            font-size: 1.05rem;
-            backdrop-filter: blur(10px);
+        .form-control, .form-select {
+            background-color: var(--input-bg);
+            border: 1px solid #333;
+            border-radius: 12px;
+            color: var(--text-light);
+            padding: 12px 16px;
+            transition: all 0.3s ease;
         }
 
-            .form-control-custom:hover {
-                border-color: #64748b !important;
-                box-shadow: var(--shadow-sm);
-            }
-
-            .form-control-custom:focus {
-                border-color: var(--input-focus) !important;
-                box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15) !important;
-                outline: none;
-                transform: translateY(-2px);
-                background: rgba(255, 255, 255, 0.08) !important;
-            }
-
-            .form-control-custom::placeholder {
-                color: var(--text-muted);
-                opacity: 0.7;
-            }
-
-        textarea.form-control-custom {
-            min-height: 120px;
-            resize: vertical;
-            line-height: 1.6;
-        }
-
-        select.form-control-custom {
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%238b5cf6' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right 25px center;
-            background-size: 16px 12px;
-            padding-right: 50px;
-        }
-
-        .input-group {
-            position: relative;
-        }
-
-        .input-icon {
-            position: absolute;
-            left: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-            font-size: 1.2rem;
-            z-index: 2;
-        }
-
-        .currency-symbol {
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-            font-weight: 600;
-            font-size: 1.1rem;
-        }
-
-        .switch-container {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .form-switch .form-check-input {
-            width: 3.5em;
-            height: 1.8em;
-            background-color: var(--input-border);
-            border-color: var(--input-border);
-            cursor: pointer;
-        }
-
-            .form-switch .form-check-input:checked {
-                background-color: var(--success);
-                border-color: var(--success);
-            }
-
-            .form-switch .form-check-input:focus {
-                box-shadow: 0 0 0 0.25rem rgba(16, 185, 129, 0.25);
-            }
-
-        .switch-label {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-            .switch-label .label-text {
-                font-weight: 600;
+            .form-control:focus, .form-select:focus {
+                border-color: var(--primary-pink);
+                box-shadow: 0 0 0 3px rgba(214, 138, 138, 0.1);
+                background-color: var(--input-bg);
                 color: var(--text-light);
             }
 
-            .switch-label .label-hint {
-                font-size: 0.85rem;
+            .form-control::placeholder {
                 color: var(--text-muted);
             }
 
-        .btn-update {
-            background: var(--primary-gradient);
+        .form-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23d68a8a' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px 12px;
+            padding-right: 40px;
+        }
+
+        .form-text {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            margin-top: 4px;
+        }
+
+        .text-danger {
+            color: var(--danger-red) !important;
+        }
+
+        .btn-submit {
+            background: var(--primary-pink);
             color: white;
             border: none;
-            border-radius: 15px;
-            padding: 20px 50px;
+            border-radius: 12px;
+            padding: 14px 40px;
             font-weight: 700;
-            font-size: 1.1rem;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            box-shadow: var(--shadow-md);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-        }
-
-            .btn-update::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: -100%;
-                width: 100%;
-                height: 100%;
-                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-                transition: 0.6s;
-            }
-
-            .btn-update:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
-                background: var(--primary-hover);
-            }
-
-                .btn-update:hover::before {
-                    left: 100%;
-                }
-
-        .btn-back {
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px solid var(--input-border);
-            color: var(--text-light);
-            border-radius: 15px;
-            padding: 18px 40px;
-            font-weight: 600;
+            letter-spacing: 1px;
             transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            text-decoration: none;
+            width: 100%;
+            margin-top: 20px;
         }
 
-            .btn-back:hover {
-                background: rgba(255, 255, 255, 0.1);
-                border-color: var(--input-focus);
-                transform: translateY(-2px);
-                box-shadow: var(--shadow-sm);
-                color: white;
-                text-decoration: none;
-            }
-
-        .validation-error {
-            color: var(--danger) !important;
-            font-size: 0.9rem;
-            margin-top: 8px;
-            display: block;
-            font-weight: 500;
-            padding-left: 5px;
-        }
-
-        .validation-summary {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 30px;
-            border-left: 4px solid var(--danger);
-        }
-
-            .validation-summary ul {
-                list-style: none;
-                padding-left: 0;
-                margin-bottom: 0;
-            }
-
-            .validation-summary li {
-                color: #fecaca;
-                margin-bottom: 10px;
-                display: flex;
-                align-items: center;
-                gap: 10px;
-            }
-
-                .validation-summary li:before {
-                    content: '⚠';
-                    color: var(--danger);
-                }
-
-                .validation-summary li:last-child {
-                    margin-bottom: 0;
-                }
-
-        .info-card {
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(102, 126, 234, 0.1) 100%);
-            border: 1px solid rgba(59, 130, 246, 0.2);
-            border-radius: 20px;
-            padding: 25px;
-            margin-top: 40px;
-            backdrop-filter: blur(10px);
-        }
-
-        .info-title {
-            color: white;
-            font-weight: 700;
-            font-size: 1.1rem;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-            .info-title i {
-                background: var(--primary-gradient);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-            }
-
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-        }
-
-        .info-item {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .info-label {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .info-value {
-            font-weight: 700;
-            font-size: 1.1rem;
-            color: var(--text-light);
-        }
-
-        /* Animations */
-        @@keyframes slideInUp {
-            from {
-                opacity: 0;
-                transform: translateY(40px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .product-card {
-            animation: slideInUp 0.7s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        @@keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateX(-20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        .form-group {
-            animation: fadeIn 0.5s ease-out forwards;
-            opacity: 0;
-        }
-
-            .form-group:nth-child(1) {
-                animation-delay: 0.1s;
-            }
-
-            .form-group:nth-child(2) {
-                animation-delay: 0.2s;
-            }
-
-            .form-group:nth-child(3) {
-                animation-delay: 0.3s;
-            }
-
-            .form-group:nth-child(4) {
-                animation-delay: 0.4s;
-            }
-
-            .form-group:nth-child(5) {
-                animation-delay: 0.5s;
-            }
-
-            .form-group:nth-child(6) {
-                animation-delay: 0.6s;
-            }
-
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 10px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--primary-gradient);
-            border-radius: 10px;
-        }
-
-            ::-webkit-scrollbar-thumb:hover {
+            .btn-submit:hover {
                 background: var(--primary-hover);
+                transform: translateY(-2px);
+                box-shadow: 0 10px 25px rgba(214, 138, 138, 0.3);
             }
 
-        /* Responsive */
-        @@media (max-width: 768px) {
-            .edit-title {
-                font-size: 2.2rem;
-            }
-
-            .product-card {
-                padding: 30px 25px;
-                margin: 0 15px 40px;
-                border-radius: 20px;
-            }
-
-            .form-control-custom {
-                padding: 16px 20px;
-            }
-
-            .btn-update, .btn-back {
-                width: 100%;
-                margin-bottom: 15px;
-                justify-content: center;
-            }
-
-            .button-container {
-                flex-direction: column;
-            }
-
-            .info-grid {
-                grid-template-columns: 1fr;
-            }
+        .btn-cancel {
+            background: transparent;
+            color: var(--text-light);
+            border: 1px solid #444;
+            border-radius: 12px;
+            padding: 14px 40px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 10px;
+            text-align: center;
+            text-decoration: none;
+            display: block;
         }
 
-        /* Loading animation */
-        .btn-update.loading {
+            .btn-cancel:hover {
+                background: #333;
+                border-color: #555;
+                color: var(--text-light);
+            }
+
+        .image-preview-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .image-preview {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 12px;
+            border: 1px solid #333;
+            margin-bottom: 15px;
+        }
+
+        .image-upload-label {
+            display: inline-block;
+            padding: 12px 24px;
+            background: var(--input-bg);
+            border: 1px dashed #444;
+            border-radius: 12px;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+            .image-upload-label:hover {
+                border-color: var(--primary-pink);
+                color: var(--primary-pink);
+            }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .form-check-input {
+            width: 22px;
+            height: 22px;
+            border: 2px solid #444;
+            border-radius: 6px;
+            background-color: var(--input-bg);
+            cursor: pointer;
+        }
+
+            .form-check-input:checked {
+                background-color: var(--primary-pink);
+                border-color: var(--primary-pink);
+            }
+
+        .form-check-label {
+            color: var(--text-light);
+            cursor: pointer;
+        }
+
+        .select-container {
             position: relative;
-            color: transparent;
         }
 
-            .btn-update.loading:after {
-                content: '';
-                position: absolute;
-                width: 20px;
-                height: 20px;
-                top: 50%;
-                left: 50%;
-                margin-top: -10px;
-                margin-left: -10px;
-                border: 3px solid rgba(255, 255, 255, 0.3);
-                border-top-color: white;
-                border-radius: 50%;
-                animation: spin 1s linear infinite;
+        .select-clear-btn {
+            position: absolute;
+            right: 40px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 5px;
+        }
+
+            .select-clear-btn:hover {
+                color: var(--danger-red);
             }
 
-        @@keyframes spin {
-            to {
-                transform: rotate(360deg);
+        /* Toast Notification */
+        .custom-toast {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: var(--card-bg);
+            color: white;
+            padding: 20px 25px;
+            border-radius: 12px;
+            border-left: 4px solid var(--primary-pink);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transform: translateX(150%);
+            transition: transform 0.4s ease;
+            max-width: 400px;
+        }
+
+        .toast-show {
+            transform: translateX(0);
+        }
+
+        .toast-icon {
+            color: var(--primary-pink);
+            font-size: 1.5rem;
+        }
+
+        .toast-content h4 {
+            margin: 0 0 5px 0;
+            font-size: 1.1rem;
+        }
+
+        .toast-content p {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive Design */
+        @@media (max-width: 768px) {
+            .edit-card {
+                padding: 25px 20px;
+                margin: 0 15px;
+            }
+
+            .edit-title {
+                font-size: 2rem;
             }
         }
     </style>
 }
 
-<div class="edit-header">
-    <div class="container">
-        <h1 class="edit-title">Edit Product</h1>
-        <p class="text-muted mt-2" style="font-size: 1.1rem;">Update and refine your product details</p>
+<!-- Toast Notification -->
+<div id="customToast" class="custom-toast">
+    <div class="toast-icon">
+        <i class="bi bi-check-circle"></i>
+    </div>
+    <div class="toast-content">
+        <h4>Notification</h4>
+        <p id="toastMessage"></p>
     </div>
 </div>
 
-<div class="container">
-    <div class="product-card">
-        <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+<div class="edit-header">
+    <div class="container">
+        <h1 class="edit-title">Edit Product</h1>
+        <p class="text-muted mt-2">Update product details and maintain luxury standards</p>
+    </div>
+</div>
 
-        <form asp-action="Edit" asp-controller="Products" method="post" id="editProductForm">
-            @Html.AntiForgeryToken()
-
+<div class="container mb-5">
+    <div class="edit-card">
+        <form asp-action="Edit" method="post" enctype="multipart/form-data" id="editForm">
             <input type="hidden" asp-for="Id" />
 
             <div class="row">
+                <!-- Basic Information -->
                 <div class="col-md-6">
-                    <div class="form-group">
-                        <label asp-for="Name" class="form-label">
-                            <i class="bi bi-box"></i>Product Name
-                        </label>
-                        <div class="input-group">
-                            <i class="bi bi-tag input-icon"></i>
-                            <input asp-for="Name" class="form-control-custom"
-                                   placeholder="Enter product name"
-                                   autofocus />
-                        </div>
-                        <span asp-validation-for="Name" class="validation-error"></span>
+                    <div class="mb-3">
+                        <label asp-for="Name" class="form-label">Product Name</label>
+                        <input asp-for="Name" class="form-control" placeholder="Enter product name" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
                     </div>
 
-                    <div class="form-group">
-                        <label asp-for="Price" class="form-label">
-                            <i class="bi bi-currency-dollar"></i>Price
-                        </label>
-                        <div class="input-group">
-                            <i class="bi bi-cash input-icon"></i>
-                            <input asp-for="Price" type="number" step="0.01"
-                                   class="form-control-custom"
-                                   placeholder="0.00" />
-                            <span class="currency-symbol">EGP</span>
-                        </div>
-                        <span asp-validation-for="Price" class="validation-error"></span>
+                    <div class="mb-3">
+                        <label asp-for="Price" class="form-label">Price ($)</label>
+                        <input asp-for="Price" type="number" step="0.01" class="form-control" placeholder="0.00" />
+                        <span asp-validation-for="Price" class="text-danger"></span>
+                        <small class="form-text">Enter price in dollars</small>
                     </div>
 
-                    <div class="form-group">
-                        <label asp-for="Stock" class="form-label">
-                            <i class="bi bi-box-seam"></i>Stock Quantity
-                        </label>
-                        <div class="input-group">
-                            <i class="bi bi-stack input-icon"></i>
-                            <input asp-for="Stock" type="number"
-                                   class="form-control-custom"
-                                   placeholder="Enter stock quantity" />
-                        </div>
-                        <span asp-validation-for="Stock" class="validation-error"></span>
+                    <div class="mb-3">
+                        <label asp-for="Stock" class="form-label">Stock Quantity</label>
+                        <input asp-for="Stock" type="number" class="form-control" placeholder="0" />
+                        <span asp-validation-for="Stock" class="text-danger"></span>
+                        <small class="form-text">Available units in inventory</small>
                     </div>
-                </div>
 
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label asp-for="CategoryId" class="form-label">
-                            <i class="bi bi-tags"></i>Category
-                        </label>
-                        <div class="input-group">
-                            <i class="bi bi-folder input-icon"></i>
-                            <select asp-for="CategoryId" id="categoryLookup" class="form-control-custom">
-                                <option value="">-- Loading categories --</option>
+                    <div class="mb-3">
+                        <label class="form-label">Category</label>
+                        <div class="select-container">
+                            <select asp-for="CategoryId" class="form-select" id="categorySelect">
+                                <option value="">-- Select Category --</option>
+                                @foreach (var category in categories)
+                                {
+                                    <option value="@category.Id" selected="@(Model.CategoryId == category.Id)">
+                                        @category.Name
+                                    </option>
+                                }
                             </select>
-                            <div id="categoryLoader" class="spinner-border spinner-border-sm text-pink position-absolute"
-                                 style="right: 45px; top: 50%; transform: translateY(-50%); display: none;"></div>
+                            @if (Model.CategoryId.HasValue)
+                            {
+                                <button type="button" class="select-clear-btn" onclick="clearCategorySelection()" title="Clear selection">
+                                    <i class="bi bi-x-circle"></i>
+                                </button>
+                            }
                         </div>
-                        <span asp-validation-for="CategoryId" class="validation-error"></span>
+                        <small class="form-text">Choose a category or leave empty</small>
+                        <span asp-validation-for="CategoryId" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- Additional Information -->
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="Description" class="form-label">Description</label>
+                        <textarea asp-for="Description" class="form-control" rows="4"
+                                  placeholder="Enter product description..."></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                        <small class="form-text">Max 1000 characters</small>
                     </div>
 
-                    <div class="form-group">
-                        <div class="switch-container">
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" asp-for="IsActive" id="activeToggle">
-                            </div>
-                            <div class="switch-label">
-                                <span class="label-text">Product Status</span>
-                                <span class="label-hint">Toggle to activate/deactivate product visibility</span>
-                            </div>
+                    <div class="mb-3">
+                        <label class="form-label">Product Image</label>
+                        <input asp-for="Image" type="file" class="form-control" id="imageInput"
+                               accept="image/*" onchange="previewImage(event)" />
+                        <span asp-validation-for="Image" class="text-danger"></span>
+                        <small class="form-text">Upload new image (optional)</small>
+
+                        <div class="image-preview-container" id="imagePreviewContainer" style="display: none;">
+                            <img id="imagePreview" class="image-preview" />
+                            <button type="button" class="btn btn-sm text-danger mt-2" onclick="clearImage()">
+                                <i class="bi bi-trash"></i> Remove Image
+                            </button>
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label asp-for="Description" class="form-label">
-                            <i class="bi bi-card-text"></i>Description
+                    <div class="checkbox-container">
+                        <input asp-for="IsActive" class="form-check-input" type="checkbox" id="isActiveCheckbox" />
+                        <label class="form-check-label" for="isActiveCheckbox">
+                            Product is Active
                         </label>
-                        <div class="input-group">
-                            <i class="bi bi-chat-left-text input-icon"></i>
-                            <textarea asp-for="Description" class="form-control-custom"
-                                      rows="5" placeholder="Describe your product..."></textarea>
-                        </div>
-                        <span asp-validation-for="Description" class="validation-error"></span>
                     </div>
+                    <small class="form-text d-block mb-3">
+                        When active, product is visible to customers
+                    </small>
                 </div>
             </div>
 
-            <div class="info-card">
-                <h5 class="info-title">
-                    <i class="bi bi-info-circle"></i> Product Information
-                </h5>
-                <div class="info-grid">
-                    <div class="info-item">
-                        <span class="info-label">Product ID</span>
-                        <span class="info-value">#@Model.Id</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Last Updated</span>
-                        <span class="info-value">Just now</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Status</span>
-                        <span class="info-value" id="statusDisplay">@(Model.IsActive ? "Active" : "Inactive")</span>
-                    </div>
+            <!-- Form Actions -->
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <button type="submit" class="btn-submit">
+                        <i class="bi bi-check-circle me-2"></i>Update Product
+                    </button>
                 </div>
-            </div>
-
-            <div class="d-flex justify-content-between align-items-center mt-5 pt-4 border-top button-container"
-                 style="border-color: rgba(255,255,255,0.05) !important;">
-                <a asp-action="Index" asp-controller="Products" class="btn-back">
-                    <i class="bi bi-arrow-left"></i> Back to Products
-                </a>
-                <button type="submit" class="btn-update" id="submitBtn">
-                    <i class="bi bi-check-circle"></i> Update Product
-                </button>
+                <div class="col-md-6">
+                    <a asp-action="GetAllProducts" class="btn-cancel">
+                        <i class="bi bi-x-circle me-2"></i>Cancel
+                    </a>
+                </div>
             </div>
         </form>
     </div>
 </div>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const form = document.getElementById('editProductForm');
-            const submitBtn = document.getElementById('submitBtn');
-            const statusDisplay = document.getElementById('statusDisplay');
-            const toggleSwitch = document.getElementById('activeToggle');
-            const categorySelect = document.getElementById('categoryLookup');
-            const categoryLoader = document.getElementById('categoryLoader');
-            const currentCategoryId = "@Model.CategoryId";
+        // عرض الصورة المختارة
+        function previewImage(event) {
+            const input = event.target;
+            const container = document.getElementById('imagePreviewContainer');
+            const preview = document.getElementById('imagePreview');
 
-            // Auto-focus on name field
-            const nameInput = document.querySelector('input[name="Name"]');
-            if (nameInput) {
-                setTimeout(() => {
-                    nameInput.focus();
-                    nameInput.select();
-                }, 300);
-            }
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
 
-            // Load categories
-            async function loadCategories() {
-                try {
-                    categoryLoader.style.display = 'block';
-                    const response = await fetch('/Categories/GetLookupList');
-                    if (!response.ok) throw new Error();
-                    const data = await response.json();
-
-                    categorySelect.innerHTML = '<option value="">-- Select Category --</option>';
-                    data.forEach(cat => {
-                        const option = new Option(cat.name, cat.id);
-                        if (cat.id == currentCategoryId) {
-                            option.selected = true;
-                        }
-                        categorySelect.add(option);
-                    });
-                } catch (error) {
-                    categorySelect.innerHTML = '<option value="">Error loading categories</option>';
-                } finally {
-                    categoryLoader.style.display = 'none';
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    container.style.display = 'block';
                 }
+
+                reader.readAsDataURL(input.files[0]);
             }
-            loadCategories();
+        }
 
-            // Update status display when toggle changes
-            if (toggleSwitch && statusDisplay) {
-                toggleSwitch.addEventListener('change', function() {
-                    statusDisplay.textContent = this.checked ? 'Active' : 'Inactive';
-                    statusDisplay.style.color = this.checked ? 'var(--success)' : 'var(--danger)';
-                });
+        // مسح الصورة المختارة
+        function clearImage() {
+            const input = document.getElementById('imageInput');
+            const container = document.getElementById('imagePreviewContainer');
+            const preview = document.getElementById('imagePreview');
 
-                // Set initial color
-                statusDisplay.style.color = toggleSwitch.checked ? 'var(--success)' : 'var(--danger)';
+            input.value = '';
+            preview.src = '';
+            container.style.display = 'none';
+        }
+
+        // مسح اختيار الفئة
+        function clearCategorySelection() {
+            const select = document.getElementById('categorySelect');
+            select.value = '';
+
+            // إخفاء زر المسح
+            const clearBtn = document.querySelector('.select-clear-btn');
+            if (clearBtn) {
+                clearBtn.style.display = 'none';
             }
+        }
 
-            // Form submission enhancement
-            if (form) {
-                form.addEventListener('submit', function (e) {
-                    if (form.checkValidity()) {
-                        submitBtn.classList.add('loading');
-                        submitBtn.disabled = true;
-                    }
-                });
-            }
-
-            // Format price input
-            const priceInput = document.querySelector('input[name="Price"]');
-            if (priceInput) {
-                priceInput.addEventListener('blur', function() {
-                    const value = parseFloat(this.value);
-                    if (!isNaN(value) && value >= 0) {
-                        this.value = value.toFixed(2);
-                    }
-                });
-
-                priceInput.addEventListener('input', function() {
-                    this.value = this.value.replace(/[^0-9.]/g, '');
-                    const parts = this.value.split('.');
-                    if (parts.length > 2) {
-                        this.value = parts[0] + '.' + parts.slice(1).join('');
-                    }
-                });
-            }
-
-            // Stock input validation
-            const stockInput = document.querySelector('input[name="Stock"]');
-            if (stockInput) {
-                stockInput.addEventListener('input', function() {
-                    this.value = this.value.replace(/[^0-9]/g, '');
-                    if (parseInt(this.value) < 0) {
-                        this.value = '0';
-                    }
-                });
-            }
-
-            // Show success message if there's one in TempData
-            @if (TempData["SuccessMessage"] != null)
-            {
-                    <text>
-                    showNotification('success', '@TempData["SuccessMessage"]');
-                    </text>
-            }
-
-            @if (TempData["ErrorMessage"] != null)
-            {
-                    <text>
-                    showNotification('error', '@TempData["ErrorMessage"]');
-                    </text>
+        // عرض/إخفاء زر مسح الفئة حسب الاختيار
+        document.getElementById('categorySelect').addEventListener('change', function() {
+            const clearBtn = document.querySelector('.select-clear-btn');
+            if (this.value) {
+                if (!clearBtn) {
+                    const container = this.parentElement;
+                    const newClearBtn = document.createElement('button');
+                    newClearBtn.type = 'button';
+                    newClearBtn.className = 'select-clear-btn';
+                    newClearBtn.innerHTML = '<i class="bi bi-x-circle"></i>';
+                    newClearBtn.title = 'Clear selection';
+                    newClearBtn.onclick = clearCategorySelection;
+                    container.appendChild(newClearBtn);
+                } else {
+                    clearBtn.style.display = 'block';
+                }
+            } else if (clearBtn) {
+                clearBtn.style.display = 'none';
             }
         });
 
-        function showNotification(type, message) {
-            const notification = document.createElement('div');
-            notification.className = `position-fixed top-0 end-0 p-4`;
-            notification.style.zIndex = '9999';
-            notification.style.minWidth = '300px';
+        // Toast Notification
+        function showToast(title, message, type = "success") {
+            const toast = document.getElementById('customToast');
+            const toastMessage = document.getElementById('toastMessage');
+            const toastIcon = toast.querySelector('.toast-icon i');
 
-            const toastHtml = `
-                <div class="toast align-items-center text-white bg-${type} border-0" role="alert">
-                    <div class="d-flex">
-                        <div class="toast-body p-3">
-                            <div class="d-flex align-items-center">
-                                <i class="bi ${type === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill'} me-2" style="font-size: 1.2rem;"></i>
-                                <div>
-                                    <strong>${type === 'success' ? 'Success!' : 'Error!'}</strong>
-                                    <div class="mt-1 small">${message}</div>
-                                </div>
-                            </div>
-                        </div>
-                        <button type="button" class="btn-close btn-close-white me-3 m-auto" data-bs-dismiss="toast"></button>
-                    </div>
-                </div>
-            `;
+            toast.querySelector('h4').textContent = title;
+            toastMessage.textContent = message;
 
-            notification.innerHTML = toastHtml;
-            document.body.appendChild(notification);
+            if (type === "error") {
+                toast.style.borderLeftColor = "#ff4444";
+                toastIcon.style.color = "#ff4444";
+                toastIcon.className = "bi bi-exclamation-circle";
+            } else {
+                toast.style.borderLeftColor = "var(--primary-pink)";
+                toastIcon.style.color = "var(--primary-pink)";
+                toastIcon.className = "bi bi-check-circle";
+            }
 
-            const toastElement = notification.querySelector('.toast');
-            const toast = new bootstrap.Toast(toastElement, {
-                autohide: true,
-                delay: 5000
-            });
-            toast.show();
+            toast.classList.add('toast-show');
+            setTimeout(() => toast.classList.remove('toast-show'), 3000);
+        }
 
-            // Remove after hiding
-            toastElement.addEventListener('hidden.bs.toast', function () {
-                notification.remove();
-            });
+        // التحقق من الصحة قبل الإرسال
+        document.getElementById('editForm').addEventListener('submit', function(event) {
+            const price = document.querySelector('[name="Price"]');
+            const stock = document.querySelector('[name="Stock"]');
+
+            if (parseFloat(price.value) <= 0) {
+                event.preventDefault();
+                showToast("Validation Error", "Price must be greater than 0", "error");
+                price.focus();
+                return;
+            }
+
+            if (parseInt(stock.value) < 0) {
+                event.preventDefault();
+                showToast("Validation Error", "Stock cannot be negative", "error");
+                stock.focus();
+                return;
+            }
+
+            // إذا تم تمرير التحقق
+            showToast("Processing", "Updating product...", "success");
+        });
+
+        // عرض رسائل التحقق من الـ ModelState
+        @if (!ViewData.ModelState.IsValid)
+        {
+                <text>
+                document.addEventListener('DOMContentLoaded', function() {
+                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                            <text>
+                            showToast("Validation Error", "@error.ErrorMessage", "error");
+                            </text>
+                    }
+                });
+                </text>
         }
     </script>
+
+    <!-- jQuery Validation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
 }

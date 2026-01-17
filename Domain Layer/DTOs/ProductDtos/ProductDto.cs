@@ -18,7 +18,7 @@ namespace Domain_Layer.DTOs.ProductDtos
         public string ImageUrl { get; set; }
 
         public int ProductStock { get; set; }
-        public int CategoryId { get; set; }
+        public int? CategoryId { get; set; }
         public List<ProductVariantDto> Variants { get; set; } = new();
     }
 }

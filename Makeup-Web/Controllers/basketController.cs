@@ -64,7 +64,7 @@ namespace Makeup_Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> RemoveItemFromBasket(int productId) 
+        public async Task<IActionResult> RemoveItemFromBasket([FromForm]int productId) 
         {
             if(!TryGetUserId( out int userid)) 
             {

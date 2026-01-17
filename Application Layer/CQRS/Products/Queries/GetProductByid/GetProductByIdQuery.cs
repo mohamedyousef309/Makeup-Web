@@ -28,7 +28,7 @@ namespace Application_Layer.CQRS.Products.Queries
             try
             {
                
-                var product = await _productRepo.GetAll().Where(p => p.Id == request.Id)
+                var product = await _productRepo.GetByCriteriaQueryable(p => p.Id == request.Id)
                     .Select(p => new ProductDto
                     {
                         Id = p.Id,
@@ -36,7 +36,7 @@ namespace Application_Layer.CQRS.Products.Queries
                         Description = p.Description,
                         Price = p.Price,
                         Stock = p.Stock,
-                        //CategoryId = p.CategoryId,
+                        CategoryId = p.CategoryId,
                         IsActive = p.IsActive,
                         Variants = p.Variants.Select(v => new ProductVariantDto
                         {

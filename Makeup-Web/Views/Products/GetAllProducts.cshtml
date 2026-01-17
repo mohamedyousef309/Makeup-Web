@@ -20,7 +20,7 @@
             --text-muted: #a0a0a0;
             --danger-red: #ff4d4d;
             --warning-orange: #ff9800;
-            --success-green: #2ecc71; /* لون أخضر واضح وجميل */
+            --success-green: #2ecc71;
         }
 
         body {
@@ -67,6 +67,7 @@
             flex-direction: column;
             overflow: hidden;
             transition: 0.3s;
+            position: relative;
         }
 
         .img-wrapper {
@@ -122,11 +123,70 @@
             color: #fff;
         }
 
-        /* تنسيق حالة المخزن المتاح */
         .stock-available {
             color: var(--success-green);
             font-weight: 600;
             font-size: 0.85rem;
+        }
+
+        /* تنسيق أزرار الأدمن */
+        .admin-actions {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #333;
+        }
+
+        .btn-admin {
+            flex: 1;
+            font-size: 0.7rem;
+            padding: 4px;
+            border-radius: 4px;
+            text-align: center;
+            text-decoration: none;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .btn-edit {
+            border: 1px solid var(--primary-pink);
+            color: var(--primary-pink);
+        }
+
+        .btn-edit:hover {
+            background: var(--primary-pink);
+            color: white;
+        }
+
+        .btn-delete {
+            border: 1px solid var(--danger-red);
+            color: var(--danger-red);
+        }
+
+        .btn-delete:hover {
+            background: var(--danger-red);
+            color: white;
+        }
+
+        /* زر Details */
+        .btn-details {
+            display: block;
+            text-align: center;
+            background: transparent;
+            color: var(--text-light);
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 8px;
+            font-size: 0.8rem;
+            text-decoration: none;
+            margin-bottom: 6px;
+            transition: 0.3s;
+        }
+
+        .btn-details:hover {
+            border-color: var(--primary-pink);
+            color: var(--primary-pink);
         }
 
         .btn-add-cart {
@@ -147,9 +207,6 @@
             opacity: 0.6;
             cursor: not-allowed;
         }
-
-        .text-out-of-stock { color: var(--danger-red); }
-        .text-warning { color: var(--warning-orange); }
 
         .pagination .page-link { background: #1a1a1a; color: #fff; border: 1px solid #333; }
         .pagination .page-item.active .page-link { background: var(--primary-pink); border-color: var(--primary-pink); }
@@ -214,32 +271,48 @@
                         </div>
                         
                         <div class="product-info">
+                            @* أزرار التحكم للأدمن فقط *@
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <div class="admin-actions">
+                                    <a asp-action="Edit" asp-route-id="@product.Id" class="btn-admin btn-edit">
+                                        <i class="bi bi-pencil"></i> Edit
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@product.Id" class="btn-admin btn-delete" 
+                                       onclick="return confirm('Delete this product?')">
+                                        <i class="bi bi-trash"></i> Delete
+                                    </a>
+                                </div>
+                            }
+
                             <h3 class="product-name">@product.Name</h3>
                             <div class="price-tag mb-1">
                                 @product.Price.ToString("N0") <span style="font-size: 0.7rem; color: var(--primary-pink);">EGP</span>
                             </div>
 
-                            @* عرض حالة المخزن بالألوان الجديدة *@
                             <div class="stock-info mb-2">
                                 @if (product.Stock > 10)
                                 {
                                     <span class="stock-available">
-                                        <i class="bi bi-check-circle-fill"></i> @product.Stock in stock
+                                        <i class="bi bi-check-circle-fill"></i> In Stock
                                     </span>
                                 }
                                 else if (product.Stock > 0)
                                 {
                                     <span class="text-warning fw-bold" style="font-size: 0.85rem;">
-                                        <i class="bi bi-clock-history"></i> Only @product.Stock left!
+                                        Only @product.Stock left!
                                     </span>
                                 }
                                 else
                                 {
-                                    <span class="text-danger fw-bold" style="font-size: 0.85rem;">
-                                        <i class="bi bi-x-circle-fill"></i> Sold Out
-                                    </span>
+                                    <span class="text-danger fw-bold" style="font-size: 0.85rem;">Sold Out</span>
                                 }
                             </div>
+
+                            @* زر التفاصيل *@
+                            <a asp-action="Details" asp-route-id="@product.Id" class="btn-details">
+                                <i class="bi bi-eye"></i> View Details
+                            </a>
 
                             <form asp-controller="basket" asp-action="AddToBasket" method="post">
                                 @Html.AntiForgeryToken()
@@ -266,6 +339,7 @@
         }
     </div>
 
+    @* Pagination Section *@
     @if (Model.TotalPages > 1)
     {
         <nav class="py-5">

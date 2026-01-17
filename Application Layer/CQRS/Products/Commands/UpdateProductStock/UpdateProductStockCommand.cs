@@ -12,9 +12,9 @@ using System.Threading.Tasks;
 
 namespace Application_Layer.CQRS.Products.Commands.UpdateProductStock
 {
-    public record UpdateProductStockCommand(int ProductId, int NewStock) : ICommand<RequestRespones<bool>>;
+    public record UpdateProductStockCommand(int ProductId, int NewStock) : ICommand<RequestRespones<int>>;
 
-    public class UpdateProductStockCommandHandler : IRequestHandler<UpdateProductStockCommand, RequestRespones<bool>>
+    public class UpdateProductStockCommandHandler : IRequestHandler<UpdateProductStockCommand, RequestRespones<int>>
     {
         private readonly IGenaricRepository<Product> productRepository;
 
@@ -22,7 +22,7 @@ namespace Application_Layer.CQRS.Products.Commands.UpdateProductStock
         {
             this.productRepository = productRepository;
         }
-        public async Task<RequestRespones<bool>> Handle(UpdateProductStockCommand request, CancellationToken cancellationToken)
+        public async Task<RequestRespones<int>> Handle(UpdateProductStockCommand request, CancellationToken cancellationToken)
         {
             var product = await productRepository.GetByCriteriaQueryable(x=>x.Id==request.ProductId).Select(x=>new Product 
             {
@@ -32,12 +32,12 @@ namespace Application_Layer.CQRS.Products.Commands.UpdateProductStock
 
             if (product == null)
             {
-                return RequestRespones<bool>.Fail("there is no Product with this id",404); 
+                return RequestRespones<int>.Fail("there is no Product with this id",404); 
             }
             product.Stock = request.NewStock;
 
-            productRepository.SaveInclude(product, nameof(Product.Stock));
-            return RequestRespones<bool>.Success(true); 
+            productRepository.SaveInclude(product, nameof(product.Stock));
+            return RequestRespones<int>.Success(product.Stock); 
         }
     }
 
