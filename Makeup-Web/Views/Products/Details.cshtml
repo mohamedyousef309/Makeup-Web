@@ -4,345 +4,901 @@
 @{
     ViewData["Title"] = Model.Name + " | Pro Makeup Studio";
     var isOutOfStock = Model.Stock <= 0;
+    var variantsInStock = Model.Variants?.Sum(v => v.Stock) ?? 0;
+    var totalStock = Model.Stock + variantsInStock;
 }
 
 @section Styles {
     <style>
         :root {
             --accent-color: #d68a8a;
-            --deep-dark: #0a0a0a;
-            --surface-color: #161616;
-            --text-main: #ffffff;
-            --text-dim: #b0b0b0;
-            --gold-gradient: linear-gradient(135deg, #d68a8a 0%, #a36666 100%);
+            --primary-pink: #d68a8a;
+            --primary-hover: #c27676;
+            --dark-bg: #0f0f0f;
+            --card-bg: #1a1a1a;
+            --input-bg: #252525;
+            --text-light: #ffffff;
+            --text-muted: #a0a0a0;
+            --accent-gold: #c5a059;
+            --danger-red: #ff4d4d;
+            --success-green: #28a745;
+            --warning-yellow: #ffc107;
         }
 
         body {
-            background-color: var(--deep-dark);
-            color: var(--text-main);
+            background-color: var(--dark-bg);
+            color: var(--text-light);
             font-family: 'Inter', sans-serif;
-            letter-spacing: 0.5px;
         }
 
         /* Breadcrumbs */
         .breadcrumb-nav {
-            padding: 20px 0;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
+            padding: 25px 0;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
         }
 
-            .breadcrumb-nav a {
-                color: var(--text-dim);
-                text-decoration: none;
-                transition: 0.3s;
+        .breadcrumb-item {
+            color: var(--text-muted);
+        }
+
+            .breadcrumb-item.active {
+                color: var(--primary-pink);
             }
 
-                .breadcrumb-nav a:hover {
-                    color: var(--accent-color);
-                }
+        .breadcrumb-divider {
+            color: #444;
+            margin: 0 10px;
+        }
 
-        /* Image Section */
+        /* Product Gallery */
         .product-gallery {
             position: sticky;
-            top: 40px;
+            top: 30px;
         }
 
-        .main-img-wrapper {
-            background: #111;
-            border-radius: 4px;
+        .main-image-container {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid #252525;
+            margin-bottom: 20px;
             overflow: hidden;
-            border: 1px solid #222;
-            transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-            .main-img-wrapper:hover img {
-                transform: scale(1.05);
-            }
-
-            .main-img-wrapper img {
-                width: 100%;
-                height: auto;
-                display: block;
-                transition: 0.8s;
-            }
-
-        /* Info Section */
-        .product-meta {
-            padding-left: 5%;
+        .main-image {
+            width: 100%;
+            height: auto;
+            border-radius: 12px;
+            transition: transform 0.5s ease;
         }
 
-        .brand-label {
-            color: var(--accent-color);
-            font-size: 0.9rem;
+        .main-image-container:hover .main-image {
+            transform: scale(1.02);
+        }
+
+        /* Product Info */
+        .product-info {
+            padding-left: 40px;
+        }
+
+        @@media (max-width: 992px) {
+            .product-info
+
+        {
+            padding-left: 0;
+            margin-top: 30px;
+        }
+
+        }
+
+        .brand-tag {
+            display: inline-block;
+            background: linear-gradient(45deg, var(--primary-pink), var(--accent-gold));
+            color: white;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 3px;
-            margin-bottom: 10px;
-            display: block;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
         }
 
         .product-title {
             font-family: 'Playfair Display', serif;
-            font-size: 3rem;
-            font-weight: 500;
-            line-height: 1.1;
+            font-size: 2.8rem;
+            font-weight: 700;
+            line-height: 1.2;
             margin-bottom: 20px;
+            background: linear-gradient(45deg, #fff 30%, var(--primary-pink) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        .price-row {
+        .price-container {
             display: flex;
-            align-items: baseline;
+            align-items: center;
             gap: 15px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
         .current-price {
-            font-size: 2.2rem;
-            font-weight: 300;
-            color: #fff;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent-gold);
         }
 
         .currency {
-            font-size: 1rem;
-            color: var(--accent-color);
-            font-weight: 600;
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            font-weight: 500;
         }
 
-        .description-text {
-            color: var(--text-dim);
-            font-size: 1.05rem;
-            line-height: 1.8;
-            margin-bottom: 40px;
-            font-weight: 300;
+        /* Stock Summary */
+        .stock-summary-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #252525;
+            margin-bottom: 25px;
         }
 
-        /* Variant Styling */
-        .variant-group {
-            margin-bottom: 30px;
-        }
-
-        .variant-title {
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-bottom: 15px;
-            color: #888;
-        }
-
-        .variant-options {
+        .stock-item {
             display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #252525;
         }
 
-        .variant-item {
-            position: relative;
-        }
-
-            .variant-item input[type="radio"] {
-                display: none;
+            .stock-item:last-child {
+                border-bottom: none;
             }
 
-        .variant-box {
-            border: 1px solid #333;
-            padding: 10px 20px;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: 0.3s;
-            display: block;
-            background: rgba(255,255,255,0.03);
+        .stock-label {
+            color: var(--text-muted);
+            font-size: 0.95rem;
         }
 
-        .variant-item input[type="radio"]:checked + .variant-box {
-            border-color: var(--accent-color);
-            color: var(--accent-color);
-            background: rgba(214, 138, 138, 0.1);
-        }
-
-        /* Purchase Section */
-        .purchase-area {
-            background: #161616;
-            padding: 30px;
-            border: 1px solid #222;
-            margin-top: 40px;
-        }
-
-        .qty-input {
-            background: transparent;
-            border: 1px solid #444;
-            color: #fff;
-            text-align: center;
-            width: 80px;
-            padding: 12px;
+        .stock-value {
+            font-weight: 600;
             font-size: 1.1rem;
         }
 
-        .btn-luxury-add {
-            flex-grow: 1;
-            background: var(--gold-gradient);
-            color: #fff;
+        .stock-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-left: 10px;
+        }
+
+        .stock-low {
+            background: rgba(255, 77, 77, 0.15);
+            color: #ff9e9e;
+            border: 1px solid rgba(255, 77, 77, 0.3);
+        }
+
+        .stock-medium {
+            background: rgba(255, 193, 7, 0.15);
+            color: #ffd700;
+            border: 1px solid rgba(255, 193, 7, 0.3);
+        }
+
+        .stock-high {
+            background: rgba(40, 167, 69, 0.15);
+            color: #6fcf97;
+            border: 1px solid rgba(40, 167, 69, 0.3);
+        }
+
+        .stock-total {
+            color: var(--primary-pink);
+            font-size: 1.2rem;
+        }
+
+        /* Variants Section */
+        .variants-section {
+            margin-top: 30px;
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: var(--text-light);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #252525;
+        }
+
+        .variant-group {
+            margin-bottom: 25px;
+        }
+
+        .variant-group-title {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .variants-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .variant-card {
+            background: var(--input-bg);
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+            .variant-card:hover {
+                border-color: var(--primary-pink);
+                transform: translateY(-3px);
+                box-shadow: 0 10px 20px rgba(214, 138, 138, 0.1);
+            }
+
+            .variant-card.selected {
+                border-color: var(--primary-pink);
+                background: rgba(214, 138, 138, 0.1);
+            }
+
+            .variant-card.disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+
+        .variant-name {
+            font-weight: 600;
+            color: var(--text-light);
+            margin-bottom: 8px;
+        }
+
+        .variant-value {
+            font-size: 1.2rem;
+            color: var(--accent-gold);
+            margin-bottom: 10px;
+        }
+
+        .variant-stock-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        .variant-stock {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .variant-status {
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 12px;
+        }
+
+        /* Purchase Section */
+        .purchase-section {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 30px;
+            border: 1px solid #252525;
+            margin-top: 30px;
+        }
+
+        .quantity-selector {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .qty-label {
+            font-weight: 600;
+            color: var(--text-light);
+        }
+
+        .qty-controls {
+            display: flex;
+            align-items: center;
+            background: var(--input-bg);
+            border-radius: 12px;
+            border: 1px solid #333;
+            overflow: hidden;
+        }
+
+        .qty-btn {
+            background: transparent;
             border: none;
-            padding: 16px;
+            color: var(--primary-pink);
+            font-size: 1.5rem;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+            .qty-btn:hover:not(:disabled) {
+                background: rgba(214, 138, 138, 0.1);
+            }
+
+            .qty-btn:disabled {
+                color: #666;
+                cursor: not-allowed;
+            }
+
+        .qty-input {
+            width: 60px;
+            height: 50px;
+            text-align: center;
+            background: transparent;
+            border: none;
+            color: var(--text-light);
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .btn-add-to-basket {
+            background: linear-gradient(45deg, var(--primary-pink), var(--accent-gold));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 18px 30px;
+            font-size: 1.1rem;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            transition: 0.4s;
+            letter-spacing: 1px;
+            width: 100%;
+            transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
         }
 
-            .btn-luxury-add:hover:not(:disabled) {
+            .btn-add-to-basket:hover:not(:disabled) {
                 transform: translateY(-3px);
-                box-shadow: 0 10px 20px rgba(214, 138, 138, 0.2);
+                box-shadow: 0 15px 30px rgba(214, 138, 138, 0.3);
             }
 
-            .btn-luxury-add:disabled {
+            .btn-add-to-basket:disabled {
                 background: #333;
                 color: #666;
+                cursor: not-allowed;
             }
 
-        .stock-indicator {
-            font-size: 0.85rem;
-            margin-top: 15px;
+            .btn-add-to-basket::after {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 5px;
+                height: 5px;
+                background: rgba(255, 255, 255, 0.5);
+                opacity: 0;
+                border-radius: 100%;
+                transform: scale(1, 1) translate(-50%);
+                transform-origin: 50% 50%;
+            }
+
+            .btn-add-to-basket:focus:not(:active)::after {
+                animation: ripple 1s ease-out;
+            }
+
+        @@keyframes ripple {
+            0%
+
+        {
+            transform: scale(0, 0);
+            opacity: 0.5;
+        }
+
+        100% {
+            transform: scale(50, 50);
+            opacity: 0;
+        }
+
+        }
+
+        /* Product Details */
+        .product-details {
+            margin-top: 40px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 30px;
+            border: 1px solid #252525;
+        }
+
+        .description-section {
+            line-height: 1.8;
+            color: var(--text-muted);
+            font-size: 1.05rem;
+        }
+
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .feature-item {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            border: 1px solid #252525;
+        }
+
+        .feature-icon {
+            color: var(--primary-pink);
+            font-size: 1.5rem;
+        }
+
+        .feature-text {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Toast Notification */
+        .custom-toast {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: var(--card-bg);
+            color: white;
+            padding: 20px 25px;
+            border-radius: 12px;
+            border-left: 4px solid var(--primary-pink);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transform: translateX(150%);
+            transition: transform 0.4s ease;
+            max-width: 400px;
+        }
+
+        .toast-show {
+            transform: translateX(0);
+        }
+
+        .toast-icon {
+            color: var(--primary-pink);
+            font-size: 1.5rem;
+        }
+
+        .toast-content h4 {
+            margin: 0 0 5px 0;
+            font-size: 1.1rem;
+        }
+
+        .toast-content p {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 0.9rem;
         }
 
         /* Animations */
-        @@keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
+        @@keyframes fadeInUp {
+            from
 
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        {
+            opacity: 0;
+            transform: translateY(30px);
         }
 
-        .animate-fade {
-            animation: fadeIn 0.8s ease forwards;
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        }
+
+        .animate-up {
+            animation: fadeInUp 0.6s ease forwards;
         }
     </style>
 }
 
-<div class="container pb-5">
-    <nav class="breadcrumb-nav">
-        <a asp-controller="Products" asp-action="GetAllProducts">Store</a>
-        <span class="mx-2" style="color:#444">/</span>
-        <span style="color:var(--accent-color)">@Model.Name</span>
+<!-- Toast Notification -->
+<div id="customToast" class="custom-toast">
+    <div class="toast-icon">
+        <i class="bi bi-check-circle"></i>
+    </div>
+    <div class="toast-content">
+        <h4>Success!</h4>
+        <p id="toastMessage">Item added to your basket</p>
+    </div>
+</div>
+
+<div class="container py-5">
+    <!-- Breadcrumbs -->
+    <nav aria-label="breadcrumb" class="breadcrumb-nav animate-up">
+        <ol class="breadcrumb d-flex align-items-center">
+            <li class="breadcrumb-item">
+                <a asp-controller="Products" asp-action="GetAllProducts" class="text-decoration-none">
+                    <i class="bi bi-house-door me-1"></i>Store
+                </a>
+            </li>
+            <li class="breadcrumb-divider">/</li>
+            <li class="breadcrumb-item active" aria-current="page">@Model.Name</li>
+        </ol>
     </nav>
 
     <div class="row">
-        <div class="col-lg-6 mb-5 mb-lg-0">
-            <div class="product-gallery animate-fade">
-                <div class="main-img-wrapper">
+        <!-- Product Image -->
+        <div class="col-lg-6">
+            <div class="product-gallery animate-up">
+                <div class="main-image-container">
                     @if (!string.IsNullOrEmpty(Model.ImageUrl))
                     {
-                        <img src="@Model.ImageUrl" alt="@Model.Name" id="mainImage" />
+                        <img src="@Model.ImageUrl" alt="@Model.Name" class="main-image" id="mainImage" />
                     }
                     else
                     {
-                        <div class="d-flex align-items-center justify-content-center" style="height: 500px">
-                            <i class="bi bi-image text-muted fs-1"></i>
+                        <div class="d-flex flex-column align-items-center justify-content-center text-center py-5">
+                            <i class="bi bi-image text-muted mb-3" style="font-size: 4rem;"></i>
+                            <p class="text-muted">No image available</p>
                         </div>
                     }
                 </div>
             </div>
         </div>
 
+        <!-- Product Info -->
         <div class="col-lg-6">
-            <div class="product-meta animate-fade" style="animation-delay: 0.2s">
-                <span class="brand-label">Professional Makeup</span>
+            <div class="product-info animate-up" style="animation-delay: 0.2s">
+                <span class="brand-tag">Luxury Collection</span>
                 <h1 class="product-title">@Model.Name</h1>
 
-                <div class="price-row">
-                    <span class="current-price">@Model.Price.ToString("N0")</span>
+                <!-- Price -->
+                <div class="price-container">
+                    <span class="current-price">@Model.Price.ToString("N2")</span>
                     <span class="currency">EGP</span>
                 </div>
 
-                <p class="description-text">
-                    @Model.Description
-                </p>
-
-                @* Variants Section *@
-                @if (Model.Variants != null && Model.Variants.Any())
-                {
-                    @foreach (var group in Model.Variants.GroupBy(v => v.VariantName))
-                    {
-                        <div class="variant-group">
-                            <h4 class="variant-title">Choose @group.Key</h4>
-                            <div class="variant-options">
-                                @foreach (var variant in group)
+                <!-- Stock Summary -->
+                <div class="stock-summary-card">
+                    <div class="stock-item">
+                        <span class="stock-label">Base Product Stock</span>
+                        <div>
+                            <span class="stock-value">@Model.Stock</span>
+                            @{
+                                var baseStockClass = Model.Stock <= 10 ? "stock-low" :
+                                Model.Stock <= 50 ? "stock-medium" : "stock-high";
+                            }
+                            <span class="stock-badge @baseStockClass">
+                                @if (Model.Stock <= 10)
                                 {
-                                    <label class="variant-item">
-                                        <input type="radio" name="selected_@group.Key" value="@variant.Id" />
-                                        <span class="variant-box">@variant.VariantValue</span>
-                                    </label>
+                                    <i class="bi bi-exclamation-triangle"></i>
+                                    <span>Low</span>
                                 }
-                            </div>
-                        </div>
-                    }
-                }
-
-                @* Purchase Form *@
-                <form asp-controller="basket" asp-action="AddToBasket" method="post">
-                    @Html.AntiForgeryToken()
-                    <input type="hidden" name="ProductId" value="@Model.Id" />
-                    <input type="hidden" name="ProductName" value="@Model.Name" />
-                    <input type="hidden" name="ProductPrice" value="@Model.Price" />
-
-                    <div class="purchase-area">
-                        <div class="d-flex gap-3 align-items-center">
-                            <div class="qty-control">
-                                <input type="number" name="Quantity" value="1" min="1" max="@Model.Stock" class="qty-input" />
-                            </div>
-                            <button type="submit" class="btn-luxury-add" @(isOutOfStock ? "disabled" : "")>
-                                @if (isOutOfStock)
+                                else if (Model.Stock <= 50)
                                 {
-                                    <span>Temporarily Unavailable</span>
+                                    <i class="bi bi-info-circle"></i>
+                                    <span>Medium</span>
                                 }
                                 else
                                 {
-                                    <span><i class="bi bi-bag-plus me-2"></i> Add to Collection</span>
+                                    <i class="bi bi-check-circle"></i>
+                                    <span>High</span>
                                 }
-                            </button>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="stock-item">
+                        <span class="stock-label">Variants Stock</span>
+                        <div>
+                            <span class="stock-value">@variantsInStock</span>
+                            @{
+                                var variantsStockClass = variantsInStock <= 10 ? "stock-low" :
+                                variantsInStock <= 50 ? "stock-medium" : "stock-high";
+                            }
+                            <span class="stock-badge @variantsStockClass">
+                                <i class="bi bi-layers"></i>
+                                <span>@Model.Variants?.Count variants</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="stock-item">
+                        <span class="stock-label">Total Available</span>
+                        <div>
+                            <span class="stock-value stock-total">@totalStock</span>
+                            <span class="stock-badge stock-high">
+                                <i class="bi bi-box-seam"></i>
+                                <span>Available</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Variants Section -->
+                @if (Model.Variants != null && Model.Variants.Any())
+                {
+                    <div class="variants-section">
+                        <h3 class="section-title">Available Variants</h3>
+
+                        @foreach (var group in Model.Variants.GroupBy(v => v.VariantName))
+                        {
+                            <div class="variant-group">
+                                <h4 class="variant-group-title">Select @group.Key</h4>
+                                <div class="variants-grid" id="variant-group-@group.Key">
+                                    @foreach (var variant in group)
+                                    {
+                                        var stockClass = variant.Stock <= 10 ? "stock-low" :
+                                        variant.Stock <= 50 ? "stock-medium" : "stock-high";
+                                        var isAvailable = variant.Stock > 0;
+
+                                        <div class="variant-card @(!isAvailable ? "disabled" : "")"
+                                             data-variant-id="@variant.Id"
+                                             data-variant-name="@group.Key"
+                                             data-stock="@variant.Stock"
+                                             onclick="selectVariant(this, '@group.Key')">
+                                            <div class="variant-name">@group.Key</div>
+                                            <div class="variant-value">@variant.VariantValue</div>
+                                            <div class="variant-stock-info">
+                                                <span class="variant-stock">
+                                                    <i class="bi bi-box me-1"></i>
+                                                    @variant.Stock available
+                                                </span>
+                                                <span class="variant-status @stockClass">
+                                                    @if (!isAvailable)
+                                                    {
+                                                        <span>Out of Stock</span>
+                                                    }
+                                                    else if (variant.Stock <= 10)
+                                                    {
+                                                        <span>Low</span>
+                                                    }
+                                                    else if (variant.Stock <= 50)
+                                                    {
+                                                        <span>Medium</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span>High</span>
+                                                    }
+                                                </span>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+
+                <!-- Purchase Section -->
+                <div class="purchase-section">
+                    <form asp-controller="basket" asp-action="AddToBasket" method="post" id="addToBasketForm">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="ProductId" value="@Model.Id" />
+                        <input type="hidden" name="ProductName" value="@Model.Name" />
+                        <input type="hidden" name="ProductPrice" value="@Model.Price" />
+                        <input type="hidden" name="SelectedVariants" id="selectedVariants" value="" />
+
+                        <div class="quantity-selector">
+                            <span class="qty-label">Quantity:</span>
+                            <div class="qty-controls">
+                                <button type="button" class="qty-btn" onclick="changeQuantity(-1)" @(isOutOfStock ? "disabled" : "")>-</button>
+                                <input type="number" name="Quantity" value="1" min="1" max="@totalStock" class="qty-input" id="quantityInput" @(isOutOfStock ? "disabled" : "") />
+                                <button type="button" class="qty-btn" onclick="changeQuantity(1)" @(isOutOfStock ? "disabled" : "")>+</button>
+                            </div>
                         </div>
 
-                        <div class="stock-indicator">
-                            @if (Model.Stock > 0)
+                        <button type="submit" class="btn-add-to-basket" id="addToBasketBtn" @(isOutOfStock ? "disabled" : "")>
+                            @if (isOutOfStock)
                             {
-                                <i class="bi bi-circle-fill" style="color: var(--accent-color); font-size: 8px;"></i>
-                                <span class="text-dim">Available for immediate delivery (@Model.Stock units)</span>
+                                <span><i class="bi bi-x-circle me-2"></i> Out of Stock</span>
                             }
                             else
                             {
-                                <i class="bi bi-circle-fill" style="color: #ff4d4d; font-size: 8px;"></i>
-                                <span style="color: #ff4d4d;">Exhausted from stock</span>
+                                <span><i class="bi bi-bag-plus me-2"></i> Add to Luxury Bag</span>
                             }
-                        </div>
-                    </div>
-                </form>
+                        </button>
+                    </form>
+                </div>
 
-                @* Minimal Footer Info *@
-                <div class="mt-5 row g-4">
-                    <div class="col-6">
-                        <div class="d-flex align-items-center gap-3">
-                            <i class="bi bi-truck fs-4 text-dim"></i>
-                            <span class="small text-dim">Secure & Fast Shipping</span>
+                <!-- Product Features -->
+                <div class="features-grid mt-4">
+                    <div class="feature-item">
+                        <i class="bi bi-truck feature-icon"></i>
+                        <div class="feature-text">
+                            <strong>Free Shipping</strong><br>
+                            On orders over 500 EGP
                         </div>
                     </div>
-                    <div class="col-6">
-                        <div class="d-flex align-items-center gap-3">
-                            <i class="bi bi-patch-check fs-4 text-dim"></i>
-                            <span class="small text-dim">100% Original Product</span>
+                    <div class="feature-item">
+                        <i class="bi bi-shield-check feature-icon"></i>
+                        <div class="feature-text">
+                            <strong>Authentic Product</strong><br>
+                            100% Original Guarantee
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <i class="bi bi-arrow-counterclockwise feature-icon"></i>
+                        <div class="feature-text">
+                            <strong>Easy Returns</strong><br>
+                            30-Day Return Policy
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Product Description -->
+    @if (!string.IsNullOrEmpty(Model.Description))
+    {
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="product-details animate-up" style="animation-delay: 0.4s">
+                    <h3 class="section-title">Product Details</h3>
+                    <div class="description-section">
+                        @Html.Raw(Model.Description.Replace("\n", "<br>"))
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
 </div>
+
+@section Scripts {
+    <script>
+        let selectedVariants = {};
+        let maxQuantity = @totalStock;
+
+        // تغيير الكمية
+        function changeQuantity(change) {
+            const input = document.getElementById('quantityInput');
+            let current = parseInt(input.value) || 1;
+            let newValue = current + change;
+
+            if (newValue < 1) newValue = 1;
+            if (newValue > maxQuantity) newValue = maxQuantity;
+
+            input.value = newValue;
+        }
+
+        // اختيار variant
+        function selectVariant(element, variantName) {
+            if (element.classList.contains('disabled')) return;
+
+            const variantId = element.dataset.variantId;
+
+            // إلغاء اختيار جميع الـ variants في نفس المجموعة
+            const group = document.querySelectorAll(`#variant-group-${variantName} .variant-card`);
+            group.forEach(card => card.classList.remove('selected'));
+
+            // اختيار الـ variant الجديد
+            element.classList.add('selected');
+
+            // حفظ الاختيار
+            selectedVariants[variantName] = variantId;
+
+            // تحديث hidden field
+            updateSelectedVariants();
+
+            // تحديث أقصى كمية بناءً على stock الـ variant المختار
+            const variantStock = parseInt(element.dataset.stock);
+            updateMaxQuantity(variantStock);
+        }
+
+        // تحديث أقصى كمية
+        function updateMaxQuantity(variantStock) {
+            const input = document.getElementById('quantityInput');
+            const maxStock = Math.min(variantStock, @Model.Stock);
+
+            input.max = maxStock;
+            if (parseInt(input.value) > maxStock) {
+                input.value = maxStock;
+            }
+        }
+
+        // تحديث الـ selected variants
+        function updateSelectedVariants() {
+            const selected = [];
+            for (const [name, id] of Object.entries(selectedVariants)) {
+                selected.push(`${name}:${id}`);
+            }
+            document.getElementById('selectedVariants').value = selected.join('|');
+        }
+
+        // إظهار Toast
+        function showToast(title, message, type = "success") {
+            const toast = document.getElementById('customToast');
+            const toastMessage = document.getElementById('toastMessage');
+            const toastIcon = toast.querySelector('.toast-icon i');
+
+            toast.querySelector('h4').textContent = title;
+            toastMessage.textContent = message;
+
+            if (type === "error") {
+                toast.style.borderLeftColor = "#ff4444";
+                toastIcon.style.color = "#ff4444";
+                toastIcon.className = "bi bi-exclamation-circle";
+            } else {
+                toast.style.borderLeftColor = "var(--primary-pink)";
+                toastIcon.style.color = "var(--primary-pink)";
+                toastIcon.className = "bi bi-check-circle";
+            }
+
+            toast.classList.add('toast-show');
+            setTimeout(() => toast.classList.remove('toast-show'), 3000);
+        }
+
+        // التحقق قبل إرسال النموذج
+        document.getElementById('addToBasketForm').addEventListener('submit', function(event) {
+            const quantityInput = document.getElementById('quantityInput');
+            const quantity = parseInt(quantityInput.value) || 1;
+
+            if (quantity < 1 || quantity > maxQuantity) {
+                event.preventDefault();
+                showToast("Error", "Invalid quantity selected", "error");
+                return;
+            }
+
+            // إذا كان هناك variants، تأكد من اختيار كل المجموعات
+            const variantGroups = @(Model.Variants?.Count > 0 ? "true" : "false");
+            if (variantGroups) {
+                const allGroups = Array.from(document.querySelectorAll('.variant-group-title')).map(el => {
+                    return el.textContent.replace('Select ', '').trim();
+                });
+
+                const missingGroups = allGroups.filter(group => !selectedVariants[group]);
+                if (missingGroups.length > 0) {
+                    event.preventDefault();
+                    showToast("Selection Required", `Please select: ${missingGroups.join(', ')}`, "error");
+                    return;
+                }
+            }
+
+            // إذا تم التحقق بنجاح
+            showToast("Adding to Bag", "Adding item to your luxury bag...", "success");
+        });
+
+        // التحكم في الكمية من خلال لوحة المفاتيح
+        document.getElementById('quantityInput').addEventListener('keydown', function(event) {
+            if (event.key === 'ArrowUp') {
+                event.preventDefault();
+                changeQuantity(1);
+            } else if (event.key === 'ArrowDown') {
+                event.preventDefault();
+                changeQuantity(-1);
+            }
+        });
+
+        // اختيار أول variant متاح تلقائياً
+        document.addEventListener('DOMContentLoaded', function() {
+            // اختيار أول variant متاح في كل مجموعة
+            document.querySelectorAll('.variant-group').forEach(group => {
+                const availableVariants = group.querySelectorAll('.variant-card:not(.disabled)');
+                if (availableVariants.length > 0) {
+                    availableVariants[0].click();
+                }
+            });
+
+            // تحديث أقصى كمية افتراضية
+            if (@isOutOfStock.ToString().ToLower()) {
+                document.getElementById('quantityInput').value = 0;
+            }
+        });
+    </script>
+}
