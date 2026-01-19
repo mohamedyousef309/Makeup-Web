@@ -42,8 +42,8 @@ namespace Application_Layer.CQRS.Products.Commands.UpdateProduct
 
             product.Name = dto.Name;
             product.Description = dto.Description;
-            product.Price = dto.Price;
-            product.Stock = dto.Stock;
+            //product.Price = dto.Price;
+            //product.Stock = dto.Stock;
             product.CategoryId = dto.CategoryId;
             product.IsActive = dto.IsActive;
 

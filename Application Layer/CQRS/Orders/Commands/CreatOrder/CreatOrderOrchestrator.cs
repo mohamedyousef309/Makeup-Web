@@ -1,6 +1,7 @@
 ﻿using Application_Layer.CQRS.Basket.Quries.GetUserBsaket;
 using Application_Layer.CQRS.Products.Queries;
 using Application_Layer.CQRS.Products.Queries.GetProductsByIds;
+using Application_Layer.CQRS.Products.Queries.GetProductVariantsByIds;
 using Application_Layer.CQRS.User.Quries.GetUserEmailbyUserid;
 using Domain_Layer.DTOs.Basket;
 using Domain_Layer.DTOs.OrderDTOs;
@@ -39,22 +40,25 @@ namespace Application_Layer.CQRS.Orders.Commands.CreatOrder
             if (!userBasket.IsSuccess || userBasket.Data?.items == null || !userBasket.Data.items.Any())
                 return RequestRespones<OrderToReturnDto>.Fail(userBasket.Message ?? "Basket is empty.", 400);
 
-            var productIds = userBasket.Data.items.Select(i => i.productid).ToList();
 
-            var productsResult = await mediator.Send(new GetProductsByIdsQuery(productIds));
-            if (!productsResult.IsSuccess || productsResult.Data == null)
-                return RequestRespones<OrderToReturnDto>.Fail(productsResult.Message ?? "Products not found.", 404);
+            var variantIds = userBasket.Data.items.Select(i => i.ProductVariantid).ToList();
 
-            var productsDict = productsResult.Data.ToDictionary(p => p.Id);
+            var variantsResult = await mediator.Send(new GetProductVariantsByIdsQuery(variantIds));
+
+            if (!variantsResult.IsSuccess || variantsResult.Data == null)
+                return RequestRespones<OrderToReturnDto>.Fail(variantsResult.Message ?? "Products not found.", 404);
+
+            var variantsDict = variantsResult.Data.ToDictionary(p => p.id);
 
             var orderItems = userBasket.Data.items
                 .Select(item => {
-                    if (!productsDict.TryGetValue(item.productid, out var product)) return null;
+                    if (!variantsDict.TryGetValue(item.ProductVariantid, out var dbVariant)) return null;
                     return new OrderItems
                     {
-                        ProductId = item.productid,
-                        ProductName = product.Name,
-                        Price = product.Price,
+                        ProductId = dbVariant.productid,
+                        ProductVariantId = dbVariant.id,
+                        ProductName = $"{dbVariant.ProductName} ({dbVariant.VariantValue})",
+                        Price = dbVariant.price,
                         Quantity = item.Quantity,
                     };
                 }).Where(x => x != null).ToList();

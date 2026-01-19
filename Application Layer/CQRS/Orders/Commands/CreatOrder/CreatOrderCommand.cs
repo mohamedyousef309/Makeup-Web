@@ -21,18 +21,18 @@ namespace Application_Layer.CQRS.Orders.Commands.CreatOrder
     public class CreatOrderCommandHandler : IRequestHandler<CreatOrderCommand, RequestRespones<bool>>
     {
         private readonly IGenaricRepository<Order> OrderRepo;
-        private readonly IGenaricRepository<Product> productRepo;
+        private readonly IGenaricRepository<ProductVariant> ProductVariant;
         private readonly IMediator mediator;
 
-        public CreatOrderCommandHandler(IGenaricRepository<Order> OrderRepo,IGenaricRepository<Product> ProductRepo,IMediator mediator)
+        public CreatOrderCommandHandler(IGenaricRepository<Order> OrderRepo,IGenaricRepository<ProductVariant> ProductRepo,IMediator mediator)
         {
             this.OrderRepo = OrderRepo;
-            productRepo = ProductRepo;
+            ProductVariant = ProductRepo;
             this.mediator = mediator;
         }
         public async Task<RequestRespones<bool>> Handle(CreatOrderCommand request, CancellationToken cancellationToken)
         {
-            var outOfStockEvents = await ProcessStockReductionAsync(request.Items, cancellationToken);
+            var outOfStockEvents = await ProcessVariantStockReductionAsync(request.Items, cancellationToken);
 
             var order = new Order
             {
@@ -44,6 +44,7 @@ namespace Application_Layer.CQRS.Orders.Commands.CreatOrder
                     status = OrderStatus.pending,
                     orderDate = DateTimeOffset.UtcNow,
                     subTotal = request.subTotal,
+                    
 
             };
 
@@ -63,33 +64,33 @@ namespace Application_Layer.CQRS.Orders.Commands.CreatOrder
 
         }
 
-        public async Task<IEnumerable<OutOfStockEvent>> ProcessStockReductionAsync(IEnumerable<OrderItems> items, CancellationToken CT ) 
+        public async Task<IEnumerable<OutOfStockEvent>> ProcessVariantStockReductionAsync(IEnumerable<OrderItems> items, CancellationToken CT ) 
         {
             var events = new List<OutOfStockEvent>();
-            var productsIds = items.Select(x => x.ProductId).ToList();
+            var ProductVariantIds = items.Select(x => x.ProductVariantId).ToList();
 
-            var products = await productRepo.GetByCriteriaQueryable(p => productsIds.Contains(p.Id)).AsTracking()
+            var ProductVariants = await ProductVariant.GetByCriteriaQueryable(p => ProductVariantIds.Contains(p.Id)).Include(x=>x.Product).AsTracking()
                 .ToListAsync(CT);
 
             foreach (var item in items)
             {
-                var product = products.FirstOrDefault(p => p.Id == item.ProductId);
+                var ProductVariant = ProductVariants.FirstOrDefault(p => p.Id == item.ProductVariantId);
 
-                if (product == null)
+                if (ProductVariant == null)
                 {
                     throw new Exception($"Product with ID {item.Id} not found in database.");
                 }
 
-                if (product.Stock < item.Quantity)
+                if (ProductVariant.Stock < item.Quantity)
                 {
-                    throw new Exception($"Product {product.Name} Out Of Stock: {product.Stock}");
+                    throw new Exception($"Product {ProductVariant.Product.Name}-{ProductVariant.VariantName} Out Of Stock: {ProductVariant.Stock}");
                 }
 
-                bool isFinished = product.ReduceStock(item.Quantity);
+                bool isFinished = ProductVariant.ReduceStock(item.Quantity);
 
                 if (isFinished)
                 {
-                    events.Add(new OutOfStockEvent(product.Id, product.Name));
+                    events.Add(new OutOfStockEvent(ProductVariant.Id, ProductVariant.Product.Name,ProductVariant.VariantName));
                 }
             }
 

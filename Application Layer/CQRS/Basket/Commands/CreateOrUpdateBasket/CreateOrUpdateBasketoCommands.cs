@@ -1,4 +1,5 @@
-﻿using Domain_Layer.Interfaces.Abstraction;
+﻿using Domain_Layer.Entites;
+using Domain_Layer.Interfaces.Abstraction;
 using Domain_Layer.Interfaces.Repositryinterfaces;
 using Domain_Layer.Respones;
 using MediatR;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Application_Layer.CQRS.Basket.Commands.CreateOrUpdateBasket
 {
-    public record CreateOrUpdateBasketoCommands( int userid,int ProductId, string ProductName, decimal Price, int Quantity): ICommand<RequestRespones<bool>>;
+    public record CreateOrUpdateBasketoCommands( int userid,int ProductId,int ProductVariantid, string productVariant, string ProductName, decimal Price, int Quantity): ICommand<RequestRespones<bool>>;
 
     public class CreateOrUpdateBasketoCommandsHandler : IRequestHandler<CreateOrUpdateBasketoCommands, RequestRespones<bool>>
     {
@@ -48,6 +49,8 @@ namespace Application_Layer.CQRS.Basket.Commands.CreateOrUpdateBasket
                         Price = request.Price,
                         ProductName = request.ProductName,
                         Quantity = request.Quantity,
+                        ProductVariantid=request.ProductVariantid,
+                        ProductVariant = request.productVariant,
                         UserCartId = request.userid.ToString(),
 
                     });

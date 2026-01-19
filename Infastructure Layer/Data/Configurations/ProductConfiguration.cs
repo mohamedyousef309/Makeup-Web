@@ -30,7 +30,7 @@ namespace Infastructure_Layer.Data.Configurations
                    .HasMaxLength(500);
 
             builder.HasIndex(p => p.CategoryId);
-            builder.HasIndex(p => p.Stock);
+            //builder.HasIndex(p => p.Stock);
 
 
             builder.HasOne(x => x.Category)

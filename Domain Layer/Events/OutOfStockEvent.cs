@@ -7,5 +7,5 @@ using System.Threading.Tasks;
 
 namespace Domain_Layer.Events
 {
-    public record OutOfStockEvent(int ProductId, string ProductName) : INotification;
+    public record OutOfStockEvent(int ProductId, string ProductName, string VariantName) : INotification;
 }

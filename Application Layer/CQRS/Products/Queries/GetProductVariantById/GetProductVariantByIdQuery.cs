@@ -44,7 +44,9 @@ namespace Application_Layer.CQRS.Products.Queries
                     Id = v.Id,
                     VariantName = v.VariantName,
                     VariantValue = v.VariantValue,
-                    Stock = v.Stock
+                    Price = v.Price,
+                    Stock = v.Stock,
+                    
                 })
                 .FirstOrDefaultAsync(cancellationToken);
 

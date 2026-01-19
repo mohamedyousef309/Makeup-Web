@@ -11,6 +11,8 @@ namespace Domain_Layer.DTOs.ProductVariantDtos
         public string VariantName { get; set; } = default!;
         public string VariantValue { get; set; } = default!;
         public int Stock { get; set; }
+
+        public decimal Price { get; set; }
     }
 
 }

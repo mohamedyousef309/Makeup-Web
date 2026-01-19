@@ -13,7 +13,7 @@ using System.Windows.Input;
 
 namespace Application_Layer.CQRS.Products.Commands.Createvariants
 {
-    public record CreatevariantsCommand(int productid,IEnumerable<UpdateProductVariantDto> UpdateProductVariantDtos):ICommand<RequestRespones<bool>>;
+    public record CreatevariantsCommand(int productid,IEnumerable<CreateProductVariantDto> UpdateProductVariantDtos):ICommand<RequestRespones<bool>>;
 
     public class CreatevariantsCommandHandler : IRequestHandler<CreatevariantsCommand, RequestRespones<bool>>
 {
@@ -30,6 +30,7 @@ namespace Application_Layer.CQRS.Products.Commands.Createvariants
                 ProductId = request.productid,
                 VariantName = dto.VariantName,
                 VariantValue = dto.VariantValue,
+                Price = dto.Price,
                 Stock = dto.Stock,    
             }).ToList();
 

@@ -48,8 +48,8 @@ namespace Application_Layer.CQRS.Products.Queries
     {
         { "id", p => p.Id },
         { "name", p => p.Name },
-        { "price", p => p.Price },
-        { "stock", p => p.Stock }
+        //{ "price", p => p.Price },
+        //{ "stock", p => p.Stock }
     };
 
             query = ApplySorting(query, request.SortBy, request.SortDir, sortColumns);
@@ -65,9 +65,9 @@ namespace Application_Layer.CQRS.Products.Queries
            {
                Id = p.Id,
                Name = p.Name,
-               Price = p.Price,
+               //Price = p.Price,
                ImageUrl = p.ImageUrl??"",
-               Stock = p.Stock,
+               //Stock = p.Stock,
                Description = p.Description
            })
            .ToListAsync(cancellationToken),

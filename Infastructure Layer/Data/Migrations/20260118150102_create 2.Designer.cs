@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infastructure_Layer.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260113041844_intial create2")]
-    partial class intialcreate2
+    [Migration("20260118150102_create 2")]
+    partial class create2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -120,6 +120,9 @@ namespace Infastructure_Layer.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasDefaultValue(0);
+
+                    b.Property<bool>("IsBlocked")
+                        .HasColumnType("bit");
 
                     b.Property<DateTime?>("LockoutEnd")
                         .HasColumnType("datetime2");
@@ -361,19 +364,11 @@ namespace Infastructure_Layer.Data.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("Stock")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
 
                     b.HasIndex("Name");
-
-                    b.HasIndex("Stock");
 
                     b.ToTable("Products", (string)null);
                 });
@@ -385,6 +380,9 @@ namespace Infastructure_Layer.Data.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("ProductId")
                         .HasColumnType("int");

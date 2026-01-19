@@ -24,14 +24,14 @@ namespace Application_Layer.CQRS.Products.Queries.GetProductsByIds
         }
         public async Task<RequestRespones<IEnumerable<ProductDto>>> Handle(GetProductsByIdsQuery request, CancellationToken cancellationToken)
         {
-            var Products = await genaricRepository.GetByCriteriaQueryable(p => request.ProductIds.Contains(p.Id)).Where(x=>x.Stock>0)
+            var Products = await genaricRepository.GetByCriteriaQueryable(p => request.ProductIds.Contains(p.Id))/*.Where(x=>x.Stock>0)*/
                  .Select(p => new ProductDto
                  {
                      Id = p.Id,
                      Name = p.Name,
                      Description = p.Description,
-                     Price = p.Price,
-                     Stock = p.Stock,
+                     //Price = p.Price,
+                     //Stock = p.Stock,
                      //CategoryId = p.CategoryId,
                      IsActive = p.IsActive,
                  }).ToListAsync(cancellationToken);

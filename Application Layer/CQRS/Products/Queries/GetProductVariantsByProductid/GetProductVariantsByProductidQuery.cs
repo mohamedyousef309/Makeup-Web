@@ -31,6 +31,7 @@ namespace Application_Layer.CQRS.Products.Queries.GetProductVariantsByProductid
                     Id = x.Id,
                     VariantName = x.VariantName,
                     VariantValue = x.VariantValue,
+                    Price=x.Price,
                     Stock=x.Stock
                 }).ToListAsync();
 

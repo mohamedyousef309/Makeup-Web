@@ -1,4 +1,5 @@
 ﻿using Application_Layer.CQRS.Products.Queries;
+using Domain_Layer.Entites;
 using Domain_Layer.Interfaces.Abstraction;
 using Domain_Layer.Respones;
 using MediatR;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Application_Layer.CQRS.Basket.Commands.CreateOrUpdateBasket
 {
-    public record CreateOrUpdateBasketOrchestrator(int userid, int Productid,string ProductName,decimal ProductPrice,int Quantity) : ICommand<RequestRespones<bool>>;
+    public record CreateOrUpdateBasketOrchestrator(int userid, int Productid,int ProductVariantId,string productVariant,string ProductName,decimal ProductPrice,int Quantity) : ICommand<RequestRespones<bool>>;
 
     public class CreateOrUpdateBasketOrchestratorHandler : IRequestHandler<CreateOrUpdateBasketOrchestrator, RequestRespones<bool>>
     {
@@ -27,6 +28,8 @@ namespace Application_Layer.CQRS.Basket.Commands.CreateOrUpdateBasket
             var addProductTobasketResult= await mediator.Send(new CreateOrUpdateBasketoCommands(
                 request.userid,
                 request.Productid,
+                request.ProductVariantId,
+                request.productVariant,
                 request.ProductName,
                 request.ProductPrice,
                 Quantity: request.Quantity));

@@ -23,6 +23,8 @@
             --text-muted: #a0a0a0;
             --accent-gold: #c5a059;
             --danger-red: #ff4d4d;
+            --success-green: #28a745;
+            --warning-yellow: #ffc107;
         }
 
         body {
@@ -55,7 +57,7 @@
             border-radius: 20px;
             padding: 40px;
             border: 1px solid #252525;
-            max-width: 800px;
+            max-width: 1000px;
             margin: 0 auto;
         }
 
@@ -224,6 +226,126 @@
                 color: var(--danger-red);
             }
 
+        /* Variants Section */
+        .variants-section {
+            background: rgba(214, 138, 138, 0.05);
+            border: 1px solid rgba(214, 138, 138, 0.1);
+            border-radius: 16px;
+            padding: 30px;
+            margin-top: 30px;
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: var(--text-light);
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #252525;
+        }
+
+        .variant-card {
+            background: var(--input-bg);
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+            .variant-card:hover {
+                border-color: var(--primary-pink);
+                box-shadow: 0 10px 20px rgba(214, 138, 138, 0.1);
+            }
+
+        .variant-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .variant-field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .variant-label {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-add-variant {
+            background: rgba(40, 167, 69, 0.1);
+            border: 1px dashed rgba(40, 167, 69, 0.3);
+            color: var(--success-green);
+            border-radius: 12px;
+            padding: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+            .btn-add-variant:hover {
+                background: rgba(40, 167, 69, 0.2);
+                border-color: var(--success-green);
+                color: white;
+            }
+
+        .remove-variant {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            color: var(--danger-red);
+            background: rgba(255, 77, 77, 0.1);
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+            .remove-variant:hover {
+                background: rgba(255, 77, 77, 0.2);
+                color: white;
+                transform: scale(1.1);
+            }
+
+        .stock-summary {
+            background: rgba(214, 138, 138, 0.1);
+            border: 1px solid rgba(214, 138, 138, 0.2);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 20px;
+            display: none;
+        }
+
+            .stock-summary.show {
+                display: block;
+                animation: fadeIn 0.3s ease;
+            }
+
+        .stock-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--primary-pink);
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
         /* Toast Notification */
         .custom-toast {
             position: fixed;
@@ -274,6 +396,10 @@
             .edit-title {
                 font-size: 2rem;
             }
+
+            .variant-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 }
@@ -308,20 +434,6 @@
                         <label asp-for="Name" class="form-label">Product Name</label>
                         <input asp-for="Name" class="form-control" placeholder="Enter product name" />
                         <span asp-validation-for="Name" class="text-danger"></span>
-                    </div>
-
-                    <div class="mb-3">
-                        <label asp-for="Price" class="form-label">Price ($)</label>
-                        <input asp-for="Price" type="number" step="0.01" class="form-control" placeholder="0.00" />
-                        <span asp-validation-for="Price" class="text-danger"></span>
-                        <small class="form-text">Enter price in dollars</small>
-                    </div>
-
-                    <div class="mb-3">
-                        <label asp-for="Stock" class="form-label">Stock Quantity</label>
-                        <input asp-for="Stock" type="number" class="form-control" placeholder="0" />
-                        <span asp-validation-for="Stock" class="text-danger"></span>
-                        <small class="form-text">Available units in inventory</small>
                     </div>
 
                     <div class="mb-3">
@@ -382,6 +494,71 @@
                     <small class="form-text d-block mb-3">
                         When active, product is visible to customers
                     </small>
+                </div>
+            </div>
+
+            <!-- Variants Section -->
+            <div class="variants-section">
+                <h4 class="section-title">
+                    <i class="bi bi-stars me-2"></i>Product Variants
+                </h4>
+                <p class="text-muted mb-4">
+                    <i class="bi bi-info-circle me-1"></i>
+                    Note: Product variants are managed separately. Price and stock are handled at the variant level.
+                </p>
+
+                <!-- Button to go to variants management -->
+                <div class="text-center">
+                    <a href="@Url.Action("ManageVariants", "Products", new { productId = Model.Id })"
+                       class="btn btn-primary" style="background: var(--primary-pink); border: none;">
+                        <i class="bi bi-gear me-2"></i>Manage Variants
+                    </a>
+                </div>
+
+                <!-- Display existing variants -->
+                <div id="variantsContainer" class="mt-4">
+                    @if (ViewBag.Variants != null)
+                    {
+                        foreach (var variant in ViewBag.Variants)
+                        {
+                            <div class="variant-card">
+                                <div class="variant-grid">
+                                    <div class="variant-field">
+                                        <label class="variant-label">Type</label>
+                                        <input type="text" class="form-control-custom" value="@variant.VariantName" readonly />
+                                    </div>
+                                    <div class="variant-field">
+                                        <label class="variant-label">Value</label>
+                                        <input type="text" class="form-control-custom" value="@variant.VariantValue" readonly />
+                                    </div>
+                                    <div class="variant-field">
+                                        <label class="variant-label">Price (EGP)</label>
+                                        <input type="text" class="form-control-custom" value="@variant.Price.ToString("C")" readonly />
+                                    </div>
+                                    <div class="variant-field">
+                                        <label class="variant-label">Quantity</label>
+                                        <input type="text" class="form-control-custom" value="@variant.Stock" readonly />
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <i class="bi bi-box-seam" style="font-size: 3rem; color: var(--text-muted);"></i>
+                            <p class="text-muted mt-3">No variants available</p>
+                            <small class="text-muted">Add variants to manage prices and stock</small>
+                        </div>
+                    }
+                </div>
+
+                <!-- Stock Summary -->
+                <div class="stock-summary" id="stockSummary">
+                    <div class="stock-total">
+                        <span>Total Stock Across All Variants:</span>
+                        <span id="totalStockValue">@(ViewBag.TotalStock ?? 0)</span>
+                    </div>
                 </div>
             </div>
 
@@ -491,20 +668,13 @@
 
         // التحقق من الصحة قبل الإرسال
         document.getElementById('editForm').addEventListener('submit', function(event) {
-            const price = document.querySelector('[name="Price"]');
-            const stock = document.querySelector('[name="Stock"]');
+            // التحقق الأساسي فقط (الإسم مطلوب)
+            const name = document.querySelector('[name="Name"]');
 
-            if (parseFloat(price.value) <= 0) {
+            if (!name.value.trim()) {
                 event.preventDefault();
-                showToast("Validation Error", "Price must be greater than 0", "error");
-                price.focus();
-                return;
-            }
-
-            if (parseInt(stock.value) < 0) {
-                event.preventDefault();
-                showToast("Validation Error", "Stock cannot be negative", "error");
-                stock.focus();
+                showToast("Validation Error", "Product name is required", "error");
+                name.focus();
                 return;
             }
 
@@ -526,6 +696,19 @@
                 });
                 </text>
         }
+
+        // Show stock summary if there are variants
+        document.addEventListener('DOMContentLoaded', function() {
+            const variantsContainer = document.getElementById('variantsContainer');
+            const stockSummary = document.getElementById('stockSummary');
+
+            if (variantsContainer && variantsContainer.children.length > 0) {
+                const variantCards = document.querySelectorAll('.variant-card');
+                if (variantCards.length > 0) {
+                    stockSummary.classList.add('show');
+                }
+            }
+        });
     </script>
 
     <!-- jQuery Validation -->

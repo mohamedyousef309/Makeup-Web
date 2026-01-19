@@ -1,15 +1,17 @@
 ﻿using Application_Layer.CQRS.Caegories.Queries.GetCategoriesLookupQuery;
 using Application_Layer.CQRS.Products.Commands;
-using Application_Layer.CQRS.Products.Commands.AddProductToCart;
 using Application_Layer.CQRS.Products.Commands.CreateProduct;
+using Application_Layer.CQRS.Products.Commands.Orchestrators.AddProductWithVariants;
 using Application_Layer.CQRS.Products.Commands.UpdateProduct;
-using Application_Layer.CQRS.Products.Commands.UpdateProductStock;
+//using Application_Layer.CQRS.Products.Commands.UpdateProductStock;
 using Application_Layer.CQRS.Products.Queries;
 using Application_Layer.CQRS.Products.Queries.GetProductsByIds;
 using Domain_Layer.DTOs;
 using Domain_Layer.DTOs._ِCategoryDtos;
 using Domain_Layer.DTOs.ProductDtos;
+using Domain_Layer.DTOs.ProductVariantDtos;
 using Domain_Layer.Respones;
+using Domain_Layer.ViewModels.ProductsViewModels;
 using Domain_Layer.ViewModels.ProductsViewModels.ListItemViewModel;
 using Domain_Layer.ViewModels.ProductsViewModels.UpdateProductsViewModel;
 using MediatR;
@@ -76,15 +78,26 @@ namespace Makeup_Web.Controllers
        
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(CreateProductDto dto)
+        public async Task<IActionResult> Create(CreateProductWithVariantsDto model)
         {
-            if (!ModelState.IsValid) return View(dto);
+            if (!ModelState.IsValid) return View(model);
 
-            var result = await _mediator.Send(new CreateProductCommand(dto));
+            var productDto = new CreateProductDto
+            {
+                Name = model.Name,
+                Description = model.Description,
+                CategoryId = model.CategoryId
+            };
+
+            var result = await _mediator.Send(new AddProductWithVariantsOrchstrator(
+                productDto,
+                model.Variants
+            ));
+
             if (result.IsSuccess) return RedirectToAction(nameof(Index));
 
             ModelState.AddModelError("", result.Message);
-            return View(dto);
+            return View(model);
         }
 
         
@@ -100,8 +113,8 @@ namespace Makeup_Web.Controllers
                 Id = productDto.Id,
                 Name = productDto.Name,
                 Description = productDto.Description,
-                Price = productDto.Price,
-                Stock = productDto.Stock,
+                //Price = productDto.Price,
+                //Stock = productDto.Stock,
                 CategoryId = productDto.CategoryId,
                 IsActive = productDto.IsActive
             };
@@ -143,7 +156,7 @@ namespace Makeup_Web.Controllers
                 Id = modle.Id,
                 Name = modle.Name,
                 Description = modle.Description,
-                Price = modle.Price,
+                //Price = modle.Price,
                 Stock = modle.Stock,
                 ImageFile = modle.Image,
                 CategoryId = modle.CategoryId,
@@ -170,17 +183,17 @@ namespace Makeup_Web.Controllers
         }
 
        
-        [HttpPost]
-        public async Task<IActionResult> UpdateStock(int productId, int newStock)
-        {
-            var result = await _mediator.Send(new UpdateProductStockCommand(productId, newStock));
-            if (!result.IsSuccess)
-            {
-                return Json(new { message = result.Message });
+        //[HttpPost]
+        //public async Task<IActionResult> UpdateStock(int productId, int newStock)
+        //{
+        //    var result = await _mediator.Send(new UpdateProductStockCommand(productId, newStock));
+        //    if (!result.IsSuccess)
+        //    {
+        //        return Json(new { message = result.Message });
 
-            }
-            return Json(new { message = result.Message });
-        }
+        //    }
+        //    return Json(new { message = result.Message });
+        //}
 
         [HttpPost]
         public async Task<IActionResult> Delete(int id)

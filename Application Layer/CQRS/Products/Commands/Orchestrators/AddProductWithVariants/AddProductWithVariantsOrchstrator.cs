@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Application_Layer.CQRS.Products.Commands.Orchestrators.AddProductWithVariants
 {
-    public record AddProductWithVariantsOrchstrator(CreateProductDto CreateProductDto, IEnumerable<UpdateProductVariantDto> UpdateProductVariantDtos) :ICommand<RequestRespones<bool>>;
+    public record AddProductWithVariantsOrchstrator(CreateProductDto CreateProductDto, IEnumerable<CreateProductVariantDto?> UpdateProductVariantDtos) :ICommand<RequestRespones<bool>>;
 
     public class AddProductWithVariantsOrchstratorHandler : IRequestHandler<AddProductWithVariantsOrchstrator, RequestRespones<bool>>
     {
@@ -31,13 +31,17 @@ namespace Application_Layer.CQRS.Products.Commands.Orchestrators.AddProductWithV
             {
                 return RequestRespones<bool>.Fail(addProductReslut.Message ?? "Failed to add product", addProductReslut.StatusCode);
             }
-
-            var addProductVariantsReslut = await mediator.Send(new CreatevariantsCommand(addProductReslut.Data.Id, request.UpdateProductVariantDtos));
-
-            if (!addProductVariantsReslut.IsSuccess)
+            if (request.UpdateProductVariantDtos!=null)
             {
-                return RequestRespones<bool>.Fail(addProductVariantsReslut.Message ?? "Failed to add variants", addProductVariantsReslut.StatusCode);
+                var addProductVariantsReslut = await mediator.Send(new CreatevariantsCommand(addProductReslut.Data.Id, request.UpdateProductVariantDtos));
+
+                if (!addProductVariantsReslut.IsSuccess)
+                {
+                    return RequestRespones<bool>.Fail(addProductVariantsReslut.Message ?? "Failed to add variants", addProductVariantsReslut.StatusCode);
+                }
             }
+
+           
 
             return RequestRespones<bool>.Success(true, Message: "Product and its variants added successfully within a single transaction.");
         }

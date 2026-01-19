@@ -15,9 +15,9 @@ namespace Application_Layer.CQRS.Products.Commands.UpdateProduct
                 .NotEmpty()
                 .WithMessage("Product name is required.");
 
-            RuleFor(x => x.Dto.Price)
-                .GreaterThan(0)
-                .WithMessage("Price must be greater than zero.");
+            //RuleFor(x => x.Dto.Price)
+            //    .GreaterThan(0)
+            //    .WithMessage("Price must be greater than zero.");
 
             RuleFor(x => x.Dto.Stock)
                 .GreaterThanOrEqualTo(0)

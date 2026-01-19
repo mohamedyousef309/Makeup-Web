@@ -3,15 +3,20 @@
 
 @{
     ViewData["Title"] = Model.Name + " | Pro Makeup Studio";
-    var isOutOfStock = Model.Stock <= 0;
+
+    // ملاحظة: Price و Stock تم إزالتهم من ProductDto
+    // الآن الأسعار والمخزون موجودة فقط في Variants
     var variantsInStock = Model.Variants?.Sum(v => v.Stock) ?? 0;
-    var totalStock = Model.Stock + variantsInStock;
+    var totalStock = variantsInStock; // فقط مخزون variants
+    var isOutOfStock = totalStock <= 0;
+    var lowestPrice = Model.Variants?.Min(v => v.Price) ?? 0;
+    var highestPrice = Model.Variants?.Max(v => v.Price) ?? 0;
+    var hasPriceRange = lowestPrice != highestPrice;
 }
 
 @section Styles {
     <style>
         :root {
-            --accent-color: #d68a8a;
             --primary-pink: #d68a8a;
             --primary-hover: #c27676;
             --dark-bg: #0f0f0f;
@@ -83,13 +88,10 @@
         }
 
         @@media (max-width: 992px) {
-            .product-info
-
-        {
-            padding-left: 0;
-            margin-top: 30px;
-        }
-
+            .product-info {
+                padding-left: 0;
+                margin-top: 30px;
+            }
         }
 
         .brand-tag {
@@ -116,23 +118,43 @@
             -webkit-text-fill-color: transparent;
         }
 
-        .price-container {
-            display: flex;
-            align-items: center;
-            gap: 15px;
+        /* Price Range */
+        .price-range-container {
             margin-bottom: 25px;
         }
 
-        .current-price {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--accent-gold);
+        .price-range-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        .currency {
+        .price-amount {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-gold);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .price-from {
             font-size: 1.2rem;
             color: var(--text-muted);
+        }
+
+        .price-separator {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+        }
+
+        .price-currency {
+            font-size: 1rem;
+            color: var(--text-muted);
             font-weight: 500;
+            margin-left: 5px;
         }
 
         /* Stock Summary */
@@ -228,7 +250,7 @@
 
         .variants-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             gap: 15px;
         }
 
@@ -258,16 +280,38 @@
                 cursor: not-allowed;
             }
 
+        .variant-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
         .variant-name {
             font-weight: 600;
             color: var(--text-light);
-            margin-bottom: 8px;
+            font-size: 1.1rem;
         }
 
-        .variant-value {
-            font-size: 1.2rem;
+        .variant-price {
+            font-weight: 700;
             color: var(--accent-gold);
-            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+
+            .variant-price .currency {
+                font-size: 0.9rem;
+                color: var(--text-muted);
+            }
+
+        .variant-value {
+            font-size: 1rem;
+            color: var(--text-light);
+            margin-bottom: 15px;
+            padding: 5px 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            display: inline-block;
         }
 
         .variant-stock-info {
@@ -275,6 +319,8 @@
             justify-content: space-between;
             align-items: center;
             margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #333;
         }
 
         .variant-stock {
@@ -287,6 +333,58 @@
             font-weight: 600;
             padding: 4px 10px;
             border-radius: 12px;
+        }
+
+        /* Selected Variant Info */
+        .selected-variant-info {
+            background: rgba(214, 138, 138, 0.1);
+            border: 1px solid var(--primary-pink);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+
+            .selected-variant-info.show {
+                display: block;
+                animation: fadeIn 0.3s ease;
+            }
+
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .selected-variant-title {
+            color: var(--primary-pink);
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .selected-variant-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .selected-variant-text {
+            color: var(--text-light);
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .selected-variant-price {
+            font-weight: 700;
+            color: var(--accent-gold);
+            font-size: 1.2rem;
         }
 
         /* Purchase Section */
@@ -396,18 +494,15 @@
             }
 
         @@keyframes ripple {
-            0%
+            0% {
+                transform: scale(0, 0);
+                opacity: 0.5;
+            }
 
-        {
-            transform: scale(0, 0);
-            opacity: 0.5;
-        }
-
-        100% {
-            transform: scale(50, 50);
-            opacity: 0;
-        }
-
+            100% {
+                transform: scale(50, 50);
+                opacity: 0;
+            }
         }
 
         /* Product Details */
@@ -495,18 +590,15 @@
 
         /* Animations */
         @@keyframes fadeInUp {
-            from
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
 
-        {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .animate-up {
@@ -566,29 +658,57 @@
                 <span class="brand-tag">Luxury Collection</span>
                 <h1 class="product-title">@Model.Name</h1>
 
-                <!-- Price -->
-                <div class="price-container">
-                    <span class="current-price">@Model.Price.ToString("N2")</span>
-                    <span class="currency">EGP</span>
+                <!-- Price Range -->
+                <div class="price-range-container">
+                    <div class="price-range-label">Price Range</div>
+                    <div class="price-amount">
+                        @if (hasPriceRange && Model.Variants?.Any() == true)
+                        {
+                            <span class="price-from">From</span>
+                            <span>@lowestPrice.ToString("N2")</span>
+                            <span class="price-separator">-</span>
+                            <span>@highestPrice.ToString("N2")</span>
+                        }
+                        else if (Model.Variants?.Any() == true)
+                        {
+                            <span>@lowestPrice.ToString("N2")</span>
+                        }
+                        else
+                        {
+                            <span>Price on selection</span>
+                        }
+                        <span class="price-currency">EGP</span>
+                    </div>
                 </div>
 
                 <!-- Stock Summary -->
                 <div class="stock-summary-card">
                     <div class="stock-item">
-                        <span class="stock-label">Base Product Stock</span>
+                        <span class="stock-label">Total Variants</span>
                         <div>
-                            <span class="stock-value">@Model.Stock</span>
+                            <span class="stock-value">@Model.Variants?.Count</span>
+                            <span class="stock-badge stock-high">
+                                <i class="bi bi-layers"></i>
+                                <span>Variants</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="stock-item">
+                        <span class="stock-label">Total Available Stock</span>
+                        <div>
+                            <span class="stock-value stock-total">@totalStock</span>
                             @{
-                                var baseStockClass = Model.Stock <= 10 ? "stock-low" :
-                                Model.Stock <= 50 ? "stock-medium" : "stock-high";
+                                var totalStockClass = totalStock <= 10 ? "stock-low" :
+                                totalStock <= 50 ? "stock-medium" : "stock-high";
                             }
-                            <span class="stock-badge @baseStockClass">
-                                @if (Model.Stock <= 10)
+                            <span class="stock-badge @totalStockClass">
+                                @if (totalStock <= 10)
                                 {
                                     <i class="bi bi-exclamation-triangle"></i>
                                     <span>Low</span>
                                 }
-                                else if (Model.Stock <= 50)
+                                else if (totalStock <= 50)
                                 {
                                     <i class="bi bi-info-circle"></i>
                                     <span>Medium</span>
@@ -601,31 +721,20 @@
                             </span>
                         </div>
                     </div>
+                </div>
 
-                    <div class="stock-item">
-                        <span class="stock-label">Variants Stock</span>
-                        <div>
-                            <span class="stock-value">@variantsInStock</span>
-                            @{
-                                var variantsStockClass = variantsInStock <= 10 ? "stock-low" :
-                                variantsInStock <= 50 ? "stock-medium" : "stock-high";
-                            }
-                            <span class="stock-badge @variantsStockClass">
-                                <i class="bi bi-layers"></i>
-                                <span>@Model.Variants?.Count variants</span>
-                            </span>
-                        </div>
+                <!-- Selected Variant Info -->
+                <div id="selectedVariantInfo" class="selected-variant-info">
+                    <div class="selected-variant-title">
+                        <i class="bi bi-check-circle"></i>
+                        Selected Variant
                     </div>
-
-                    <div class="stock-item">
-                        <span class="stock-label">Total Available</span>
+                    <div class="selected-variant-details">
                         <div>
-                            <span class="stock-value stock-total">@totalStock</span>
-                            <span class="stock-badge stock-high">
-                                <i class="bi bi-box-seam"></i>
-                                <span>Available</span>
-                            </span>
+                            <div id="selectedVariantValue" class="selected-variant-text"></div>
+                            <small id="selectedVariantName" class="text-muted" style="font-size: 0.9rem;"></small>
                         </div>
+                        <span id="selectedVariantPrice" class="selected-variant-price"></span>
                     </div>
                 </div>
 
@@ -648,10 +757,18 @@
 
                                         <div class="variant-card @(!isAvailable ? "disabled" : "")"
                                              data-variant-id="@variant.Id"
-                                             data-variant-name="@group.Key"
-                                             data-stock="@variant.Stock"
+                                             data-variant-name="@variant.VariantName"
+                                             data-variant-value="@variant.VariantValue"
+                                             data-variant-price="@variant.Price"
+                                             data-variant-stock="@variant.Stock"
                                              onclick="selectVariant(this, '@group.Key')">
-                                            <div class="variant-name">@group.Key</div>
+                                            <div class="variant-header">
+                                                <div class="variant-name">@variant.VariantName</div>
+                                                <div class="variant-price">
+                                                    @variant.Price.ToString("N2")
+                                                    <span class="currency">EGP</span>
+                                                </div>
+                                            </div>
                                             <div class="variant-value">@variant.VariantValue</div>
                                             <div class="variant-stock-info">
                                                 <span class="variant-stock">
@@ -691,8 +808,12 @@
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="ProductId" value="@Model.Id" />
                         <input type="hidden" name="ProductName" value="@Model.Name" />
-                        <input type="hidden" name="ProductPrice" value="@Model.Price" />
-                        <input type="hidden" name="SelectedVariants" id="selectedVariants" value="" />
+                        <!-- إضافة حقل ProductVariantId -->
+                        <input type="hidden" name="ProductVariantId" id="productVariantIdInput" value="" />
+                        <!-- إضافة حقل ProductVariant (سيحتوي فقط على القيمة Value) -->
+                        <input type="hidden" name="ProductVariant" id="selectedVariantValueInput" value="" />
+                        <!-- الـ Price سيتم إرساله من الـ variant المختار -->
+                        <input type="hidden" name="ProductPrice" id="selectedVariantPriceInput" value="" />
 
                         <div class="quantity-selector">
                             <span class="qty-label">Quantity:</span>
@@ -764,6 +885,10 @@
     <script>
         let selectedVariants = {};
         let maxQuantity = @totalStock;
+        let selectedVariantId = null;
+        let selectedVariantPrice = null;
+        let selectedVariantStock = null;
+        let selectedVariantValue = null;
 
         // تغيير الكمية
         function changeQuantity(change) {
@@ -782,6 +907,9 @@
             if (element.classList.contains('disabled')) return;
 
             const variantId = element.dataset.variantId;
+            const variantValue = element.dataset.variantValue;
+            const variantPrice = element.dataset.variantPrice;
+            const variantStock = element.dataset.variantStock;
 
             // إلغاء اختيار جميع الـ variants في نفس المجموعة
             const group = document.querySelectorAll(`#variant-group-${variantName} .variant-card`);
@@ -792,33 +920,46 @@
 
             // حفظ الاختيار
             selectedVariants[variantName] = variantId;
+            selectedVariantId = variantId;
+            selectedVariantValue = variantValue;
+            selectedVariantPrice = variantPrice;
+            selectedVariantStock = variantStock;
 
-            // تحديث hidden field
-            updateSelectedVariants();
+            // تحديث hidden fields - هنا المهم: نرسل القيمة (Value) فقط
+            document.getElementById('productVariantIdInput').value = variantId;
+            document.getElementById('selectedVariantValueInput').value = variantValue; // فقط القيمة
+            document.getElementById('selectedVariantPriceInput').value = variantPrice;
+
+            // عرض معلومات الـ variant المختار
+            const infoDiv = document.getElementById('selectedVariantInfo');
+            const variantValueElement = document.getElementById('selectedVariantValue');
+            const variantNameElement = document.getElementById('selectedVariantName');
+            const variantPriceSpan = document.getElementById('selectedVariantPrice');
+
+            // نعرض القيمة بشكل كبير والاسم بشكل صغير تحتها
+            variantValueElement.textContent = variantValue;
+            variantNameElement.textContent = variantName;
+            variantPriceSpan.textContent = `${variantPrice} EGP`;
+            infoDiv.classList.add('show');
 
             // تحديث أقصى كمية بناءً على stock الـ variant المختار
-            const variantStock = parseInt(element.dataset.stock);
-            updateMaxQuantity(variantStock);
+            updateMaxQuantity(parseInt(variantStock));
+
+            // إضافة console.log للتأكد من القيمة المرسلة
+            console.log(`Selected Variant ID: ${variantId}`);
+            console.log(`Selected Variant Value: ${variantValue} (سيتم إرسال هذه القيمة فقط)`);
+            console.log(`Sending to server: ProductVariant = "${variantValue}"`);
         }
 
         // تحديث أقصى كمية
         function updateMaxQuantity(variantStock) {
             const input = document.getElementById('quantityInput');
-            const maxStock = Math.min(variantStock, @Model.Stock);
 
-            input.max = maxStock;
-            if (parseInt(input.value) > maxStock) {
-                input.value = maxStock;
+            input.max = variantStock;
+            maxQuantity = variantStock;
+            if (parseInt(input.value) > variantStock) {
+                input.value = variantStock;
             }
-        }
-
-        // تحديث الـ selected variants
-        function updateSelectedVariants() {
-            const selected = [];
-            for (const [name, id] of Object.entries(selectedVariants)) {
-                selected.push(`${name}:${id}`);
-            }
-            document.getElementById('selectedVariants').value = selected.join('|');
         }
 
         // إظهار Toast
@@ -848,6 +989,21 @@
         document.getElementById('addToBasketForm').addEventListener('submit', function(event) {
             const quantityInput = document.getElementById('quantityInput');
             const quantity = parseInt(quantityInput.value) || 1;
+            const productVariantId = document.getElementById('productVariantIdInput').value;
+            const productVariant = document.getElementById('selectedVariantValueInput').value;
+
+            // إضافة console.log لعرض القيمة النهائية
+            console.log(`=== البيانات التي سيتم إرسالها ===`);
+            console.log(`ProductVariantId: ${productVariantId}`);
+            console.log(`ProductVariant: "${productVariant}" (القيمة فقط)`);
+            console.log(`ProductPrice: ${document.getElementById('selectedVariantPriceInput').value}`);
+            console.log(`Quantity: ${quantity}`);
+
+            if (!productVariantId || !productVariant) {
+                event.preventDefault();
+                showToast("Selection Required", "Please select a variant first", "error");
+                return;
+            }
 
             if (quantity < 1 || quantity > maxQuantity) {
                 event.preventDefault();
@@ -887,13 +1043,18 @@
 
         // اختيار أول variant متاح تلقائياً
         document.addEventListener('DOMContentLoaded', function() {
-            // اختيار أول variant متاح في كل مجموعة
-            document.querySelectorAll('.variant-group').forEach(group => {
-                const availableVariants = group.querySelectorAll('.variant-card:not(.disabled)');
-                if (availableVariants.length > 0) {
-                    availableVariants[0].click();
-                }
-            });
+            @if (Model.Variants?.Any() == true)
+            {
+                        <text>
+                        // اختيار أول variant متاح في كل مجموعة
+                        document.querySelectorAll('.variant-group').forEach(group => {
+                            const availableVariants = group.querySelectorAll('.variant-card:not(.disabled)');
+                            if (availableVariants.length > 0) {
+                                availableVariants[0].click();
+                            }
+                        });
+                        </text>
+            }
 
             // تحديث أقصى كمية افتراضية
             if (@isOutOfStock.ToString().ToLower()) {

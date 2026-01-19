@@ -34,8 +34,8 @@ namespace Application_Layer.CQRS.Products.Queries
                         Id = p.Id,
                         Name = p.Name,
                         Description = p.Description,
-                        Price = p.Price,
-                        Stock = p.Stock,
+                        //Price = p.Price,
+                        //Stock = p.Stock,
                         CategoryId = p.CategoryId,
                         IsActive = p.IsActive,
                         Variants = p.Variants.Select(v => new ProductVariantDto
@@ -43,7 +43,8 @@ namespace Application_Layer.CQRS.Products.Queries
                             Id = v.Id,
                             VariantName = v.VariantName,
                             VariantValue = v.VariantValue,
-                            Stock = v.Stock
+                            Stock = v.Stock,
+                            Price= v.Price
                         }).ToList()
                     })
                     .FirstOrDefaultAsync(cancellationToken);
