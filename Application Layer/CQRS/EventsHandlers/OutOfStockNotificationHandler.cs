@@ -24,7 +24,7 @@ namespace Application_Layer.CQRS.EventsHandlers
             {
                 To = "kahled.pop.2003@gmail.com",
                 Subject = "Product Out of Stock Alert",
-                Body = $"The product with ID {notification.ProductId} and Name{notification.ProductName} is out of stock."
+                Body = $"The product with ID {notification.ProductId} and Name{notification.ProductName}-{notification.VariantName} is out of stock."
 
             };
 

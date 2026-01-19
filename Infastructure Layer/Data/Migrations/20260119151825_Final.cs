@@ -5,25 +5,25 @@
 namespace Infastructure_Layer.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class create2 : Migration
+    public partial class Final : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<bool>(
-                name: "IsBlocked",
-                table: "Users",
-                type: "bit",
+            migrationBuilder.AddColumn<int>(
+                name: "ProductVariantId",
+                table: "OrderItems",
+                type: "int",
                 nullable: false,
-                defaultValue: false);
+                defaultValue: 0);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "IsBlocked",
-                table: "Users");
+                name: "ProductVariantId",
+                table: "OrderItems");
         }
     }
 }

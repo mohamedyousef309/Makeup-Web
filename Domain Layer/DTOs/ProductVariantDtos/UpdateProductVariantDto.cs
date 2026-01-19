@@ -11,6 +11,8 @@ namespace Domain_Layer.DTOs.ProductVariantDtos
         public int Id { get; set; }                     // Required to update
         public string VariantName { get; set; } = default!;
         public string VariantValue { get; set; } = default!;
+
+        public decimal Price { get; set; }
         public int Stock { get; set; }
     }
 

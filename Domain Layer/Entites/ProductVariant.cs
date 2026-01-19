@@ -17,8 +17,16 @@ namespace Domain_Layer.Entites
         public string VariantName { get; set; } = default!;   // e.g., "Color", "Shade"
         public string VariantValue { get; set; } = default!;  // e.g., "01 Ivory", "Red 33"
 
+        public decimal Price { get; set; }
+
         public int Stock { get; set; }
-       
+
+        public bool ReduceStock(int quantity)
+        {
+            Stock -= quantity;
+            return Stock == 0;
+        }
+
     }
 
 }

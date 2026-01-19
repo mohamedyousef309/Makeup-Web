@@ -13,9 +13,7 @@ namespace Domain_Layer.Entites
 
         public string? Description { get; set; }
 
-        public decimal Price { get; set; }
 
-        public int Stock { get; set; }
         public string? ImageUrl { get; set; } 
 
         public bool IsActive { get; set; } = true;
@@ -30,11 +28,11 @@ namespace Domain_Layer.Entites
         public IEnumerable<ProductVariant?> Variants { get; set; } = new HashSet<ProductVariant?>();
 
 
-        public bool ReduceStock(int quantity)
-        {
-            Stock -= quantity;
-            return Stock == 0; 
-        }
+        //public bool ReduceStock(int quantity)
+        //{
+        //    //Stock -= quantity;
+        //    //return Stock == 0; 
+        //}
     }
 
     }

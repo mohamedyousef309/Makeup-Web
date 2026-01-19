@@ -22,6 +22,12 @@ namespace Infastructure_Layer.Data.Configurations
             builder.Property(x => x.Stock)
                    .IsRequired();
 
+            builder.Property(x => x.Price)
+                   .HasColumnType("decimal(18,2)")
+                   .IsRequired();
+
+
+
             builder.HasOne(x => x.Product)
                    .WithMany(x => x.Variants)
                    .HasForeignKey(x => x.ProductId)

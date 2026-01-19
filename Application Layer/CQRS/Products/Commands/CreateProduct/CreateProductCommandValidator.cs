@@ -23,8 +23,8 @@ namespace Application_Layer.CQRS.Products.Commands
             RuleFor(x => x.CreateProductDto.Description)
                 .MaximumLength(500).WithMessage("Description must not exceed 500 characters.");
 
-            RuleFor(x => x.CreateProductDto.Price)
-                .GreaterThan(0).WithMessage("Price must be greater than zero.");
+            //RuleFor(x => x.CreateProductDto.Price)
+            //    .GreaterThan(0).WithMessage("Price must be greater than zero.");
 
             RuleFor(x => x.CreateProductDto.Stock)
                 .GreaterThanOrEqualTo(0).WithMessage("Stock cannot be negative.");

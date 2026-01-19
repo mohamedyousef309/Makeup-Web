@@ -34,8 +34,8 @@ namespace Application_Layer.CQRS.Products.Commands.CreateProduct
                 {
                     Name = request.CreateProductDto.Name,
                     Description = request.CreateProductDto.Description,
-                    Price = request.CreateProductDto.Price,
-                    Stock = request.CreateProductDto.Stock,
+                    //Price = request.CreateProductDto.Price,
+                    //Stock = request.CreateProductDto.Stock,
                     CategoryId = request.CreateProductDto.CategoryId,
                     IsActive = true,
                     
@@ -53,8 +53,8 @@ namespace Application_Layer.CQRS.Products.Commands.CreateProduct
                 Id = product.Id, 
                 Name = product.Name,
                 Description = product.Description,
-                Price = product.Price,
-                Stock = product.Stock,
+                //Price = product.Price,
+                //Stock = product.Stock,
                 IsActive = product.IsActive,
                 //CategoryId = product.CategoryId,
             
