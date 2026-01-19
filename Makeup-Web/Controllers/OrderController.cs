@@ -1,4 +1,6 @@
-﻿using Application_Layer.CQRS.Orders.Commands.CreatOrder;
+﻿using Application_Layer.CQRS.Orders.Commands;
+using Application_Layer.CQRS.Orders.Commands.CreatOrder;
+using Application_Layer.CQRS.Orders.Commands.DeleteOrder;
 using Application_Layer.CQRS.Orders.Quries.GetAllOrders;
 using Application_Layer.CQRS.Orders.Quries.GetAllOrdersForUser;
 using Application_Layer.CQRS.Orders.Quries.GetOrderbyid;
@@ -95,7 +97,7 @@ namespace Makeup_Web.Controllers
 
         public async Task<IActionResult> GetAllOrders(int? pageIndex, int? pageSize, string? sortBy
             , string? sortDir,
-            string? search) 
+            string? search)
         {
             try
             {
@@ -112,10 +114,10 @@ namespace Makeup_Web.Controllers
                     ViewBag.ErrorMessage = GetallOrdersResult.Message;
                     return View(new PaginatedListDto<OrderToReturnDto>());
                 }
-               
-                    return View(GetallOrdersResult.Data);
 
-                
+                return View(GetallOrdersResult.Data);
+
+
 
             }
             catch (Exception ex)
@@ -127,7 +129,20 @@ namespace Makeup_Web.Controllers
 
                 return View(new PaginatedListDto<OrderToReturnDto>());
             }
-            
+
+        }
+
+        [HttpPost]
+
+        public async Task<IActionResult> DeletOrder(int orderid) 
+        {
+            var DeletOrderResult = await _Mediator.Send(new DeleteOrderCommand(orderid));
+
+            if (!DeletOrderResult.IsSuccess) 
+            {
+                return BadRequest(new { success = false, message = DeletOrderResult.Message });
+            }
+            return Ok(new { success = true, message = "Order deleted" });
         }
     }
 }
