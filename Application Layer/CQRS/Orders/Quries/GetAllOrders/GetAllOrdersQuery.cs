@@ -37,6 +37,8 @@ namespace Application_Layer.CQRS.Orders.Quries.GetAllOrders
                 subTotal=x.subTotal,
                 orderDate=x.orderDate,
                 PhoneNumber=x.PhoneNumber,
+                BuyerEmail=x.BuyerEmail,
+
             }).AsQueryable();
 
             if (!orders.Any())

@@ -13,8 +13,9 @@ namespace Infastructure_Layer.Data.Configurations.AuthanticationConfiguration
     {
         public void Configure(EntityTypeBuilder<Permissions> builder)
         {
-            builder.Property(x => x.Id).ValueGeneratedOnAdd().HasColumnType("int");
-
+            builder.Property(x => x.Id)
+                               .ValueGeneratedNever()
+                               .HasColumnType("int");
             builder.Property(x=>x.Name).IsRequired().HasMaxLength(100);
 
             builder.HasMany(x=>x.userPermissions).WithOne(x=>x.permission).HasForeignKey(x=>x.PermissionId).OnDelete(DeleteBehavior.NoAction);

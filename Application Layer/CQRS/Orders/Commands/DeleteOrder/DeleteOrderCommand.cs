@@ -39,7 +39,7 @@ namespace Application_Layer.CQRS.Orders.Commands.DeleteOrder
                     return RequestRespones<bool>.Fail("Order not found", 404);
                 }
 
-                if (order.status != OrderStatus.OutForDelivery)
+                if (order.status == OrderStatus.OutForDelivery)
                 {
                     return RequestRespones<bool>.Fail("Cannot delete order that is already OutForDelivery.", 400);
                 }

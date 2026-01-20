@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Infastructure_Layer.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class intialcreate : Migration
+    public partial class intialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -29,8 +29,7 @@ namespace Infastructure_Layer.Data.Migrations
                 name: "Permissions",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<int>(type: "int", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false)
                 },
                 constraints: table =>
@@ -64,7 +63,8 @@ namespace Infastructure_Layer.Data.Migrations
                     UserAddress = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
                     EmailConfirmed = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     FailedLoginAttempts = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
-                    LockoutEnd = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    LockoutEnd = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsBlocked = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -79,8 +79,6 @@ namespace Infastructure_Layer.Data.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Stock = table.Column<int>(type: "int", nullable: false),
                     ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     CategoryId = table.Column<int>(type: "int", nullable: true)
@@ -229,6 +227,7 @@ namespace Infastructure_Layer.Data.Migrations
                     ProductId = table.Column<int>(type: "int", nullable: false),
                     VariantName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     VariantValue = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Stock = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -251,6 +250,7 @@ namespace Infastructure_Layer.Data.Migrations
                     orderid = table.Column<int>(type: "int", nullable: false),
                     ProductId = table.Column<int>(type: "int", nullable: false),
                     ProductName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    ProductVariantId = table.Column<int>(type: "int", nullable: false),
                     PictureUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Quantity = table.Column<int>(type: "int", nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
@@ -290,11 +290,6 @@ namespace Infastructure_Layer.Data.Migrations
                 name: "IX_Products_Name",
                 table: "Products",
                 column: "Name");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Products_Stock",
-                table: "Products",
-                column: "Stock");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProductVariants_ProductId",

@@ -25,10 +25,7 @@ namespace Infastructure_Layer.Data.Migrations
             modelBuilder.Entity("Domain_Layer.Entites.Authantication.Permissions", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
