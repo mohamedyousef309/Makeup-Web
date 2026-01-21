@@ -14,6 +14,7 @@ using Domain_Layer.Respones;
 using Domain_Layer.ViewModels.ProductsViewModels;
 using Domain_Layer.ViewModels.ProductsViewModels.ListItemViewModel;
 using Domain_Layer.ViewModels.ProductsViewModels.UpdateProductsViewModel;
+using Infastructure_Layer.DynamicRBASystem;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -73,11 +74,14 @@ namespace Makeup_Web.Controllers
 
         
         [HttpGet]
+        [HasPermission("Products.Create")]
         public IActionResult Create() => View();
 
        
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [HasPermission("Products.Create")]
+
         public async Task<IActionResult> Create(CreateProductWithVariantsDto model)
         {
             if (!ModelState.IsValid) return View(model);
@@ -102,6 +106,8 @@ namespace Makeup_Web.Controllers
 
         
         [HttpGet]
+        [HasPermission("Products.Edit")]
+
         public async Task<IActionResult> Edit(int id)
         {
             var result = await _mediator.Send(new GetProductByIdQuery(id));
@@ -135,6 +141,8 @@ namespace Makeup_Web.Controllers
         
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [HasPermission("Products.Edit")]
+
         public async Task<IActionResult> Edit(UpdateProductViewModel modle)
         {
             if (!ModelState.IsValid)

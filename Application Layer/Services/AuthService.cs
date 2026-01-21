@@ -128,7 +128,7 @@ namespace Application_Layer.Services
 
             foreach (var item in UserPermissions)
             {
-                claims.Add(new Claim("P", item.Name));
+                claims.Add(new Claim("Permission", item.Name));
             }
 
             var keyInByte = Encoding.UTF8.GetBytes(configuration["JWT:Key"]!);
