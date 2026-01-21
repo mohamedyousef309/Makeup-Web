@@ -9,9 +9,11 @@ using FluentValidation;
 using Infastructure_Layer.Data;
 using Infastructure_Layer.Data.DependencyInjection;
 using Infastructure_Layer.Data.Seeders;
+using Infastructure_Layer.DynamicRBASystem;
 using Makeup_Web.Middlewares;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -76,6 +78,10 @@ namespace Makeup_Web
 
 
             builder.Services.AddTransient<GlobalExceptionHandler>();
+
+            builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
+
+            builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
 
 
             var app = builder.Build();

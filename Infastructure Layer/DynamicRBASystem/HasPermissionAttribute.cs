@@ -5,12 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Infastructure_Layer.DynamicRBASystem.Attributes
+namespace Infastructure_Layer.DynamicRBASystem
 {
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, Inherited = true, AllowMultiple = true)]
     public class HasPermissionAttribute: AuthorizeAttribute
     {
-        public const string Prefix = "Permission";
+        public const string Prefix = "Permission:";
 
 
         public HasPermissionAttribute(bool requireAll, params string[] permissions)
