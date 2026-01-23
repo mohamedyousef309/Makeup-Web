@@ -8,31 +8,27 @@ namespace Application_Layer.CQRS.Products.Validators
     {
         public UpdateProductVariantCommandValidator()
         {
-            RuleFor(x => x.UpdateProductVariantDtos)
-                .NotNull()
-                .WithMessage("Variants data is required.")
-                .NotEmpty()
-                .WithMessage("At least one variant is required.");
+            RuleFor(x => x.Id)
+           .GreaterThan(0)
+           .WithMessage("Variant Id must be greater than 0");
 
-            RuleForEach(x => x.UpdateProductVariantDtos)
-                .ChildRules(variant =>
-                {
-                    variant.RuleFor(v => v.Id)
-                        .GreaterThan(0)
-                        .WithMessage("Variant Id is required.");
+            RuleFor(x => x.VariantName)
+                .NotEmpty().WithMessage("Variant name is required")
+                .MinimumLength(2).WithMessage("Variant name must be at least 2 characters")
+                .MaximumLength(100).WithMessage("Variant name must not exceed 100 characters");
 
-                    variant.RuleFor(v => v.VariantName)
-                        .NotEmpty()
-                        .WithMessage("Variant name is required.");
+            RuleFor(x => x.VariantValue)
+                .NotEmpty().WithMessage("Variant value is required")
+                .MaximumLength(100).WithMessage("Variant value must not exceed 100 characters");
 
-                    variant.RuleFor(v => v.VariantValue)
-                        .NotEmpty()
-                        .WithMessage("Variant value is required.");
+            RuleFor(x => x.Price)
+                .GreaterThan(0)
+                .WithMessage("Price must be greater than 0");
 
-                    variant.RuleFor(v => v.Stock)
-                        .GreaterThanOrEqualTo(0)
-                        .WithMessage("Stock cannot be negative.");
-                });
+            RuleFor(x => x.Stock)
+                .GreaterThanOrEqualTo(0)
+                .WithMessage("Stock cannot be negative");
+        
         }
     }
 }

@@ -8,315 +8,150 @@
 @section Styles {
     <style>
         :root {
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --primary-hover: linear-gradient(135deg, #5a6fd8 0%, #6a4391 100%);
-            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            --dark-bg: #0f172a;
-            --card-bg: #1e293b;
-            --card-border: #334155;
-            --input-bg: rgba(255, 255, 255, 0.05);
-            --input-border: #475569;
-            --input-focus: #8b5cf6;
-            --text-light: #f1f5f9;
-            --text-muted: #94a3b8;
-            --success: #10b981;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --shadow-lg: 0 25px 50px rgba(0, 0, 0, 0.25);
-            --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.2);
-            --shadow-sm: 0 5px 15px rgba(0, 0, 0, 0.1);
-            --glow: 0 0 40px rgba(102, 126, 234, 0.2);
+            --primary-pink: #d68a8a;
+            --primary-hover: #c27676;
+            --dark-bg: #0f0f0f;
+            --card-bg: #1a1a1a;
+            --input-bg: #252525;
+            --text-light: #ffffff;
+            --text-muted: #a0a0a0;
+            --accent-gold: #c5a059;
+            --danger-red: #ff4d4d;
+            --success-green: #28a745;
+            --warning-yellow: #ffc107;
         }
 
         body {
-            background: var(--dark-bg);
+            background-color: var(--dark-bg);
             color: var(--text-light);
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            min-height: 100vh;
-            background-image: radial-gradient(at 20% 30%, rgba(102, 126, 234, 0.15) 0%, transparent 50%), radial-gradient(at 80% 70%, rgba(236, 72, 153, 0.15) 0%, transparent 50%);
+            font-family: 'Inter', sans-serif;
         }
 
         .create-header {
-            padding: 60px 0 40px;
+            padding: 60px 0 30px;
             text-align: center;
-            position: relative;
-            overflow: hidden;
+            background: linear-gradient(to bottom, #1a1a1a 0%, #0f0f0f 100%);
+            margin-bottom: 30px;
+            border-bottom: 1px solid #222;
         }
-
-            .create-header::before {
-                content: '';
-                position: absolute;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                height: 1px;
-                background: linear-gradient(90deg, transparent, var(--input-focus), transparent);
-            }
 
         .create-title {
-            font-family: 'Poppins', sans-serif;
-            font-size: 3rem;
+            font-family: 'Playfair Display', serif;
+            font-size: 2.8rem;
             font-weight: 800;
-            background: var(--primary-gradient);
+            text-transform: uppercase;
+            background: linear-gradient(45deg, #fff 30%, var(--primary-pink) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 15px;
-            position: relative;
-            display: inline-block;
-            letter-spacing: 1.2px;
+            letter-spacing: 2px;
         }
-
-            .create-title::after {
-                content: '';
-                position: absolute;
-                bottom: -10px;
-                left: 50%;
-                transform: translateX(-50%);
-                width: 150px;
-                height: 4px;
-                background: var(--primary-gradient);
-                border-radius: 2px;
-                box-shadow: var(--glow);
-            }
 
         .create-subtitle {
             color: var(--text-muted);
             font-size: 1.1rem;
-            margin-top: 20px;
-            font-weight: 300;
-            letter-spacing: 2px;
-            text-transform: uppercase;
+            margin-top: 10px;
         }
 
         .creation-card {
             background: var(--card-bg);
-            border-radius: 25px;
-            border: 1px solid var(--card-border);
-            padding: 50px;
+            border-radius: 20px;
+            padding: 40px;
+            border: 1px solid #252525;
             max-width: 900px;
             margin: 0 auto 60px;
-            box-shadow: var(--shadow-lg);
-            position: relative;
-            overflow: hidden;
-            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         }
 
-            .creation-card::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                height: 5px;
-                background: var(--primary-gradient);
-            }
-
         .form-group {
-            margin-bottom: 35px;
-            position: relative;
+            margin-bottom: 25px;
         }
 
         .form-label {
-            color: var(--text-light);
             font-weight: 600;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            font-size: 0.95rem;
-            letter-spacing: 0.8px;
-            text-transform: uppercase;
-            opacity: 0.9;
+            margin-bottom: 10px;
+            display: block;
+            color: var(--text-light);
         }
-
-            .form-label i {
-                margin-right: 12px;
-                font-size: 1.3rem;
-                background: var(--primary-gradient);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-            }
 
         .form-control-custom {
-            background: var(--input-bg) !important;
-            border: 2px solid var(--input-border) !important;
-            color: var(--text-light) !important;
-            border-radius: 15px;
-            padding: 18px 25px;
+            background-color: var(--input-bg);
+            border: 1px solid #333;
+            border-radius: 12px;
+            color: var(--text-light);
+            padding: 14px 18px;
+            transition: all 0.3s ease;
             width: 100%;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            font-size: 1.05rem;
-            backdrop-filter: blur(10px);
+            font-size: 1rem;
         }
 
-            .form-control-custom:hover {
-                border-color: #64748b !important;
-                box-shadow: var(--shadow-sm);
-            }
-
             .form-control-custom:focus {
-                border-color: var(--input-focus) !important;
-                box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15) !important;
+                border-color: var(--primary-pink);
+                box-shadow: 0 0 0 3px rgba(214, 138, 138, 0.1);
+                background-color: var(--input-bg);
+                color: var(--text-light);
                 outline: none;
-                transform: translateY(-2px);
-                background: rgba(255, 255, 255, 0.08) !important;
             }
 
             .form-control-custom::placeholder {
                 color: var(--text-muted);
-                opacity: 0.7;
-                font-style: italic;
-            }
-
-        .input-icon {
-            position: relative;
-        }
-
-            .input-icon i {
-                position: absolute;
-                left: 20px;
-                top: 50%;
-                transform: translateY(-50%);
-                color: var(--text-muted);
-                font-size: 1.2rem;
-            }
-
-            .input-icon .form-control-custom {
-                padding-left: 55px;
             }
 
         .btn-create {
-            background: var(--primary-gradient);
+            background: var(--primary-pink);
             color: white;
             border: none;
-            border-radius: 15px;
-            padding: 20px 50px;
+            border-radius: 12px;
+            padding: 16px 40px;
             font-weight: 700;
-            font-size: 1.1rem;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            box-shadow: var(--shadow-md);
-            display: flex;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            display: inline-flex;
             align-items: center;
-            justify-content: center;
-            gap: 12px;
+            gap: 10px;
         }
 
-            .btn-create::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: -100%;
-                width: 100%;
-                height: 100%;
-                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-                transition: 0.6s;
-            }
-
             .btn-create:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
                 background: var(--primary-hover);
+                transform: translateY(-2px);
+                box-shadow: 0 10px 25px rgba(214, 138, 138, 0.3);
             }
-
-                .btn-create:hover::before {
-                    left: 100%;
-                }
 
         .btn-back {
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px solid var(--input-border);
+            background: transparent;
             color: var(--text-light);
-            border-radius: 15px;
-            padding: 18px 40px;
+            border: 1px solid #444;
+            border-radius: 12px;
+            padding: 16px 40px;
             font-weight: 600;
             transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
             text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
         }
 
             .btn-back:hover {
-                background: rgba(255, 255, 255, 0.1);
-                border-color: var(--input-focus);
-                transform: translateY(-2px);
-                box-shadow: var(--shadow-sm);
-                color: white;
+                background: #333;
+                border-color: #555;
+                color: var(--text-light);
                 text-decoration: none;
             }
 
-        .info-card {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
-            border: 1px solid rgba(139, 92, 246, 0.2);
-            border-radius: 20px;
-            padding: 30px;
-            margin-top: 40px;
-            backdrop-filter: blur(10px);
-        }
-
-        .info-title {
-            color: white;
-            font-weight: 700;
-            font-size: 1.2rem;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-            .info-title i {
-                background: var(--primary-gradient);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-            }
-
-        .info-list {
-            list-style: none;
-            padding-left: 0;
-            margin-bottom: 0;
-        }
-
-        .info-item {
-            color: var(--text-muted);
-            margin-bottom: 12px;
-            padding-left: 25px;
-            position: relative;
-            line-height: 1.6;
-        }
-
-            .info-item:before {
-                content: '✓';
-                position: absolute;
-                left: 0;
-                color: var(--success);
-                font-weight: bold;
-            }
-
-            .info-item:last-child {
-                margin-bottom: 0;
-            }
-
         .validation-error {
-            color: var(--danger) !important;
+            color: var(--danger-red) !important;
             font-size: 0.9rem;
-            margin-top: 8px;
+            margin-top: 5px;
             display: block;
-            font-weight: 500;
-            padding-left: 5px;
         }
 
         .validation-summary {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            border-radius: 15px;
-            padding: 25px;
+            background: rgba(255, 77, 77, 0.1);
+            border: 1px solid rgba(255, 77, 77, 0.3);
+            border-radius: 12px;
+            padding: 20px;
             margin-bottom: 30px;
-            border-left: 4px solid var(--danger);
+            border-left: 4px solid var(--danger-red);
         }
 
             .validation-summary ul {
@@ -326,109 +161,173 @@
             }
 
             .validation-summary li {
-                color: #fecaca;
-                margin-bottom: 10px;
+                color: #ff9e9e;
+                margin-bottom: 8px;
                 display: flex;
                 align-items: center;
-                gap: 10px;
+                gap: 8px;
             }
 
                 .validation-summary li:before {
                     content: '⚠';
-                    color: var(--danger);
+                    color: var(--danger-red);
                 }
 
-                .validation-summary li:last-child {
-                    margin-bottom: 0;
-                }
+        /* Success Message Container */
+        .success-message-container {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            z-index: 99999;
+            max-width: 400px;
+            animation: slideInRight 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .success-message-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(40, 167, 69, 0.3);
+            border-left: 5px solid var(--success-green);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 0 40px rgba(40, 167, 69, 0.2);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+            .success-message-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 5px;
+                background: linear-gradient(90deg, var(--success-green), rgba(40, 167, 69, 0.5));
+            }
+
+        .success-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .success-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(40, 167, 69, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--success-green);
+            color: var(--success-green);
+            font-size: 1.5rem;
+            animation: pulseSuccess 2s infinite;
+        }
+
+        .success-content h4 {
+            color: var(--success-green);
+            font-weight: 700;
+            margin: 0 0 5px 0;
+            font-size: 1.2rem;
+        }
+
+        .success-content p {
+            color: var(--text-light);
+            margin: 0;
+            font-size: 1rem;
+        }
+
+        .success-details {
+            background: rgba(40, 167, 69, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .detail-label {
+            color: var(--text-muted);
+        }
+
+        .detail-value {
+            color: var(--success-green);
+            font-weight: 600;
+        }
+
+        .success-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-success-action {
+            background: rgba(40, 167, 69, 0.1);
+            border: 1px solid var(--success-green);
+            color: var(--success-green);
+            border-radius: 8px;
+            padding: 8px 15px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            flex: 1;
+            justify-content: center;
+        }
+
+            .btn-success-action:hover {
+                background: var(--success-green);
+                color: white;
+                transform: translateY(-2px);
+                text-decoration: none;
+            }
 
         /* Animations */
-        @@keyframes slideInUp {
+        @@keyframes slideInRight {
             from {
-                opacity: 0;
-                transform: translateY(40px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .creation-card {
-            animation: slideInUp 0.7s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        @@keyframes fadeIn {
-            from {
+                transform: translateX(100%);
                 opacity: 0;
             }
 
             to {
+                transform: translateX(0);
                 opacity: 1;
             }
         }
 
-        .form-group {
-            animation: fadeIn 0.6s ease-out forwards;
-            opacity: 0;
+        @@keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
         }
 
-            .form-group:nth-child(1) {
-                animation-delay: 0.2s;
+        @@keyframes pulseSuccess {
+            0% {
+                box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.4);
             }
 
-            .form-group:nth-child(2) {
-                animation-delay: 0.4s;
+            70% {
+                box-shadow: 0 0 0 10px rgba(40, 167, 69, 0);
             }
 
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 10px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--primary-gradient);
-            border-radius: 10px;
-        }
-
-            ::-webkit-scrollbar-thumb:hover {
-                background: var(--primary-hover);
-            }
-
-        /* Responsive */
-        @@media (max-width: 768px) {
-            .create-title {
-                font-size: 2.2rem;
-            }
-
-            .creation-card {
-                padding: 30px 25px;
-                margin: 0 15px 40px;
-                border-radius: 20px;
-            }
-
-            .form-control-custom {
-                padding: 16px 20px;
-            }
-
-            .btn-create, .btn-back {
-                width: 100%;
-                margin-bottom: 15px;
-                justify-content: center;
-            }
-
-            .button-container {
-                flex-direction: column;
-            }
-
-            .info-card {
-                padding: 20px;
+            100% {
+                box-shadow: 0 0 0 0 rgba(40, 167, 69, 0);
             }
         }
 
@@ -458,13 +357,46 @@
                 transform: rotate(360deg);
             }
         }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .create-title {
+                font-size: 2rem;
+            }
+
+            .creation-card {
+                padding: 25px 20px;
+                margin: 0 15px 40px;
+                border-radius: 20px;
+            }
+
+            .btn-create, .btn-back {
+                width: 100%;
+                justify-content: center;
+                margin-bottom: 15px;
+            }
+
+            .success-message-container {
+                top: 20px;
+                right: 20px;
+                left: 20px;
+                max-width: none;
+            }
+
+            .success-actions {
+                flex-direction: column;
+            }
+        }
     </style>
 }
+
+<!-- Success Message Container -->
+<div id="successMessageContainer" class="success-message-container" style="display: none;"></div>
 
 <div class="create-header">
     <div class="container">
         <h1 class="create-title">Create New Category</h1>
-        <p class="create-subtitle">Design • Organize • Elevate</p>
+        <p class="create-subtitle">Organize your luxury collection with categories</p>
     </div>
 </div>
 
@@ -475,58 +407,38 @@
         <form asp-action="Create" asp-controller="Categories" method="post" id="createCategoryForm">
             @Html.AntiForgeryToken()
 
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label asp-for="Name" class="form-label">
-                            <i class="bi bi-tags"></i>Category Name
-                        </label>
-                        <div class="input-icon">
-                            <i class="bi bi-tag"></i>
-                            <input asp-for="Name" class="form-control-custom"
-                                   placeholder="Enter a descriptive category name"
-                                   autofocus />
-                        </div>
-                        <span asp-validation-for="Name" class="validation-error"></span>
-                        <small class="text-muted mt-2 d-block">Choose a clear, descriptive name for your category</small>
-                    </div>
-                </div>
-
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label asp-for="Description" class="form-label">
-                            <i class="bi bi-card-text"></i>Description
-                        </label>
-                        <div class="input-icon">
-                            <i class="bi bi-text-paragraph"></i>
-                            <input asp-for="Description" class="form-control-custom"
-                                   placeholder="Brief description (optional)" />
-                        </div>
-                        <span asp-validation-for="Description" class="validation-error"></span>
-                        <small class="text-muted mt-2 d-block">Provide additional context about this category</small>
-                    </div>
-                </div>
+            <div class="form-group">
+                <label asp-for="Name" class="form-label">
+                    <i class="bi bi-tag me-1"></i>Category Name
+                </label>
+                <input asp-for="Name" class="form-control-custom"
+                       placeholder="Enter category name"
+                       autofocus />
+                <span asp-validation-for="Name" class="validation-error"></span>
+                <small class="text-muted mt-2 d-block">
+                    <i class="bi bi-info-circle me-1"></i> Choose a clear, descriptive name for your category
+                </small>
             </div>
 
-            <div class="info-card">
-                <h5 class="info-title">
-                    <i class="bi bi-lightbulb"></i>Best Practices
-                </h5>
-                <ul class="info-list">
-                    <li class="info-item">Use descriptive names that clearly represent the product group</li>
-                    <li class="info-item">Keep category names concise but meaningful</li>
-                    <li class="info-item">Add descriptions to provide context for team members</li>
-                    <li class="info-item">Consider your product hierarchy when creating categories</li>
-                </ul>
+            <div class="form-group">
+                <label asp-for="Description" class="form-label">
+                    <i class="bi bi-card-text me-1"></i>Description
+                </label>
+                <textarea asp-for="Description" class="form-control-custom"
+                          rows="4" placeholder="Describe your category..."></textarea>
+                <span asp-validation-for="Description" class="validation-error"></span>
+                <small class="text-muted mt-2 d-block">
+                    <i class="bi bi-info-circle me-1"></i> Provide additional context about this category
+                </small>
             </div>
 
-            <div class="d-flex justify-content-between align-items-center mt-5 pt-4 border-top button-container"
+            <div class="d-flex justify-content-between align-items-center mt-5 pt-4 border-top"
                  style="border-color: rgba(255,255,255,0.05) !important;">
                 <a asp-action="Index" asp-controller="Categories" class="btn-back">
-                    <i class="bi bi-arrow-left"></i> Back to Categories
+                    <i class="bi bi-arrow-left me-2"></i> Back to Categories
                 </a>
                 <button type="submit" class="btn-create" id="submitBtn">
-                    <i class="bi bi-plus-circle"></i> Create Category
+                    <i class="bi bi-plus-circle me-2"></i> Create Category
                 </button>
             </div>
         </form>
@@ -536,6 +448,105 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
+        // دالة لعرض رسالة النجاح
+        function showSuccessMessage(message, data) {
+            const container = document.getElementById('successMessageContainer');
+
+            // إنشاء محتوى رسالة النجاح
+            const successHtml = `
+                <div class="success-message-card">
+                    <div class="success-header">
+                        <div class="success-icon">
+                            <i class="bi bi-check-lg"></i>
+                        </div>
+                        <div class="success-content">
+                            <h4>Success!</h4>
+                            <p>${message}</p>
+                        </div>
+                    </div>
+
+                    <div class="success-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Status:</span>
+                            <span class="detail-value">
+                                <i class="bi bi-check-circle-fill me-1"></i>Completed Successfully
+                            </span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Command Result:</span>
+                            <span class="detail-value">
+                                <i class="bi bi-code-slash me-1"></i>True (Success)
+                            </span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Time:</span>
+                            <span class="detail-value">
+                                <i class="bi bi-clock me-1"></i>${new Date().toLocaleTimeString()}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="success-actions">
+                        <a href="@Url.Action("Index", "Categories")" class="btn-success-action">
+                            <i class="bi bi-list-ul"></i> View All Categories
+                        </a>
+                        <button class="btn-success-action" onclick="createAnotherCategory()">
+                            <i class="bi bi-plus-circle"></i> Create Another
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = successHtml;
+            container.style.display = 'block';
+
+            // إخفاء الرسالة بعد 7 ثوانٍ
+            setTimeout(() => {
+                if (container.style.display !== 'none') {
+                    container.style.animation = 'slideOutRight 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+                    setTimeout(() => {
+                        container.style.display = 'none';
+                        container.style.animation = '';
+                    }, 500);
+                }
+            }, 7000);
+        }
+
+        // دالة لإنشاء category أخرى
+        function createAnotherCategory() {
+            const container = document.getElementById('successMessageContainer');
+            container.style.animation = 'slideOutRight 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+
+            setTimeout(() => {
+                container.style.display = 'none';
+                container.style.animation = '';
+
+                // إعادة تعيين النموذج
+                const form = document.getElementById('createCategoryForm');
+                form.reset();
+
+                // التركيز على حقل الاسم
+                const nameInput = document.querySelector('input[name="Name"]');
+                if (nameInput) {
+                    nameInput.focus();
+                }
+            }, 500);
+        }
+
+        // إغلاق رسالة النجاح بالضغط على ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const container = document.getElementById('successMessageContainer');
+                if (container.style.display !== 'none') {
+                    container.style.animation = 'slideOutRight 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+                    setTimeout(() => {
+                        container.style.display = 'none';
+                        container.style.animation = '';
+                    }, 500);
+                }
+            }
+        });
+
         document.addEventListener('DOMContentLoaded', function () {
             const form = document.getElementById('createCategoryForm');
             const submitBtn = document.getElementById('submitBtn');
@@ -555,12 +566,13 @@
                     if (form.checkValidity()) {
                         submitBtn.classList.add('loading');
                         submitBtn.disabled = true;
+                        submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Creating Category...';
                     }
                 });
             }
 
             // Character counter for description
-            const descriptionInput = document.querySelector('input[name="Description"]');
+            const descriptionInput = document.querySelector('textarea[name="Description"]');
             if (descriptionInput) {
                 const counter = document.createElement('small');
                 counter.className = 'text-muted mt-1 d-block text-end';
@@ -568,16 +580,16 @@
                 descriptionInput.parentElement.appendChild(counter);
 
                 descriptionInput.addEventListener('input', function() {
-                    const maxLength = 250; // Assuming max length from your validator
+                    const maxLength = 500;
                     const currentLength = this.value.length;
                     counter.textContent = `${currentLength}/${maxLength} characters`;
 
                     if (currentLength > maxLength * 0.9) {
-                        counter.style.color = 'var(--warning)';
+                        counter.style.color = 'var(--warning-yellow)';
                     } else if (currentLength > maxLength * 0.7) {
                         counter.style.color = 'var(--text-muted)';
                     } else {
-                        counter.style.color = 'var(--success)';
+                        counter.style.color = 'var(--success-green)';
                     }
                 });
 
@@ -606,59 +618,13 @@
                 });
             });
 
-            // Show success message if there's one in TempData
+            // عرض رسالة النجاح من TempData إذا وجدت
             @if (TempData["SuccessMessage"] != null)
             {
                     <text>
-                    showNotification('success', '@TempData["SuccessMessage"]');
-                    </text>
-            }
-
-            @if (TempData["ErrorMessage"] != null)
-            {
-                    <text>
-                    showNotification('error', '@TempData["ErrorMessage"]');
+                    showSuccessMessage('@TempData["SuccessMessage"]');
                     </text>
             }
         });
-
-        function showNotification(type, message) {
-            const notification = document.createElement('div');
-            notification.className = `position-fixed top-0 end-0 p-4`;
-            notification.style.zIndex = '9999';
-            notification.style.minWidth = '300px';
-
-            const toastHtml = `
-                <div class="toast align-items-center text-white bg-${type} border-0" role="alert">
-                    <div class="d-flex">
-                        <div class="toast-body p-3">
-                            <div class="d-flex align-items-center">
-                                <i class="bi ${type === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill'} me-2" style="font-size: 1.2rem;"></i>
-                                <div>
-                                    <strong>${type === 'success' ? 'Success!' : 'Error!'}</strong>
-                                    <div class="mt-1 small">${message}</div>
-                                </div>
-                            </div>
-                        </div>
-                        <button type="button" class="btn-close btn-close-white me-3 m-auto" data-bs-dismiss="toast"></button>
-                    </div>
-                </div>
-            `;
-
-            notification.innerHTML = toastHtml;
-            document.body.appendChild(notification);
-
-            const toastElement = notification.querySelector('.toast');
-            const toast = new bootstrap.Toast(toastElement, {
-                autohide: true,
-                delay: 5000
-            });
-            toast.show();
-
-            // Remove after hiding
-            toastElement.addEventListener('hidden.bs.toast', function () {
-                notification.remove();
-            });
-        }
     </script>
 }

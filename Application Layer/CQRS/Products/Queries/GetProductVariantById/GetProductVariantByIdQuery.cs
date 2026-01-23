@@ -42,6 +42,7 @@ namespace Application_Layer.CQRS.Products.Queries
                 .Select(v => new ProductVariantDto
                 {
                     Id = v.Id,
+                    ProductId=v.ProductId,  
                     VariantName = v.VariantName,
                     VariantValue = v.VariantValue,
                     Price = v.Price,
