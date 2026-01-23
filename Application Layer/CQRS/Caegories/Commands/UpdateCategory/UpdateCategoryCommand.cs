@@ -4,6 +4,7 @@ using Domain_Layer.Interfaces.Abstraction;
 using Domain_Layer.Interfaces.Repositryinterfaces;
 using Domain_Layer.Respones;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,9 +14,9 @@ using System.Threading.Tasks;
 namespace Application_Layer.CQRS.Caegories.Commands.UpdateCategory
 {
     public record UpdateCategoryCommand(UpdateCategoryDto UpdateCategoryDto)
-        : ICommand<RequestRespones<CategoryDto>>;
+        : ICommand<RequestRespones<bool>>;
     public class UpdateCategoryHandler
-    : IRequestHandler<UpdateCategoryCommand, RequestRespones<CategoryDto>>
+    : IRequestHandler<UpdateCategoryCommand, RequestRespones<bool>>
     {
         private readonly IGenaricRepository<Category> _categoryRepo;
 
@@ -24,35 +25,25 @@ namespace Application_Layer.CQRS.Caegories.Commands.UpdateCategory
             _categoryRepo = categoryRepo;
         }
 
-        public async Task<RequestRespones<CategoryDto>> Handle(UpdateCategoryCommand request, CancellationToken cancellationToken)
+        public async Task<RequestRespones<bool>> Handle(UpdateCategoryCommand request, CancellationToken cancellationToken)
         {
             
             
                 var dto = request.UpdateCategoryDto;
 
-                var category = await _categoryRepo.GetByCriteriaAsync(x => x.Id == dto.Id);
+                var category = await _categoryRepo.GetByCriteriaQueryable(x => x.Id == dto.Id).FirstOrDefaultAsync();
                 if (category == null)
-                    return RequestRespones<CategoryDto>.Fail($"Category with Id {dto.Id} not found.", 404);
+                    return RequestRespones<bool>.Fail($"Category with Id {dto.Id} not found.", 404);
 
-                var updatedCategory = new Category
-                {
-                    Id = dto.Id,
-                    Name = dto.Name,
-                    Description = dto.Description
-                };
+                category.Description = dto.Description;
+                category.Name = dto.Name;
 
-                _categoryRepo.SaveInclude(updatedCategory);
+                _categoryRepo.SaveInclude(category,nameof(category.Description),nameof(category.Name));
                 await _categoryRepo.SaveChanges();
 
-                // 3️⃣ رجّع DTO
-                var resultDto = new CategoryDto
-                {
-                    Id = updatedCategory.Id,
-                    Name = updatedCategory.Name,
-                    Description = updatedCategory.Description
-                };
+             
 
-                return RequestRespones<CategoryDto>.Success(resultDto, 200, "Category updated successfully.");
+                return RequestRespones<bool>.Success(true, 200, "Category updated successfully.");
             
            
         }

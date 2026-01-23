@@ -19,9 +19,9 @@ namespace Application_Layer.CQRS.Products.Commands.UpdateProduct
             //    .GreaterThan(0)
             //    .WithMessage("Price must be greater than zero.");
 
-            RuleFor(x => x.Dto.Stock)
-                .GreaterThanOrEqualTo(0)
-                .WithMessage("Stock cannot be negative.");
+            //RuleFor(x => x.Dto.Stock)
+            //    .GreaterThanOrEqualTo(0)
+            //    .WithMessage("Stock cannot be negative.");
 
             RuleFor(x => x.Dto.CategoryId)
                 .GreaterThan(0)

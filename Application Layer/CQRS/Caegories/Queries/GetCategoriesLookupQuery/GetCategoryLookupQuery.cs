@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace Application_Layer.CQRS.Caegories.Queries.GetCategoriesLookupQuery
 {
-    public record GetCategoryLookupQuery() : ICommand<RequestRespones<IEnumerable<CategoryLookupDto>>>;
+    public record GetCategoryLookupQuery() : IRequest<RequestRespones<IEnumerable<CategoryLookupDto>>>;
 
     
     public class GetCategoryLookupHandler : IRequestHandler<GetCategoryLookupQuery, RequestRespones<IEnumerable<CategoryLookupDto>>>
@@ -32,35 +32,27 @@ namespace Application_Layer.CQRS.Caegories.Queries.GetCategoriesLookupQuery
 
         public async Task<RequestRespones<IEnumerable<CategoryLookupDto>>> Handle(GetCategoryLookupQuery request, CancellationToken cancellationToken)
         {
-            try
+            var categories = await _cache.GetOrCreateAsync(CacheKey, async entry =>  // to solve Race condition
             {
+                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1); 
+                entry.SlidingExpiration = TimeSpan.FromMinutes(20);           
+                entry.Priority = CacheItemPriority.Normal;
 
-                if (!_cache.TryGetValue(CacheKey, out IEnumerable<CategoryLookupDto> categories))
-                {
-                   
-                    categories = await _categoryRepo.GetAll()
-                        .AsNoTracking() 
-                        .Select(c => new CategoryLookupDto
-                        {
-                            Id = c.Id,
-                            Name = c.Name
-                        })
-                        .ToListAsync(cancellationToken);
+                return await _categoryRepo.GetAll()
+                    .Select(c => new CategoryLookupDto
+                    {
+                        Id = c.Id,
+                        Name = c.Name
+                    })
+                    .ToListAsync(cancellationToken);
+            });
 
-                    _cache.Set(CacheKey, categories, TimeSpan.FromHours(1));
-                }
-                if (!categories!.Any())
-                {
-                    return RequestRespones<IEnumerable<CategoryLookupDto>>.Fail("there is no categories Was Found", 404);
-                }
-
-
-                return RequestRespones<IEnumerable<CategoryLookupDto>>.Success(categories, 200, "Success");
-            }
-            catch (Exception ex)
+            if (categories == null || !categories.Any())
             {
-                return RequestRespones<IEnumerable<CategoryLookupDto>>.Fail($"Error: {ex.Message}", 500);
+                return RequestRespones<IEnumerable<CategoryLookupDto>>.Fail("No categories found", 404);
             }
+
+            return RequestRespones<IEnumerable<CategoryLookupDto>>.Success(categories);
         }
     }
 }

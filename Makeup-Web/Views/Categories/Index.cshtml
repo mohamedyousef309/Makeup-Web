@@ -1,820 +1,642 @@
-﻿@model List<Domain_Layer.ViewModels.CategoriesViewModel.CategoryViewModel>
+﻿@using Domain_Layer.DTOs
+@using Domain_Layer.DTOs._ِCategoryDtos
+@model PaginatedListDto<CategoryDto>
 
 @{
-    ViewData["Title"] = "Categories Management";
-    Layout = "_Layout";
+    ViewData["Title"] = "Luxury Categories - Pro Makeup Studio";
 }
-
-@Html.AntiForgeryToken()
 
 @section Styles {
     <style>
         :root {
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --primary-hover: linear-gradient(135deg, #5a6fd8 0%, #6a4391 100%);
-            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            --dark-bg: #0f172a;
-            --card-bg: #1e293b;
-            --card-border: #334155;
-            --table-header: rgba(30, 41, 59, 0.9);
-            --table-row: rgba(255, 255, 255, 0.02);
-            --table-hover: rgba(102, 126, 234, 0.1);
-            --text-light: #f1f5f9;
-            --text-muted: #94a3b8;
-            --accent-purple: #8b5cf6;
-            --accent-pink: #ec4899;
-            --success: #10b981;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.3);
-            --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.2);
-            --shadow-sm: 0 5px 15px rgba(0, 0, 0, 0.1);
-            --glow: 0 0 40px rgba(139, 92, 246, 0.2);
+            --primary-pink: #d68a8a;
+            --dark-bg: #0f0f0f;
+            --card-bg: #1a1a1a;
+            --input-bg: #252525;
+            --text-light: #ffffff;
+            --text-muted: #a0a0a0;
+            --accent-gold: #c5a059;
+            --danger-red: #ff4d4d;
+            --success-green: #2ecc71;
+            --info-blue: #6a8fd8;
         }
 
         body {
-            background: var(--dark-bg);
+            background-color: var(--dark-bg);
             color: var(--text-light);
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            background-image: radial-gradient(at 10% 20%, rgba(102, 126, 234, 0.1) 0%, transparent 50%), radial-gradient(at 90% 80%, rgba(236, 72, 153, 0.1) 0%, transparent 50%);
-            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
         }
 
-        .page-header {
-            padding: 40px 0 30px;
-            position: relative;
-            overflow: hidden;
+        .categories-header {
+            padding: 60px 0 30px;
+            text-align: center;
+            background: linear-gradient(to bottom, #1a1a1a 0%, #0f0f0f 100%);
+            margin-bottom: 30px;
+            border-bottom: 1px solid #222;
         }
 
-            .page-header::before {
-                content: '';
-                position: absolute;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                height: 1px;
-                background: linear-gradient(90deg, transparent, var(--accent-purple), transparent);
-            }
-
-        .page-title {
-            font-family: 'Poppins', sans-serif;
+        .categories-title {
+            font-family: 'Playfair Display', serif;
             font-size: 2.8rem;
             font-weight: 800;
-            background: var(--primary-gradient);
+            text-transform: uppercase;
+            background: linear-gradient(45deg, #fff 30%, var(--primary-pink) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
-            position: relative;
-            display: inline-block;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
         }
 
-            .page-title::after {
-                content: '';
-                position: absolute;
-                bottom: -8px;
-                left: 0;
-                width: 120px;
-                height: 4px;
-                background: var(--primary-gradient);
-                border-radius: 2px;
-                box-shadow: var(--glow);
-            }
+        .categories-subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-top: 10px;
+            font-weight: 300;
+        }
 
-        .dashboard-card {
+        /* Category Cards */
+        .category-card {
             background: var(--card-bg);
-            border-radius: 20px;
-            border: 1px solid var(--card-border);
-            box-shadow: var(--shadow-lg);
-            margin-bottom: 30px;
-            position: relative;
+            border-radius: 16px;
+            border: 1px solid #252525;
             overflow: hidden;
-            backdrop-filter: blur(10px);
-        }
-
-            .dashboard-card::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                height: 5px;
-                background: var(--primary-gradient);
-            }
-
-        .card-header {
-            background: rgba(255, 255, 255, 0.03);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 25px 30px;
-            position: relative;
-        }
-
-            .card-header h3 {
-                font-weight: 700;
-                font-size: 1.5rem;
-                margin: 0;
-                display: flex;
-                align-items: center;
-                gap: 10px;
-            }
-
-                .card-header h3 i {
-                    background: var(--primary-gradient);
-                    -webkit-background-clip: text;
-                    -webkit-text-fill-color: transparent;
-                    font-size: 1.8rem;
-                }
-
-        .btn-primary-custom {
-            background: var(--primary-gradient);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            padding: 14px 28px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+            height: 100%;
             display: flex;
-            align-items: center;
-            gap: 10px;
+            flex-direction: column;
+            position: relative;
         }
 
-            .btn-primary-custom::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: -100%;
-                width: 100%;
-                height: 100%;
-                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-                transition: 0.6s;
+            .category-card:hover {
+                transform: translateY(-10px);
+                border-color: var(--primary-pink);
+                box-shadow: 0 20px 40px rgba(214, 138, 138, 0.1);
             }
 
-            .btn-primary-custom:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
-                background: var(--primary-hover);
-            }
-
-                .btn-primary-custom:hover::before {
-                    left: 100%;
-                }
-
-        .category-table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-        }
-
-            .category-table thead th {
-                background: rgba(30, 41, 59, 0.95);
-                color: var(--text-light);
-                font-weight: 700;
-                text-transform: uppercase;
-                letter-spacing: 0.8px;
-                font-size: 0.85rem;
-                padding: 20px 15px;
-                border-bottom: 2px solid var(--accent-purple);
-                position: sticky;
-                top: 0;
-                backdrop-filter: blur(10px);
-            }
-
-                .category-table thead th:first-child {
-                    border-top-left-radius: 15px;
-                }
-
-                .category-table thead th:last-child {
-                    border-top-right-radius: 15px;
-                }
-
-            .category-table tbody tr {
-                background: rgba(255, 255, 255, 0.01);
-                transition: all 0.3s ease;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            }
-
-                .category-table tbody tr:hover {
-                    background: rgba(102, 126, 234, 0.1);
-                    transform: translateX(5px);
-                    box-shadow: var(--shadow-sm);
-                }
-
-                .category-table tbody tr td {
-                    padding: 20px 15px;
-                    color: var(--text-light);
-                    vertical-align: middle;
-                }
-
-                .category-table tbody tr:last-child {
-                    border-bottom: none;
-                }
-
-        .category-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 12px;
-            background: var(--primary-gradient);
+        .category-icon-wrapper {
+            aspect-ratio: 1/1;
+            background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 15px;
-            box-shadow: var(--shadow-sm);
+            position: relative;
+            overflow: hidden;
         }
 
-            .category-icon i {
-                color: white;
-                font-size: 1.2rem;
-            }
+        .category-icon {
+            font-size: 3.5rem;
+            color: var(--primary-pink);
+            opacity: 0.8;
+            transition: all 0.5s ease;
+        }
 
-        .btn-action {
-            border-radius: 10px;
-            padding: 10px 20px;
+        .category-card:hover .category-icon {
+            transform: scale(1.2) rotate(10deg);
+            opacity: 1;
+        }
+
+        .category-info {
+            padding: 25px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .category-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
             font-weight: 600;
-            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-bottom: 15px;
+            line-height: 1.3;
+        }
+
+        .category-description {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            flex: 1;
+            min-height: 60px;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+        }
+
+        /* Admin Actions في أسفل البطاقة */
+        .admin-footer-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: auto;
+            padding-top: 15px;
+            border-top: 1px solid #333;
+        }
+
+        .btn-admin {
+            flex: 1;
+            padding: 10px 0;
+            border-radius: 10px;
+            text-decoration: none;
             transition: all 0.3s ease;
-            border: 2px solid transparent;
-            display: inline-flex;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
             align-items: center;
-            gap: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            justify-content: center;
+            gap: 6px;
+            border: 1px solid transparent;
+            max-width: 110px;
+            cursor: pointer;
         }
 
         .btn-edit {
-            background: rgba(16, 185, 129, 0.1);
-            border-color: rgba(16, 185, 129, 0.3);
-            color: var(--success);
+            background: linear-gradient(135deg, var(--primary-pink) 0%, #c27676 100%);
+            color: white;
+            border: 1px solid var(--primary-pink);
         }
 
             .btn-edit:hover {
-                background: rgba(16, 185, 129, 0.2);
-                border-color: var(--success);
+                background: transparent;
+                color: var(--primary-pink);
+                border-color: var(--primary-pink);
                 transform: translateY(-2px);
-                box-shadow: 0 8px 20px rgba(16, 185, 129, 0.2);
-                color: white;
+                box-shadow: 0 5px 15px rgba(214, 138, 138, 0.3);
             }
 
         .btn-delete {
-            background: rgba(239, 68, 68, 0.1);
-            border-color: rgba(239, 68, 68, 0.3);
-            color: var(--danger);
+            background: linear-gradient(135deg, var(--danger-red) 0%, #ff3333 100%);
+            color: white;
+            border: 1px solid var(--danger-red);
         }
 
             .btn-delete:hover {
-                background: rgba(239, 68, 68, 0.2);
-                border-color: var(--danger);
+                background: transparent;
+                color: var(--danger-red);
+                border-color: var(--danger-red);
                 transform: translateY(-2px);
-                box-shadow: 0 8px 20px rgba(239, 68, 68, 0.2);
-                color: white;
+                box-shadow: 0 5px 15px rgba(255, 77, 77, 0.3);
             }
 
-        .empty-state {
-            padding: 60px 20px;
+        /* Add Category Button */
+        .add-category-section {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 2px dashed #333;
+            transition: all 0.3s ease;
             text-align: center;
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 20px;
-            margin: 20px;
-            border: 2px dashed rgba(255, 255, 255, 0.1);
         }
 
-            .empty-state i {
-                font-size: 4rem;
-                background: var(--primary-gradient);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-                margin-bottom: 20px;
+            .add-category-section:hover {
+                border-color: var(--primary-pink);
+                background: rgba(214, 138, 138, 0.05);
             }
 
-        .stats-badge {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 50px;
-            padding: 10px 25px;
-            font-size: 0.9rem;
+        .btn-add-category {
+            background: transparent;
+            color: var(--primary-pink);
+            border: 1px solid var(--primary-pink);
+            border-radius: 12px;
+            padding: 14px 28px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            backdrop-filter: blur(10px);
+            gap: 10px;
+            text-decoration: none;
         }
 
-        /* Modal Styling */
-        .delete-modal .modal-content {
+            .btn-add-category:hover {
+                background: var(--primary-pink);
+                color: white;
+                transform: translateY(-2px);
+                box-shadow: 0 10px 20px rgba(214, 138, 138, 0.2);
+            }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
             background: var(--card-bg);
-            border-radius: 20px;
-            border: 1px solid var(--card-border);
-            box-shadow: var(--shadow-lg);
-            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            border: 1px solid #252525;
         }
 
-        .delete-modal .modal-header {
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(220, 38, 38, 0.2) 100%);
-            border-bottom: 1px solid rgba(239, 68, 68, 0.3);
-            border-radius: 20px 20px 0 0;
-            padding: 25px 30px;
+        .empty-state-icon {
+            font-size: 4rem;
+            color: var(--primary-pink);
+            margin-bottom: 20px;
+            opacity: 0.5;
         }
 
-        .delete-modal .modal-body {
-            padding: 30px;
+        .empty-state-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #fff 30%, var(--primary-pink) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        .delete-modal .modal-footer {
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 20px 30px;
-            border-radius: 0 0 20px 20px;
-        }
-
-        /* Animations */
-        @@keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .dashboard-card {
-            animation: fadeInUp 0.6s ease-out;
-        }
-
-        @@keyframes slideInRight {
-            from {
-                opacity: 0;
-                transform: translateX(30px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        .category-table tbody tr {
-            animation: slideInRight 0.5s ease-out forwards;
-            opacity: 0;
-        }
-
-            .category-table tbody tr:nth-child(1) {
-                animation-delay: 0.1s;
-            }
-
-            .category-table tbody tr:nth-child(2) {
-                animation-delay: 0.2s;
-            }
-
-            .category-table tbody tr:nth-child(3) {
-                animation-delay: 0.3s;
-            }
-
-            .category-table tbody tr:nth-child(4) {
-                animation-delay: 0.4s;
-            }
-
-            .category-table tbody tr:nth-child(5) {
-                animation-delay: 0.5s;
-            }
-
-            .category-table tbody tr:nth-child(6) {
-                animation-delay: 0.6s;
-            }
-
-        /* Toast Notifications */
+        /* Toast Notification */
         .custom-toast {
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: var(--card-bg);
+            color: white;
+            padding: 20px 25px;
             border-radius: 12px;
-            box-shadow: var(--shadow-lg);
+            border-left: 4px solid var(--danger-red);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transform: translateX(150%);
+            transition: transform 0.4s ease;
+            max-width: 400px;
         }
 
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+        .toast-show {
+            transform: translateX(0);
         }
 
-        ::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
+        .toast-icon {
+            color: var(--danger-red);
+            font-size: 1.5rem;
         }
 
-        ::-webkit-scrollbar-thumb {
-            background: var(--primary-gradient);
-            border-radius: 10px;
+        .toast-content h4 {
+            margin: 0 0 5px 0;
+            font-size: 1.1rem;
         }
 
-            ::-webkit-scrollbar-thumb:hover {
-                background: var(--primary-hover);
+        .toast-content p {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* SweetAlert Custom Styling */
+        .swal2-popup {
+            background: #1a1a1a !important;
+            border: 1px solid #252525 !important;
+            border-radius: 16px !important;
+            color: #ffffff !important;
+        }
+
+        .swal2-title {
+            color: #ffffff !important;
+            font-family: 'Playfair Display', serif !important;
+        }
+
+        .swal2-html-container {
+            color: #a0a0a0 !important;
+        }
+
+        .swal2-confirm {
+            background: linear-gradient(45deg, #d68a8a, #c27676) !important;
+            border: none !important;
+            border-radius: 8px !important;
+        }
+
+        .swal2-cancel {
+            background: transparent !important;
+            border: 1px solid #444 !important;
+            color: #ffffff !important;
+            border-radius: 8px !important;
+        }
+
+        /* Animations for deletion */
+        .category-card.removing {
+            animation: slideOut 0.5s ease forwards;
+        }
+
+        @@keyframes slideOut {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
             }
 
-        /* Responsive */
+            100% {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.9);
+                height: 0;
+                margin: 0;
+                padding: 0;
+                border: none;
+            }
+        }
+
+        /* Responsive Design */
         @@media (max-width: 768px) {
-            .page-title {
-                font-size: 2.2rem;
+            .categories-title {
+                font-size: 2rem;
             }
 
-            .dashboard-card {
-                border-radius: 15px;
-                margin: 0 10px 20px;
+            .category-info {
+                padding: 20px;
             }
 
-            .btn-action {
-                width: 100%;
-                justify-content: center;
-                margin-bottom: 10px;
+            .category-name {
+                font-size: 1.2rem;
             }
 
-            .category-table thead {
-                display: none;
+            .admin-footer-actions {
+                flex-direction: column;
             }
 
-            .category-table tbody tr {
-                display: block;
-                margin-bottom: 20px;
-                border: 1px solid rgba(255, 255, 255, 0.1);
-                border-radius: 15px;
-                padding: 15px;
+            .btn-admin {
+                max-width: 100%;
             }
-
-                .category-table tbody tr td {
-                    display: flex;
-                    justify-content: space-between;
-                    padding: 10px 0;
-                    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-                }
-
-                    .category-table tbody tr td:before {
-                        content: attr(data-label);
-                        font-weight: 600;
-                        color: var(--text-muted);
-                        text-transform: uppercase;
-                        font-size: 0.8rem;
-                        margin-right: 15px;
-                    }
-
-                    .category-table tbody tr td:last-child {
-                        border-bottom: none;
-                    }
         }
     </style>
 }
 
-<div class="container-fluid">
-    <div class="page-header">
-        <div class="container">
-            <h1 class="page-title">Categories Management</h1>
-            <p class="text-muted mt-2" style="font-size: 1.1rem;">Organize and manage your product categories</p>
+<!-- Hidden Anti-Forgery Token -->
+<input type="hidden" id="RequestVerificationToken" name="__RequestVerificationToken"
+       value="@Html.AntiForgeryToken()" />
+
+<!-- Toast Notification for Error Messages -->
+@if (TempData["ErrorMessage"] != null)
+{
+    <div id="errorToast" class="custom-toast">
+        <div class="toast-icon">
+            <i class="bi bi-exclamation-triangle"></i>
+        </div>
+        <div class="toast-content">
+            <h4>Error</h4>
+            <p>@TempData["ErrorMessage"]</p>
         </div>
     </div>
+}
 
+<div class="categories-header">
     <div class="container">
-        <!-- رسائل التنبيه -->
-        @if (TempData["SuccessMessage"] != null)
-        {
-            <div class="alert alert-success alert-dismissible fade show" role="alert" style="border-radius: 15px; backdrop-filter: blur(10px);">
-                <div class="d-flex align-items-center">
-                    <i class="bi bi-check-circle-fill me-3" style="font-size: 1.5rem;"></i>
-                    <div class="flex-grow-1">
-                        <strong>Success!</strong> @TempData["SuccessMessage"]
-                    </div>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            </div>
-        }
-
-        @if (TempData["ErrorMessage"] != null)
-        {
-            <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: 15px; backdrop-filter: blur(10px);">
-                <div class="d-flex align-items-center">
-                    <i class="bi bi-exclamation-triangle-fill me-3" style="font-size: 1.5rem;"></i>
-                    <div class="flex-grow-1">
-                        <strong>Error!</strong> @TempData["ErrorMessage"]
-                    </div>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            </div>
-        }
-
-        <div class="dashboard-card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h3>
-                    <i class="bi bi-diagram-3"></i> Categories Dashboard
-                </h3>
-                <a asp-action="Create" class="btn-primary-custom">
-                    <i class="bi bi-plus-circle"></i> Add New Category
-                </a>
-            </div>
-
-            <div class="card-body">
-                @if (Model == null || !Model.Any())
-                {
-                    <div class="empty-state">
-                        <i class="bi bi-inboxes"></i>
-                        <h4 class="mt-3 mb-2">No Categories Found</h4>
-                        <p class="text-muted mb-4">Get started by creating your first category</p>
-                        <a asp-action="Create" class="btn-primary-custom">
-                            <i class="bi bi-plus-circle"></i> Create First Category
-                        </a>
-                    </div>
-                }
-                else
-                {
-                    <div class="table-responsive">
-                        <table class="category-table">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Category Name</th>
-                                    <th>Description</th>
-                                    <th class="text-center">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @for (int i = 0; i < Model.Count; i++)
-                                {
-                                    var category = Model[i];
-                                    <tr>
-                                        <td data-label="#">
-                                            <span class="fw-bold" style="color: var(--accent-purple);">@(i + 1)</span>
-                                        </td>
-                                        <td data-label="Category Name">
-                                            <div class="d-flex align-items-center">
-                                                <div class="category-icon">
-                                                    <i class="bi bi-folder"></i>
-                                                </div>
-                                                <div>
-                                                    <span class="fw-bold">@category.Name</span>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td data-label="Description">
-                                            @if (!string.IsNullOrEmpty(category.Description))
-                                            {
-                                                <div class="text-truncate" style="max-width: 300px;"
-                                                     data-bs-toggle="tooltip"
-                                                     data-bs-placement="top"
-                                                     title="@category.Description">
-                                                    @category.Description
-                                                </div>
-                                            }
-                                            else
-                                            {
-                                                <span class="text-muted fst-italic">No description provided</span>
-                                            }
-                                        </td>
-                                        <td data-label="Actions" class="text-center">
-                                            <div class="d-flex justify-content-center gap-3">
-                                                <a asp-action="Edit" asp-route-id="@category.Id"
-                                                   class="btn btn-action btn-edit"
-                                                   data-bs-toggle="tooltip"
-                                                   data-bs-placement="top"
-                                                   title="Edit category">
-                                                    <i class="bi bi-pencil-square"></i> Edit
-                                                </a>
-
-                                                <button type="button"
-                                                        class="btn btn-action btn-delete delete-btn"
-                                                        data-id="@category.Id"
-                                                        data-name="@category.Name"
-                                                        data-bs-toggle="tooltip"
-                                                        data-bs-placement="top"
-                                                        title="Delete category">
-                                                    <i class="bi bi-trash"></i> Delete
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top" style="border-color: rgba(255,255,255,0.05) !important;">
-                        <div class="stats-badge">
-                            <i class="bi bi-collection"></i>
-                            <span>Total Categories: <strong>@Model.Count</strong></span>
-                        </div>
-                        <div class="text-muted">
-                            <small>Last updated: @DateTime.Now.ToString("MMM dd, yyyy HH:mm")</small>
-                        </div>
-                    </div>
-                }
-            </div>
-        </div>
+        <h1 class="categories-title">Luxury Categories</h1>
+        <p class="categories-subtitle">Explore our curated collection of premium makeup categories</p>
     </div>
 </div>
 
-<!-- Delete Confirmation Modal -->
-<div class="modal fade delete-modal" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="deleteModalLabel">
-                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                    Confirm Deletion
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="text-center mb-4">
-                    <div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, rgba(239,68,68,0.2) 0%, rgba(220,38,38,0.2) 100%); display: inline-flex; align-items: center; justify-content: center;">
-                        <i class="bi bi-trash-fill text-danger" style="font-size: 2.5rem;"></i>
-                    </div>
+<div class="container">
+    <!-- Add Category Section (Admin Only) -->
+    @if (User.IsInRole("Admin"))
+    {
+        <div class="add-category-section">
+            <div class="row align-items-center">
+                <div class="col-md-8 text-md-start text-center">
+                    <h3 style="font-family: 'Playfair Display', serif; color: var(--text-light);">
+                        Manage Categories
+                    </h3>
+                    <p class="text-muted mb-0">
+                        Add new categories to organize your luxury products
+                    </p>
                 </div>
+                <div class="col-md-4 text-md-end text-center mt-3 mt-md-0">
+                    <a asp-action="Create" asp-controller="Categories" class="btn-add-category">
+                        <i class="bi bi-plus-circle"></i>
+                        <span>Add New Category</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
 
-                <h5 class="text-center mb-3">Are you sure you want to delete this category?</h5>
+    <!-- Categories Grid -->
+    <div class="row g-4" id="categoriesGrid">
+        @if (Model.Items != null && Model.Items.Any())
+        {
+            @foreach (var category in Model.Items)
+            {
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3" id="category-@category.Id">
+                    <div class="category-card">
+                        <!-- Category Icon -->
+                        <div class="category-icon-wrapper">
+                            <i class="bi bi-tags category-icon"></i>
+                        </div>
 
-                <div class="alert alert-warning border-0" style="background: rgba(245,158,11,0.1); border-left: 4px solid var(--warning);">
-                    <div class="d-flex">
-                        <i class="bi bi-info-circle-fill me-2" style="color: var(--warning);"></i>
-                        <div>
-                            <strong class="d-block">Category to delete:</strong>
-                            <span id="deleteCategoryName" class="fw-bold text-danger" style="font-size: 1.1rem;"></span>
+                        <!-- Category Info -->
+                        <div class="category-info">
+                            <!-- Category Name -->
+                            <h3 class="category-name" title="@category.Name">
+                                @category.Name
+                            </h3>
+
+                            <!-- Category Description -->
+                            @if (!string.IsNullOrEmpty(category.Description))
+                            {
+                                <div class="category-description" title="@category.Description">
+                                    @{
+                                        var shortDescription = category.Description.Length > 120
+                                        ? category.Description.Substring(0, 120) + "..."
+                                        : category.Description;
+                                    }
+                                    @shortDescription
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="category-description text-muted">
+                                    <i>No description available</i>
+                                </div>
+                            }
+
+                            <!-- Admin Actions في أسفل البطاقة -->
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <div class="admin-footer-actions">
+                                    <a asp-action="Edit"
+                                       asp-controller="Categories"
+                                       asp-route-id="@category.Id"
+                                       class="btn-admin btn-edit">
+                                        <i class="bi bi-pencil"></i>
+                                        <span>Edit</span>
+                                    </a>
+
+                                    <!-- زر Delete المعدل -->
+                                    <button type="button"
+                                            class="btn-admin btn-delete delete-category-btn"
+                                            data-category-id="@category.Id"
+                                            data-category-name="@category.Name">
+                                        <i class="bi bi-trash"></i>
+                                        <span>Delete</span>
+                                    </button>
+                                </div>
+                            }
                         </div>
                     </div>
                 </div>
-
-                <div class="alert alert-dark border-0 mt-3" style="background: rgba(255,255,255,0.05);">
-                    <small class="text-muted">
-                        <i class="bi bi-lightbulb me-1"></i>
-                        This action will permanently remove the category and cannot be undone.
-                        Any products associated with this category will need to be reassigned.
-                    </small>
+            }
+        }
+        else
+        {
+            <!-- Empty State -->
+            <div class="col-12">
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="bi bi-tags"></i>
+                    </div>
+                    <h3 class="empty-state-title">No Categories Found</h3>
+                    <p class="text-muted mb-4">
+                        There are currently no categories available in our luxury collection.
+                    </p>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <a asp-action="Create" asp-controller="Categories" class="btn-add-category">
+                            <i class="bi bi-plus-circle"></i>
+                            <span>Create First Category</span>
+                        </a>
+                    }
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 10px; padding: 12px 25px;">
-                    <i class="bi bi-x-circle me-1"></i> Cancel
-                </button>
-                <button type="button" class="btn btn-danger" id="confirmDeleteBtn" style="border-radius: 10px; padding: 12px 25px;">
-                    <i class="bi bi-check-circle me-1"></i> Delete Category
-                </button>
-            </div>
-        </div>
+        }
     </div>
 </div>
 
 @section Scripts {
+    <!-- SweetAlert Library -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
-        $(document).ready(function () {
-            // Initialize Bootstrap tooltips
-            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl);
+        // دالة عرض Toast
+        function showToast(message, type = 'success') {
+            // إزالة أي toast موجود
+            const existingToast = document.querySelector('.custom-toast');
+            if (existingToast) {
+                existingToast.remove();
+            }
+
+            const toast = document.createElement('div');
+            toast.className = 'custom-toast';
+            toast.style.borderLeftColor = type === 'success' ? '#2ecc71' : '#ff4d4d';
+
+            toast.innerHTML = `
+                <div class="toast-icon">
+                    <i class="bi ${type === 'success' ? 'bi-check-circle' : 'bi-exclamation-triangle'}"></i>
+                </div>
+                <div class="toast-content">
+                    <h4>${type === 'success' ? 'Success' : 'Error'}</h4>
+                    <p>${message}</p>
+                </div>
+            `;
+
+            document.body.appendChild(toast);
+
+            setTimeout(() => toast.classList.add('toast-show'), 100);
+            setTimeout(() => {
+                toast.classList.remove('toast-show');
+                setTimeout(() => toast.remove(), 400);
+            }, 3000);
+        }
+
+        // دالة لحذف الفئة باستخدام AJAX
+        async function deleteCategory(categoryId, categoryName) {
+            const result = await Swal.fire({
+                title: 'Delete Category?',
+                html: `Are you sure you want to delete <strong>"${categoryName}"</strong>?<br>This action cannot be undone.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d68a8a',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'Cancel'
             });
 
-            // Variables to store delete data
-            let categoryToDelete = {
-                id: null,
-                name: null
-            };
+            if (!result.isConfirmed) return;
 
-            // When delete button is clicked
-            $(document).on('click', '.delete-btn', function () {
-                // Store category data
-                categoryToDelete.id = $(this).data('id');
-                categoryToDelete.name = $(this).data('name');
+            try {
+                // الحصول على anti-forgery token
+                const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
 
-                // Update modal content
-                $('#deleteCategoryName').text(categoryToDelete.name);
+                // إرسال الطلب باستخدام FormData
+                const formData = new FormData();
+                formData.append('id', categoryId);
 
-                // Show modal
-                const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmationModal'));
-                deleteModal.show();
-            });
-
-            // Confirm delete button click
-            $('#confirmDeleteBtn').click(function () {
-                if (!categoryToDelete.id) return;
-
-                // Disable button and show loading
-                const deleteBtn = $(this);
-                const originalText = deleteBtn.html();
-                deleteBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span> Deleting...');
-
-                // Get the anti-forgery token
-                const token = $('input[name="__RequestVerificationToken"]').val();
-
-                // Send AJAX request
-                $.ajax({
-                    url: '/Categories/Delete',
-                    type: 'POST',
-                    data: {
-                        id: categoryToDelete.id,
-                        __RequestVerificationToken: token
+                const response = await fetch('@Url.Action("Delete", "Categories")', {
+                    method: 'POST',
+                    headers: {
+                        'RequestVerificationToken': token
                     },
-                    success: function (response) {
-                        // Reset button
-                        deleteBtn.prop('disabled', false).html(originalText);
+                    body: formData
+                });
 
-                        if (response.success) {
-                            // Show success message
-                            showNotification('success', response.message);
+                const data = await response.json();
 
-                            // Hide modal
-                            bootstrap.Modal.getInstance(document.getElementById('deleteConfirmationModal')).hide();
+                if (data.success) {
+                    // إخفاء البطاقة بسلاسة
+                    const categoryElement = document.getElementById(`category-${categoryId}`);
+                    if (categoryElement) {
+                        const card = categoryElement.querySelector('.category-card');
+                        card.classList.add('removing');
 
-                            // Remove row from table after a delay
-                            setTimeout(function () {
-                                const row = $(`.delete-btn[data-id="${categoryToDelete.id}"]`).closest('tr');
-                                row.css('background', 'rgba(239, 68, 68, 0.1)');
-                                row.fadeOut(500, function () {
-                                    $(this).remove();
-                                    // Update row numbers
-                                    updateRowNumbers();
-                                    // Show message if no categories left
-                                    checkEmptyTable();
-                                });
-                            }, 800);
-                        } else {
-                            // Show error message
-                            showNotification('error', response.message);
+                        setTimeout(() => {
+                            categoryElement.remove();
 
-                            // Hide modal
-                            bootstrap.Modal.getInstance(document.getElementById('deleteConfirmationModal')).hide();
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        // Reset button
-                        deleteBtn.prop('disabled', false).html(originalText);
+                            // التحقق إذا لم تعد هناك فئات لعرض الحالة الفارغة
+                            const remainingCategories = document.querySelectorAll('.category-card');
+                            if (remainingCategories.length === 0) {
+                                window.location.reload();
+                            }
+                        }, 500);
+                    }
 
-                        // Show error message
-                        showNotification('error', 'An error occurred while deleting the category. Please try again.');
+                    // إظهار رسالة النجاح
+                    showToast(data.message || 'Category deleted successfully!', 'success');
+
+                } else {
+                    showToast(data.message || 'Failed to delete category.', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('An error occurred while deleting the category.', 'error');
+            }
+        }
+
+        // إضافة event listener لجميع أزرار الحذف
+        document.addEventListener('DOMContentLoaded', function() {
+            // Show error toast if exists
+            const errorToast = document.getElementById('errorToast');
+            if (errorToast) {
+                errorToast.classList.add('toast-show');
+                setTimeout(() => {
+                    errorToast.classList.remove('toast-show');
+                    setTimeout(() => errorToast.remove(), 400);
+                }, 5000);
+            }
+
+            // Lazy loading animation
+            const categoryCards = document.querySelectorAll('.category-card');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
                     }
                 });
+            }, {
+                threshold: 0.1
             });
 
-            // Function to update row numbers after deletion
-            function updateRowNumbers() {
-                $('tbody tr').each(function (index) {
-                    $(this).find('td:first span').text(index + 1);
+            categoryCards.forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                observer.observe(card);
+            });
+
+            // إضافة event listener لجميع أزرار الحذف
+            document.querySelectorAll('.delete-category-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const categoryId = this.getAttribute('data-category-id');
+                    const categoryName = this.getAttribute('data-category-name');
+                    deleteCategory(categoryId, categoryName);
                 });
-            }
-
-            // Function to check if table is empty
-            function checkEmptyTable() {
-                if ($('tbody tr').length === 0) {
-                    const emptyHtml = `
-                        <div class="empty-state">
-                            <i class="bi bi-inboxes"></i>
-                            <h4 class="mt-3 mb-2">No Categories Found</h4>
-                            <p class="text-muted mb-4">All categories have been deleted</p>
-                            <a href="/Categories/Create" class="btn-primary-custom">
-                                <i class="bi bi-plus-circle"></i> Create New Category
-                            </a>
-                        </div>
-                    `;
-                    $('tbody').parent().parent().html(emptyHtml);
-                }
-            }
-
-            // Function to show notifications
-            function showNotification(type, message) {
-                const notificationId = 'notification-' + Date.now();
-                const notificationHtml = `
-                    <div id="${notificationId}" class="position-fixed top-0 end-0 p-4" style="z-index: 9999; min-width: 300px;">
-                        <div class="custom-toast ${type === 'success' ? 'bg-success' : 'bg-danger'} text-white border-0" role="alert">
-                            <div class="d-flex">
-                                <div class="toast-body p-4">
-                                    <div class="d-flex align-items-center">
-                                        <i class="bi ${type === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill'} me-3" style="font-size: 1.5rem;"></i>
-                                        <div>
-                                            <strong>${type === 'success' ? 'Success!' : 'Error!'}</strong>
-                                            <div class="mt-1">${message}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <button type="button" class="btn-close btn-close-white me-3 m-auto" data-bs-dismiss="toast"></button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-
-                $('body').append(notificationHtml);
-                const toastElement = document.getElementById(notificationId).querySelector('.custom-toast');
-                const toast = new bootstrap.Toast(toastElement, {
-                    autohide: true,
-                    delay: 5000
-                });
-                toast.show();
-
-                // Remove after hiding
-                toastElement.addEventListener('hidden.bs.toast', function () {
-                    $('#' + notificationId).remove();
-                });
-            }
-
-            // Auto-hide alerts after 5 seconds
-            setTimeout(function() {
-                $('.alert').alert('close');
-            }, 5000);
+            });
         });
     </script>
 }

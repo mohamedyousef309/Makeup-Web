@@ -91,8 +91,32 @@ namespace Makeup_Web.Controllers
         //    return RedirectToAction(nameof(GetAllVariants), new { productId });
         //}
 
+        [HttpGet]
+
+        public async Task<IActionResult> UpdateVariant(int VariantId) 
+        {
+            var result = await _mediator.Send(new GetProductVariantByIdQuery(VariantId));
+            if (!result.IsSuccess)
+            {
+                TempData["ErrorMessage"] = result.Message;
+                return View();
+            }
+            var dto = result.Data;
+            var model = new UpdateProductVariantViewModel
+            {
+                Id = dto.Id,
+                ProductId=dto.ProductId,
+                VariantName = dto.VariantName,
+                VariantValue = dto.VariantValue,
+                Price=dto.Price,
+                Stock = dto.Stock
+            };
+            return View(model);
+        }
+
+
         [HttpPost]
-        public async Task<IActionResult> UpdateVariant(int productId, UpdateProductVariantViewModel model)
+        public async Task<IActionResult> UpdateVariant( UpdateProductVariantViewModel model)
         {
             var dto = new UpdateProductVariantDto
             {

@@ -25,9 +25,9 @@ namespace Domain_Layer.ViewModels.ProductsViewModels.UpdateProductsViewModel
         //[Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than 0.")]
         //public decimal Price { get; set; }
 
-        [Required(ErrorMessage = "Product stock is required.")]
-        [Range(0, int.MaxValue, ErrorMessage = "Stock cannot be negative.")]
-        public int Stock { get; set; }
+        //[Required(ErrorMessage = "Product stock is required.")]
+        //[Range(0, int.MaxValue, ErrorMessage = "Stock cannot be negative.")]
+        //public int Stock { get; set; }
 
         public int? CategoryId { get; set; }
 

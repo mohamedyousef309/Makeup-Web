@@ -4,6 +4,7 @@ using Domain_Layer.Interfaces.Abstraction;
 using Domain_Layer.Interfaces.Repositryinterfaces;
 using Domain_Layer.Respones;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -11,9 +12,7 @@ using System.Threading.Tasks;
 
 namespace Application_Layer.CQRS.Products.Commands.UpdateVariants
 {
-    public record UpdateProductVariantCommand(
-        IEnumerable<UpdateProductVariantDto> UpdateProductVariantDtos)
-        : ICommand<RequestRespones<bool>>;
+    public record UpdateProductVariantCommand(int Id, string VariantName, string VariantValue, decimal Price) :ICommand<RequestRespones<bool>>;
 
     public class UpdateProductVariantCommandHandler
         : IRequestHandler<UpdateProductVariantCommand, RequestRespones<bool>>
@@ -30,33 +29,25 @@ namespace Application_Layer.CQRS.Products.Commands.UpdateVariants
             UpdateProductVariantCommand request,
             CancellationToken cancellationToken)
         {
-            var variantIds = request.UpdateProductVariantDtos
-                .Select(v => v.Id)
-                .ToList();
+            var Variant = await _variantRepo.GetByCriteriaQueryable(x=>x.Id==request.Id)
+                .FirstOrDefaultAsync(cancellationToken);
 
-            var existingVariants = _variantRepo.GetAll()
-                .Where(v => variantIds.Contains(v.Id))
-                .ToList();
-
-            if (!existingVariants.Any())
-                return RequestRespones<bool>
-                    .Fail("No variants found to update", 404);
-
-            foreach (var variant in existingVariants)
+            if (Variant == null) 
             {
-                var dto = request.UpdateProductVariantDtos
-                    .First(v => v.Id == variant.Id);
-
-                variant.VariantName = dto.VariantName;
-                variant.VariantValue = dto.VariantValue;
-                variant.Stock = dto.Stock;
-
-                _variantRepo.SaveInclude(variant);
+                return RequestRespones<bool>.Fail("There is no Variant with this id", 404);
             }
+
+            Variant.VariantValue=request.VariantValue;
+            Variant.Price=request.Price;
+            Variant.VariantName=request.VariantName;
+
+            _variantRepo.SaveInclude(Variant,nameof(Variant.VariantName),nameof(Variant.VariantValue),nameof(Variant.Price));
 
             await _variantRepo.SaveChanges();
 
-            return new RequestRespones<bool>(true);
+            return RequestRespones<bool>.Success(true);
+
+
         }
     }
 }

@@ -8,10 +8,10 @@ using MediatR;
 namespace Application_Layer.CQRS.Caegories.Commands.CreateCategory
 {
     public record CreateCategoryCommand(CreateCategoryDto CreateCategoryDto)
-        : ICommand<RequestRespones<CategoryDto>>;
+        : ICommand<RequestRespones<bool>>;
 
     public class CreateCategoryHandler
-        : IRequestHandler<CreateCategoryCommand, RequestRespones<CategoryDto>>
+        : IRequestHandler<CreateCategoryCommand, RequestRespones<bool>>
     {
         private readonly IGenaricRepository<Category> _categoryRepo;
 
@@ -20,7 +20,7 @@ namespace Application_Layer.CQRS.Caegories.Commands.CreateCategory
             _categoryRepo = categoryRepo;
         }
 
-        public async Task<RequestRespones<CategoryDto>> Handle(CreateCategoryCommand request, CancellationToken cancellationToken)
+        public async Task<RequestRespones<bool>> Handle(CreateCategoryCommand request, CancellationToken cancellationToken)
         {
             
             
@@ -44,7 +44,7 @@ namespace Application_Layer.CQRS.Caegories.Commands.CreateCategory
                     Description = category.Description
                 };
 
-                return RequestRespones<CategoryDto>.Success(resultDto, 201, "Category created successfully.");
+                return RequestRespones<bool>.Success(true);
             
             
         }

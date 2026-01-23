@@ -165,7 +165,6 @@ namespace Makeup_Web.Controllers
                 Name = modle.Name,
                 Description = modle.Description,
                 //Price = modle.Price,
-                Stock = modle.Stock,
                 ImageFile = modle.Image,
                 CategoryId = modle.CategoryId,
                 IsActive= modle.IsActive,
@@ -207,7 +206,11 @@ namespace Makeup_Web.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var result = await _mediator.Send(new DeleteProductCommand(id));
-            return Json(result);
+
+            if (result.IsSuccess)
+                return Json(new { success = true, message = result.Message });
+
+            return Json(new { success = false, message = result.Message });
         }
 
         #endregion

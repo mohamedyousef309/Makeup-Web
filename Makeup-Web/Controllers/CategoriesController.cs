@@ -1,4 +1,5 @@
-﻿using Application_Layer.CQRS.Caegories.Commands.CreateCategory;
+﻿using Application_Layer.CQRS.Basket.Commands.DeleteFromBasket;
+using Application_Layer.CQRS.Caegories.Commands.CreateCategory;
 using Application_Layer.CQRS.Caegories.Commands.DeleteCategory;
 using Application_Layer.CQRS.Caegories.Commands.UpdateCategory;
 using Application_Layer.CQRS.Caegories.Queries.GetAllCategories;
@@ -7,6 +8,7 @@ using Application_Layer.CQRS.Caegories.Queries.GetCAtegoryById;
 using Domain_Layer.DTOs._ِCategoryDtos;
 using Domain_Layer.ViewModels.CategoriesViewModel;
 using MediatR;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Makeup_Web.Controllers
@@ -70,7 +72,7 @@ namespace Makeup_Web.Controllers
             if (result.IsSuccess)
             {
                 TempData["SuccessMessage"] = "Category Created Successfully";
-                return RedirectToAction(nameof(Index));
+                return View();
             }
 
             ModelState.AddModelError(string.Empty, result.Message);
@@ -86,7 +88,14 @@ namespace Makeup_Web.Controllers
                 TempData["ErrorMessage"] = result?.Message?? "error while Editing";
                 return View();
             }
-            return View(result.Data);
+
+            var Modle = new UpdateCategoryViewModel
+            {
+                Id = result.Data.Id,
+                Name = result.Data.Name,
+                Description = result.Data.Description,
+            };
+            return View(Modle);
 
         }
 
@@ -123,5 +132,8 @@ namespace Makeup_Web.Controllers
 
             return Json(new { success = false, message = result.Message });
         }
+
+
+
     }
 }
