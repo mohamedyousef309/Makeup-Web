@@ -3,11 +3,8 @@
 
 @{
     ViewData["Title"] = Model.Name + " | Pro Makeup Studio";
-
-    // ملاحظة: Price و Stock تم إزالتهم من ProductDto
-    // الآن الأسعار والمخزون موجودة فقط في Variants
     var variantsInStock = Model.Variants?.Sum(v => v.Stock) ?? 0;
-    var totalStock = variantsInStock; // فقط مخزون variants
+    var totalStock = variantsInStock;
     var isOutOfStock = totalStock <= 0;
     var lowestPrice = Model.Variants?.Min(v => v.Price) ?? 0;
     var highestPrice = Model.Variants?.Max(v => v.Price) ?? 0;
@@ -28,6 +25,7 @@
             --danger-red: #ff4d4d;
             --success-green: #28a745;
             --warning-yellow: #ffc107;
+            --info-blue: #6a8fd8;
         }
 
         body {
@@ -335,6 +333,50 @@
             border-radius: 12px;
         }
 
+        /* Stock Edit Button */
+        .stock-edit-btn {
+            background: rgba(106, 143, 216, 0.1);
+            border: 1px solid var(--info-blue);
+            color: var(--info-blue);
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-left: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+            .stock-edit-btn:hover {
+                background: var(--info-blue);
+                color: white;
+                transform: translateY(-1px);
+            }
+
+        /* Variant Edit Button */
+        .variant-edit-btn {
+            background: rgba(214, 138, 138, 0.1);
+            border: 1px solid var(--primary-pink);
+            color: var(--primary-pink);
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-left: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+            .variant-edit-btn:hover {
+                background: var(--primary-pink);
+                color: white;
+                transform: translateY(-1px);
+            }
+
         /* Selected Variant Info */
         .selected-variant-info {
             background: rgba(214, 138, 138, 0.1);
@@ -588,6 +630,393 @@
             font-size: 0.9rem;
         }
 
+        /* Edit Stock Modal */
+        .edit-stock-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 15, 15, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 99999;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .edit-stock-modal.show {
+            display: flex;
+        }
+
+        .edit-stock-content {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 450px;
+            width: 90%;
+            border: 1px solid #333;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: slideUp 0.4s ease;
+        }
+
+        .edit-stock-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .edit-stock-icon {
+            font-size: 3rem;
+            color: var(--info-blue);
+            margin-bottom: 15px;
+        }
+
+        .edit-stock-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #fff 30%, var(--info-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .edit-stock-subtitle {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .variant-info-summary {
+            background: rgba(106, 143, 216, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(106, 143, 216, 0.3);
+        }
+
+        .variant-info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .variant-info-label {
+            color: var(--text-muted);
+        }
+
+        .variant-info-value {
+            color: var(--text-light);
+            font-weight: 600;
+        }
+
+        .stock-input-group {
+            margin-bottom: 25px;
+        }
+
+        .stock-input-label {
+            display: block;
+            color: var(--text-light);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .stock-input-wrapper {
+            position: relative;
+        }
+
+        .stock-input {
+            width: 100%;
+            background: var(--input-bg);
+            border: 1px solid #333;
+            border-radius: 10px;
+            color: var(--text-light);
+            padding: 12px 45px 12px 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+            .stock-input:focus {
+                border-color: var(--info-blue);
+                outline: none;
+                box-shadow: 0 0 0 3px rgba(106, 143, 216, 0.2);
+            }
+
+        .stock-input-unit {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .stock-input-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .stock-input-btn {
+            flex: 1;
+            padding: 8px;
+            background: rgba(106, 143, 216, 0.1);
+            border: 1px solid var(--info-blue);
+            color: var(--info-blue);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+            .stock-input-btn:hover {
+                background: var(--info-blue);
+                color: white;
+            }
+
+        .edit-stock-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .btn-edit-save {
+            flex: 1;
+            background: linear-gradient(45deg, var(--info-blue), #5a7bc9);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+            .btn-edit-save:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 20px rgba(106, 143, 216, 0.3);
+            }
+
+        .btn-edit-cancel {
+            flex: 1;
+            background: transparent;
+            color: var(--text-light);
+            border: 1px solid #444;
+            border-radius: 10px;
+            padding: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+            .btn-edit-cancel:hover {
+                background: #333;
+                border-color: #555;
+            }
+
+        /* Edit Variant Modal */
+        .edit-variant-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 15, 15, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 100000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .edit-variant-modal.show {
+            display: flex;
+        }
+
+        .edit-variant-content {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid #333;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: slideUp 0.4s ease;
+        }
+
+        .edit-variant-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .edit-variant-icon {
+            font-size: 3rem;
+            color: var(--primary-pink);
+            margin-bottom: 15px;
+        }
+
+        .edit-variant-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #fff 30%, var(--primary-pink) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .edit-variant-subtitle {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .edit-variant-form .form-group {
+            margin-bottom: 20px;
+        }
+
+        .edit-variant-form .form-label {
+            display: block;
+            color: var(--text-light);
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .edit-variant-form .form-control {
+            width: 100%;
+            background: var(--input-bg);
+            border: 1px solid #333;
+            border-radius: 10px;
+            color: var(--text-light);
+            padding: 12px 15px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+            .edit-variant-form .form-control:focus {
+                border-color: var(--primary-pink);
+                outline: none;
+                box-shadow: 0 0 0 3px rgba(214, 138, 138, 0.2);
+            }
+
+        .edit-variant-form .input-with-unit {
+            position: relative;
+        }
+
+        .edit-variant-form .input-unit {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .edit-variant-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #333;
+        }
+
+        .btn-variant-save {
+            flex: 1;
+            background: linear-gradient(45deg, var(--primary-pink), var(--accent-gold));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+            .btn-variant-save:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 20px rgba(214, 138, 138, 0.3);
+            }
+
+        .btn-variant-cancel {
+            flex: 1;
+            background: transparent;
+            color: var(--text-light);
+            border: 1px solid #444;
+            border-radius: 10px;
+            padding: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+            .btn-variant-cancel:hover {
+                background: #333;
+                border-color: #555;
+            }
+
+        /* Loading overlays */
+        .stock-loading,
+        .variant-loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 15, 15, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 100001;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .stock-loading.active,
+        .variant-loading.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .stock-loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(106, 143, 216, 0.3);
+            border-top: 3px solid var(--info-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .variant-loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(214, 138, 138, 0.3);
+            border-top: 3px solid var(--primary-pink);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @@keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @@keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         /* Animations */
         @@keyframes fadeInUp {
             from {
@@ -617,6 +1046,153 @@
         <p id="toastMessage">Item added to your basket</p>
     </div>
 </div>
+
+<!-- Edit Stock Modal -->
+<div id="editStockModal" class="edit-stock-modal">
+    <div class="edit-stock-content">
+        <div class="edit-stock-header">
+            <div class="edit-stock-icon">
+                <i class="bi bi-box-seam"></i>
+            </div>
+            <h3 class="edit-stock-title">Update Stock</h3>
+            <p class="edit-stock-subtitle">Adjust the available stock for this variant</p>
+        </div>
+
+        <div class="variant-info-summary">
+            <div class="variant-info-row">
+                <span class="variant-info-label">Variant:</span>
+                <span id="modalVariantName" class="variant-info-value"></span>
+            </div>
+            <div class="variant-info-row">
+                <span class="variant-info-label">Value:</span>
+                <span id="modalVariantValue" class="variant-info-value"></span>
+            </div>
+            <div class="variant-info-row">
+                <span class="variant-info-label">Current Stock:</span>
+                <span id="modalCurrentStock" class="variant-info-value"></span>
+            </div>
+        </div>
+
+        <form id="editStockForm">
+            <input type="hidden" id="modalVariantId" value="" />
+            
+            <div class="stock-input-group">
+                <label class="stock-input-label" for="newStockInput">New Stock Quantity</label>
+                <div class="stock-input-wrapper">
+                    <input type="number" 
+                           id="newStockInput" 
+                           class="stock-input" 
+                           min="0" 
+                           max="10000" 
+                           value="0" 
+                           required />
+                    <span class="stock-input-unit">units</span>
+                </div>
+                <div class="stock-input-controls">
+                    <button type="button" class="stock-input-btn" onclick="adjustStock(-10)">-10</button>
+                    <button type="button" class="stock-input-btn" onclick="adjustStock(-5)">-5</button>
+                    <button type="button" class="stock-input-btn" onclick="adjustStock(5)">+5</button>
+                    <button type="button" class="stock-input-btn" onclick="adjustStock(10)">+10</button>
+                </div>
+            </div>
+
+            <div class="edit-stock-actions">
+                <button type="button" class="btn-edit-cancel" onclick="closeEditStockModal()">
+                    Cancel
+                </button>
+                <button type="submit" class="btn-edit-save">
+                    Update Stock
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Variant Modal -->
+<div id="editVariantModal" class="edit-variant-modal">
+    <div class="edit-variant-content">
+        <div class="edit-variant-header">
+            <div class="edit-variant-icon">
+                <i class="bi bi-sliders"></i>
+            </div>
+            <h3 class="edit-variant-title">Edit Variant</h3>
+            <p class="edit-variant-subtitle">Update variant details and pricing</p>
+        </div>
+
+        <form id="editVariantForm" class="edit-variant-form">
+            <input type="hidden" id="editVariantId" value="" />
+            <input type="hidden" id="editVariantProductId" value="" />
+            
+            <div class="form-group">
+                <label class="form-label" for="editVariantName">Variant Name</label>
+                <input type="text" 
+                       id="editVariantName" 
+                       class="form-control" 
+                       placeholder="e.g., Color, Size, Finish" 
+                       required />
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="editVariantValue">Variant Value</label>
+                <input type="text" 
+                       id="editVariantValue" 
+                       class="form-control" 
+                       placeholder="e.g., Red, Large, Matte" 
+                       required />
+            </div>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label" for="editVariantPrice">Price</label>
+                        <div class="input-with-unit">
+                            <input type="number" 
+                                   id="editVariantPrice" 
+                                   class="form-control" 
+                                   min="0" 
+                                   step="0.01" 
+                                   placeholder="0.00" 
+                                   required />
+                            <span class="input-unit">EGP</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label" for="editVariantStock">Stock</label>
+                        <input type="number" 
+                               id="editVariantStock" 
+                               class="form-control" 
+                               min="0" 
+                               placeholder="0" 
+                               required />
+                    </div>
+                </div>
+            </div>
+
+            <div class="edit-variant-actions">
+                <button type="button" class="btn-variant-cancel" onclick="closeEditVariantModal()">
+                    Cancel
+                </button>
+                <button type="submit" class="btn-variant-save">
+                    Update Variant
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Loading overlays -->
+<div id="stockLoading" class="stock-loading">
+    <div class="stock-loading-spinner"></div>
+</div>
+
+<div id="variantLoading" class="variant-loading">
+    <div class="variant-loading-spinner"></div>
+</div>
+
+<!-- Anti-Forgery Token -->
+@Html.AntiForgeryToken()
 
 <div class="container py-5">
     <!-- Breadcrumbs -->
@@ -774,6 +1350,22 @@
                                                 <span class="variant-stock">
                                                     <i class="bi bi-box me-1"></i>
                                                     @variant.Stock available
+                                                    @if (User.IsInRole("Admin"))
+                                                    {
+                                                        <button class="stock-edit-btn" 
+                                                                onclick="openEditStockModal(event, @variant.Id, '@variant.VariantName.Replace("'", "\\'")', '@variant.VariantValue.Replace("'", "\\'")', @variant.Stock)"
+                                                                title="Edit Stock">
+                                                            <i class="bi bi-box-seam"></i>
+                                                            Stock
+                                                        </button>
+                                                        
+                                                        <button class="variant-edit-btn" 
+                                                                onclick="openEditVariantModal(event, @variant.Id, @variant.ProductId)"
+                                                                title="Edit Variant">
+                                                            <i class="bi bi-pencil"></i>
+                                                            Edit
+                                                        </button>
+                                                    }
                                                 </span>
                                                 <span class="variant-status @stockClass">
                                                     @if (!isAvailable)
@@ -808,11 +1400,8 @@
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="ProductId" value="@Model.Id" />
                         <input type="hidden" name="ProductName" value="@Model.Name" />
-                        <!-- إضافة حقل ProductVariantId -->
                         <input type="hidden" name="ProductVariantId" id="productVariantIdInput" value="" />
-                        <!-- إضافة حقل ProductVariant (سيحتوي فقط على القيمة Value) -->
                         <input type="hidden" name="ProductVariant" id="selectedVariantValueInput" value="" />
-                        <!-- الـ Price سيتم إرساله من الـ variant المختار -->
                         <input type="hidden" name="ProductPrice" id="selectedVariantPriceInput" value="" />
 
                         <div class="quantity-selector">
@@ -883,6 +1472,30 @@
 
 @section Scripts {
     <script>
+        // دالة عرض Toast
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('customToast');
+            const toastMessage = document.getElementById('toastMessage');
+            const toastIcon = toast.querySelector('.toast-icon i');
+
+            toast.querySelector('h4').textContent = type === 'success' ? 'Success' : 'Error';
+            toastMessage.textContent = message;
+
+            if (type === 'error') {
+                toast.style.borderLeftColor = '#ff4444';
+                toastIcon.style.color = '#ff4444';
+                toastIcon.className = 'bi bi-exclamation-circle';
+            } else {
+                toast.style.borderLeftColor = 'var(--primary-pink)';
+                toastIcon.style.color = 'var(--primary-pink)';
+                toastIcon.className = 'bi bi-check-circle';
+            }
+
+            toast.classList.add('toast-show');
+            setTimeout(() => toast.classList.remove('toast-show'), 3000);
+        }
+
+        // الكود الأصلي للمنتج
         let selectedVariants = {};
         let maxQuantity = @totalStock;
         let selectedVariantId = null;
@@ -890,7 +1503,6 @@
         let selectedVariantStock = null;
         let selectedVariantValue = null;
 
-        // تغيير الكمية
         function changeQuantity(change) {
             const input = document.getElementById('quantityInput');
             let current = parseInt(input.value) || 1;
@@ -902,7 +1514,6 @@
             input.value = newValue;
         }
 
-        // اختيار variant
         function selectVariant(element, variantName) {
             if (element.classList.contains('disabled')) return;
 
@@ -911,50 +1522,36 @@
             const variantPrice = element.dataset.variantPrice;
             const variantStock = element.dataset.variantStock;
 
-            // إلغاء اختيار جميع الـ variants في نفس المجموعة
             const group = document.querySelectorAll(`#variant-group-${variantName} .variant-card`);
             group.forEach(card => card.classList.remove('selected'));
 
-            // اختيار الـ variant الجديد
             element.classList.add('selected');
 
-            // حفظ الاختيار
             selectedVariants[variantName] = variantId;
             selectedVariantId = variantId;
             selectedVariantValue = variantValue;
             selectedVariantPrice = variantPrice;
             selectedVariantStock = variantStock;
 
-            // تحديث hidden fields - هنا المهم: نرسل القيمة (Value) فقط
             document.getElementById('productVariantIdInput').value = variantId;
-            document.getElementById('selectedVariantValueInput').value = variantValue; // فقط القيمة
+            document.getElementById('selectedVariantValueInput').value = variantValue;
             document.getElementById('selectedVariantPriceInput').value = variantPrice;
 
-            // عرض معلومات الـ variant المختار
             const infoDiv = document.getElementById('selectedVariantInfo');
             const variantValueElement = document.getElementById('selectedVariantValue');
             const variantNameElement = document.getElementById('selectedVariantName');
             const variantPriceSpan = document.getElementById('selectedVariantPrice');
 
-            // نعرض القيمة بشكل كبير والاسم بشكل صغير تحتها
             variantValueElement.textContent = variantValue;
             variantNameElement.textContent = variantName;
             variantPriceSpan.textContent = `${variantPrice} EGP`;
             infoDiv.classList.add('show');
 
-            // تحديث أقصى كمية بناءً على stock الـ variant المختار
             updateMaxQuantity(parseInt(variantStock));
-
-            // إضافة console.log للتأكد من القيمة المرسلة
-            console.log(`Selected Variant ID: ${variantId}`);
-            console.log(`Selected Variant Value: ${variantValue} (سيتم إرسال هذه القيمة فقط)`);
-            console.log(`Sending to server: ProductVariant = "${variantValue}"`);
         }
 
-        // تحديث أقصى كمية
         function updateMaxQuantity(variantStock) {
             const input = document.getElementById('quantityInput');
-
             input.max = variantStock;
             maxQuantity = variantStock;
             if (parseInt(input.value) > variantStock) {
@@ -962,104 +1559,409 @@
             }
         }
 
-        // إظهار Toast
-        function showToast(title, message, type = "success") {
-            const toast = document.getElementById('customToast');
-            const toastMessage = document.getElementById('toastMessage');
-            const toastIcon = toast.querySelector('.toast-icon i');
+        // Stock Modal Functions
+        function openEditStockModal(event, variantId, variantName, variantValue, currentStock) {
+            event.stopPropagation();
+            
+            document.getElementById('modalVariantId').value = variantId;
+            document.getElementById('modalVariantName').textContent = variantName;
+            document.getElementById('modalVariantValue').textContent = variantValue;
+            document.getElementById('modalCurrentStock').textContent = currentStock;
+            document.getElementById('newStockInput').value = currentStock;
 
-            toast.querySelector('h4').textContent = title;
-            toastMessage.textContent = message;
-
-            if (type === "error") {
-                toast.style.borderLeftColor = "#ff4444";
-                toastIcon.style.color = "#ff4444";
-                toastIcon.className = "bi bi-exclamation-circle";
-            } else {
-                toast.style.borderLeftColor = "var(--primary-pink)";
-                toastIcon.style.color = "var(--primary-pink)";
-                toastIcon.className = "bi bi-check-circle";
-            }
-
-            toast.classList.add('toast-show');
-            setTimeout(() => toast.classList.remove('toast-show'), 3000);
+            document.getElementById('editStockModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
         }
 
-        // التحقق قبل إرسال النموذج
-        document.getElementById('addToBasketForm').addEventListener('submit', function(event) {
-            const quantityInput = document.getElementById('quantityInput');
-            const quantity = parseInt(quantityInput.value) || 1;
-            const productVariantId = document.getElementById('productVariantIdInput').value;
-            const productVariant = document.getElementById('selectedVariantValueInput').value;
+        function closeEditStockModal() {
+            document.getElementById('editStockModal').classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
 
-            // إضافة console.log لعرض القيمة النهائية
-            console.log(`=== البيانات التي سيتم إرسالها ===`);
-            console.log(`ProductVariantId: ${productVariantId}`);
-            console.log(`ProductVariant: "${productVariant}" (القيمة فقط)`);
-            console.log(`ProductPrice: ${document.getElementById('selectedVariantPriceInput').value}`);
-            console.log(`Quantity: ${quantity}`);
+        function adjustStock(change) {
+            const input = document.getElementById('newStockInput');
+            let current = parseInt(input.value) || 0;
+            let newValue = current + change;
+            
+            if (newValue < 0) newValue = 0;
+            if (newValue > 10000) newValue = 10000;
+            
+            input.value = newValue;
+        }
 
-            if (!productVariantId || !productVariant) {
-                event.preventDefault();
-                showToast("Selection Required", "Please select a variant first", "error");
+        // Variant Modal Functions
+        async function openEditVariantModal(event, variantId, productId) {
+            event.stopPropagation();
+            
+            document.getElementById('variantLoading').classList.add('active');
+            
+            try {
+                const response = await fetch(`/ProductVariant/UpdateVariant?VariantId=${variantId}`);
+                
+                if (response.ok) {
+                    const html = await response.text();
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = html;
+                    
+                    const form = tempDiv.querySelector('form');
+                    if (form) {
+                        const variantName = form.querySelector('#VariantName')?.value || '';
+                        const variantValue = form.querySelector('#VariantValue')?.value || '';
+                        const price = form.querySelector('#Price')?.value || '0';
+                        const stock = form.querySelector('#Stock')?.value || '0';
+                        
+                        document.getElementById('editVariantId').value = variantId;
+                        document.getElementById('editVariantProductId').value = productId;
+                        document.getElementById('editVariantName').value = variantName;
+                        document.getElementById('editVariantValue').value = variantValue;
+                        document.getElementById('editVariantPrice').value = price;
+                        document.getElementById('editVariantStock').value = stock;
+                        
+                        document.getElementById('editVariantModal').classList.add('show');
+                        document.body.style.overflow = 'hidden';
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading variant data:', error);
+                showToast('Failed to load variant data', 'error');
+            } finally {
+                document.getElementById('variantLoading').classList.remove('active');
+            }
+        }
+
+        function closeEditVariantModal() {
+            document.getElementById('editVariantModal').classList.remove('show');
+            document.body.style.overflow = 'auto';
+            document.getElementById('editVariantForm').reset();
+        }
+
+        // إرسال تحديث الـ Stock
+        document.getElementById('editStockForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            
+            const variantId = document.getElementById('modalVariantId').value;
+            const newStock = document.getElementById('newStockInput').value;
+            
+            if (!variantId || newStock === '') {
+                showToast('Please enter a valid stock quantity', 'error');
                 return;
             }
 
-            if (quantity < 1 || quantity > maxQuantity) {
-                event.preventDefault();
-                showToast("Error", "Invalid quantity selected", "error");
-                return;
-            }
+            document.getElementById('stockLoading').classList.add('active');
 
-            // إذا كان هناك variants، تأكد من اختيار كل المجموعات
-            const variantGroups = @(Model.Variants?.Count > 0 ? "true" : "false");
-            if (variantGroups) {
-                const allGroups = Array.from(document.querySelectorAll('.variant-group-title')).map(el => {
-                    return el.textContent.replace('Select ', '').trim();
+            try {
+                const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+                
+                const formData = new FormData();
+                formData.append('ProductVariantId', variantId);
+                formData.append('NewStock', newStock);
+
+                const response = await fetch('@Url.Action("UpdateVariantsStock", "Products")', {
+                    method: 'POST',
+                    headers: {
+                        'RequestVerificationToken': token
+                    },
+                    body: formData
                 });
 
-                const missingGroups = allGroups.filter(group => !selectedVariants[group]);
-                if (missingGroups.length > 0) {
-                    event.preventDefault();
-                    showToast("Selection Required", `Please select: ${missingGroups.join(', ')}`, "error");
-                    return;
+                const data = await response.json();
+
+                if (data.success) {
+                    updateVariantStockInUI(variantId, newStock);
+                    closeEditStockModal();
+                    showToast(data.message || 'Stock updated successfully!');
+                } else {
+                    showToast(data.message || 'Failed to update stock', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('An error occurred while updating stock', 'error');
+            } finally {
+                document.getElementById('stockLoading').classList.remove('active');
+            }
+        });
+
+        // إرسال تحديث الـ Variant
+        document.getElementById('editVariantForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            
+            const variantId = document.getElementById('editVariantId').value;
+            const productId = document.getElementById('editVariantProductId').value;
+            const variantName = document.getElementById('editVariantName').value.trim();
+            const variantValue = document.getElementById('editVariantValue').value.trim();
+            const price = parseFloat(document.getElementById('editVariantPrice').value);
+            const stock = parseInt(document.getElementById('editVariantStock').value);
+            
+            if (!variantName || !variantValue) {
+                showToast('Please fill in all required fields', 'error');
+                return;
+            }
+            
+            if (isNaN(price) || price < 0) {
+                showToast('Please enter a valid price', 'error');
+                return;
+            }
+            
+            if (isNaN(stock) || stock < 0) {
+                showToast('Please enter a valid stock quantity', 'error');
+                return;
+            }
+            
+            document.getElementById('variantLoading').classList.add('active');
+            
+            try {
+                const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+                
+                const formData = new FormData();
+                formData.append('Id', variantId);
+                formData.append('ProductId', productId);
+                formData.append('VariantName', variantName);
+                formData.append('VariantValue', variantValue);
+                formData.append('Price', price);
+                formData.append('Stock', stock);
+                
+                const response = await fetch('/ProductVariant/UpdateVariant', {
+                    method: 'POST',
+                    headers: {
+                        'RequestVerificationToken': token
+                    },
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    const html = await response.text();
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = html;
+                    
+                    const errorMessage = tempDiv.querySelector('.validation-summary-errors');
+                    
+                    if (errorMessage) {
+                        showToast('Please correct the form errors', 'error');
+                    } else {
+                        updateVariantInUI(variantId, {
+                            name: variantName,
+                            value: variantValue,
+                            price: price,
+                            stock: stock
+                        });
+                        
+                        closeEditVariantModal();
+                        showToast('Variant updated successfully!');
+                    }
+                } else {
+                    showToast('Failed to update variant', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('An error occurred while updating variant', 'error');
+            } finally {
+                document.getElementById('variantLoading').classList.remove('active');
+            }
+        });
+
+        // تحديث الـ Stock في الـ UI
+        function updateVariantStockInUI(variantId, newStock) {
+            const variantElement = document.querySelector(`[data-variant-id="${variantId}"]`);
+            if (!variantElement) return;
+            
+            variantElement.setAttribute('data-variant-stock', newStock);
+            
+            const stockElement = variantElement.querySelector('.variant-stock');
+            if (stockElement) {
+                stockElement.innerHTML = `<i class="bi bi-box me-1"></i>${newStock} available`;
+                
+                if ('@User.IsInRole("Admin")' === 'True') {
+                    const variantName = variantElement.getAttribute('data-variant-name');
+                    const variantValue = variantElement.getAttribute('data-variant-value');
+                    stockElement.innerHTML += `
+                        <button class="stock-edit-btn" 
+                                onclick="openEditStockModal(event, ${variantId}, '${variantName.replace("'", "\\'")}', '${variantValue.replace("'", "\\'")}', ${newStock})"
+                                title="Edit Stock">
+                            <i class="bi bi-box-seam"></i>
+                            Stock
+                        </button>
+                        <button class="variant-edit-btn" 
+                                onclick="openEditVariantModal(event, ${variantId}, @Model.Id)"
+                                title="Edit Variant">
+                            <i class="bi bi-pencil"></i>
+                            Edit
+                        </button>
+                    `;
                 }
             }
-
-            // إذا تم التحقق بنجاح
-            showToast("Adding to Bag", "Adding item to your luxury bag...", "success");
-        });
-
-        // التحكم في الكمية من خلال لوحة المفاتيح
-        document.getElementById('quantityInput').addEventListener('keydown', function(event) {
-            if (event.key === 'ArrowUp') {
-                event.preventDefault();
-                changeQuantity(1);
-            } else if (event.key === 'ArrowDown') {
-                event.preventDefault();
-                changeQuantity(-1);
+            
+            const stockClass = newStock <= 10 ? 'stock-low' : newStock <= 50 ? 'stock-medium' : 'stock-high';
+            const statusElement = variantElement.querySelector('.variant-status');
+            if (statusElement) {
+                statusElement.className = 'variant-status ' + stockClass;
+                if (newStock <= 0) {
+                    statusElement.innerHTML = '<span>Out of Stock</span>';
+                    variantElement.classList.add('disabled');
+                } else if (newStock <= 10) {
+                    statusElement.innerHTML = '<span>Low</span>';
+                    variantElement.classList.remove('disabled');
+                } else if (newStock <= 50) {
+                    statusElement.innerHTML = '<span>Medium</span>';
+                    variantElement.classList.remove('disabled');
+                } else {
+                    statusElement.innerHTML = '<span>High</span>';
+                    variantElement.classList.remove('disabled');
+                }
             }
-        });
+            
+            if (selectedVariantId == variantId) {
+                updateMaxQuantity(parseInt(newStock));
+            }
+            
+            updateTotalStock();
+        }
 
-        // اختيار أول variant متاح تلقائياً
+        // تحديث الـ Variant في الـ UI
+        function updateVariantInUI(variantId, updatedData) {
+            const variantElement = document.querySelector(`[data-variant-id="${variantId}"]`);
+            if (!variantElement) return;
+            
+            variantElement.setAttribute('data-variant-name', updatedData.name);
+            variantElement.setAttribute('data-variant-value', updatedData.value);
+            variantElement.setAttribute('data-variant-price', updatedData.price);
+            variantElement.setAttribute('data-variant-stock', updatedData.stock);
+            
+            const variantNameElement = variantElement.querySelector('.variant-name');
+            const variantValueElement = variantElement.querySelector('.variant-value');
+            const variantPriceElement = variantElement.querySelector('.variant-price .price-amount');
+            const stockElement = variantElement.querySelector('.variant-stock');
+            
+            if (variantNameElement) variantNameElement.textContent = updatedData.name;
+            if (variantValueElement) variantValueElement.textContent = updatedData.value;
+            if (variantPriceElement) {
+                variantPriceElement.innerHTML = `${updatedData.price.toFixed(2)} <span class="currency">EGP</span>`;
+            }
+            
+            if (stockElement) {
+                stockElement.innerHTML = `<i class="bi bi-box me-1"></i>${updatedData.stock} available`;
+                
+                if ('@User.IsInRole("Admin")' === 'True') {
+                    stockElement.innerHTML += `
+                        <button class="stock-edit-btn" 
+                                onclick="openEditStockModal(event, ${variantId}, '${updatedData.name.replace("'", "\\'")}', '${updatedData.value.replace("'", "\\'")}', ${updatedData.stock})"
+                                title="Edit Stock">
+                            <i class="bi bi-box-seam"></i>
+                            Stock
+                        </button>
+                        <button class="variant-edit-btn" 
+                                onclick="openEditVariantModal(event, ${variantId}, @Model.Id)"
+                                title="Edit Variant">
+                            <i class="bi bi-pencil"></i>
+                            Edit
+                        </button>
+                    `;
+                }
+            }
+            
+            const stockClass = updatedData.stock <= 10 ? 'stock-low' : 
+                              updatedData.stock <= 50 ? 'stock-medium' : 'stock-high';
+            const statusElement = variantElement.querySelector('.variant-status');
+            if (statusElement) {
+                statusElement.className = 'variant-status ' + stockClass;
+                if (updatedData.stock <= 0) {
+                    statusElement.innerHTML = '<span>Out of Stock</span>';
+                    variantElement.classList.add('disabled');
+                } else if (updatedData.stock <= 10) {
+                    statusElement.innerHTML = '<span>Low</span>';
+                    variantElement.classList.remove('disabled');
+                } else if (updatedData.stock <= 50) {
+                    statusElement.innerHTML = '<span>Medium</span>';
+                    variantElement.classList.remove('disabled');
+                } else {
+                    statusElement.innerHTML = '<span>High</span>';
+                    variantElement.classList.remove('disabled');
+                }
+            }
+            
+            if (selectedVariantId == variantId) {
+                selectedVariantName = updatedData.name;
+                selectedVariantValue = updatedData.value;
+                selectedVariantPrice = updatedData.price;
+                selectedVariantStock = updatedData.stock;
+                
+                document.getElementById('selectedVariantValue').textContent = updatedData.value;
+                document.getElementById('selectedVariantName').textContent = updatedData.name;
+                document.getElementById('selectedVariantPrice').textContent = `${updatedData.price} EGP`;
+                
+                updateMaxQuantity(updatedData.stock);
+            }
+            
+            updateTotalStock();
+        }
+
+        // تحديث الـ stock الإجمالي
+        function updateTotalStock() {
+            let total = 0;
+            document.querySelectorAll('.variant-card').forEach(card => {
+                const stock = parseInt(card.getAttribute('data-variant-stock')) || 0;
+                total += stock;
+            });
+            
+            const totalStockElement = document.querySelector('.stock-total');
+            if (totalStockElement) {
+                totalStockElement.textContent = total;
+                
+                const totalStockClass = total <= 10 ? 'stock-low' : total <= 50 ? 'stock-medium' : 'stock-high';
+                const badge = totalStockElement.parentElement.querySelector('.stock-badge');
+                if (badge) {
+                    badge.className = 'stock-badge ' + totalStockClass;
+                    badge.innerHTML = total <= 10 ? 
+                        '<i class="bi bi-exclamation-triangle"></i><span>Low</span>' :
+                        total <= 50 ? 
+                        '<i class="bi bi-info-circle"></i><span>Medium</span>' :
+                        '<i class="bi bi-check-circle"></i><span>High</span>';
+                }
+            }
+            
+            maxQuantity = total;
+            if (total <= 0) {
+                document.getElementById('addToBasketBtn').disabled = true;
+                document.getElementById('addToBasketBtn').innerHTML = '<span><i class="bi bi-x-circle me-2"></i> Out of Stock</span>';
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             @if (Model.Variants?.Any() == true)
             {
-                        <text>
-                        // اختيار أول variant متاح في كل مجموعة
-                        document.querySelectorAll('.variant-group').forEach(group => {
-                            const availableVariants = group.querySelectorAll('.variant-card:not(.disabled)');
-                            if (availableVariants.length > 0) {
-                                availableVariants[0].click();
-                            }
-                        });
-                        </text>
+                <text>
+                document.querySelectorAll('.variant-group').forEach(group => {
+                    const availableVariants = group.querySelectorAll('.variant-card:not(.disabled)');
+                    if (availableVariants.length > 0) {
+                        availableVariants[0].click();
+                    }
+                });
+                </text>
             }
 
-            // تحديث أقصى كمية افتراضية
             if (@isOutOfStock.ToString().ToLower()) {
                 document.getElementById('quantityInput').value = 0;
             }
+
+            // إغلاق Modals عند النقر خارجها
+            document.getElementById('editStockModal').addEventListener('click', function(event) {
+                if (event.target === this) {
+                    closeEditStockModal();
+                }
+            });
+
+            document.getElementById('editVariantModal').addEventListener('click', function(event) {
+                if (event.target === this) {
+                    closeEditVariantModal();
+                }
+            });
+
+            // إغلاق Modals عند الضغط على Escape
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape') {
+                    closeEditStockModal();
+                    closeEditVariantModal();
+                }
+            });
         });
     </script>
 }

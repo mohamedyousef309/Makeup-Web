@@ -7,6 +7,10 @@
     // هذه القائمة ستأتي من ViewBag
     var categories = ViewBag.Categories as IEnumerable<Domain_Layer.DTOs._ِCategoryDtos.CategoryLookupDto> ??
                      new List<Domain_Layer.DTOs._ِCategoryDtos.CategoryLookupDto>();
+
+    // جلب الـ Variants من ViewBag
+    var variants = ViewBag.Variants as IEnumerable<dynamic> ?? new List<dynamic>();
+    var totalStock = variants.Sum(v => v?.Stock ?? 0);
 }
 
 @Html.AntiForgeryToken()
@@ -25,6 +29,7 @@
             --danger-red: #ff4d4d;
             --success-green: #28a745;
             --warning-yellow: #ffc107;
+            --variant-blue: #6a8fd8;
         }
 
         body {
@@ -279,6 +284,15 @@
             letter-spacing: 0.5px;
         }
 
+        .variant-value {
+            color: var(--text-light);
+            font-weight: 600;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            border: 1px solid #333;
+        }
+
         .btn-add-variant {
             background: rgba(40, 167, 69, 0.1);
             border: 1px dashed rgba(40, 167, 69, 0.3);
@@ -293,6 +307,8 @@
             justify-content: center;
             gap: 10px;
             margin-top: 20px;
+            text-decoration: none;
+            text-align: center;
         }
 
             .btn-add-variant:hover {
@@ -301,41 +317,66 @@
                 color: white;
             }
 
-        .remove-variant {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            color: var(--danger-red);
-            background: rgba(255, 77, 77, 0.1);
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
+        .variant-actions {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #333;
         }
 
-            .remove-variant:hover {
-                background: rgba(255, 77, 77, 0.2);
+        .btn-edit-variant {
+            background: rgba(106, 143, 216, 0.1);
+            color: var(--variant-blue);
+            border: 1px solid var(--variant-blue);
+            border-radius: 8px;
+            padding: 8px 15px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+        }
+
+            .btn-edit-variant:hover {
+                background: var(--variant-blue);
                 color: white;
-                transform: scale(1.1);
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(106, 143, 216, 0.2);
+            }
+
+        .btn-delete-variant {
+            background: rgba(255, 77, 77, 0.1);
+            color: var(--danger-red);
+            border: 1px solid var(--danger-red);
+            border-radius: 8px;
+            padding: 8px 15px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+        }
+
+            .btn-delete-variant:hover {
+                background: var(--danger-red);
+                color: white;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(255, 77, 77, 0.2);
             }
 
         .stock-summary {
             background: rgba(214, 138, 138, 0.1);
             border: 1px solid rgba(214, 138, 138, 0.2);
             border-radius: 12px;
-            padding: 15px;
+            padding: 20px;
             margin-top: 20px;
-            display: none;
         }
-
-            .stock-summary.show {
-                display: block;
-                animation: fadeIn 0.3s ease;
-            }
 
         .stock-total {
             display: flex;
@@ -343,7 +384,7 @@
             align-items: center;
             color: var(--primary-pink);
             font-weight: 600;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
         }
 
         /* Toast Notification */
@@ -386,6 +427,27 @@
             font-size: 0.9rem;
         }
 
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            border: 2px dashed #333;
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .empty-state-text {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
         /* Responsive Design */
         @@media (max-width: 768px) {
             .edit-card {
@@ -399,6 +461,16 @@
 
             .variant-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .variant-actions {
+                flex-direction: column;
+            }
+
+            .btn-edit-variant,
+            .btn-delete-variant {
+                width: 100%;
+                justify-content: center;
             }
         }
     </style>
@@ -507,57 +579,87 @@
                     Note: Product variants are managed separately. Price and stock are handled at the variant level.
                 </p>
 
-                <!-- Button to go to variants management -->
-                <div class="text-center">
-                    <a href="@Url.Action("ManageVariants", "Products", new { productId = Model.Id })"
-                       class="btn btn-primary" style="background: var(--primary-pink); border: none;">
-                        <i class="bi bi-gear me-2"></i>Manage Variants
-                    </a>
-                </div>
+                <!-- Button to add new variant -->
+                <a asp-action="CreateVariant"
+                   asp-controller="Products"
+                   asp-route-productId="@Model.Id"
+                   class="btn-add-variant">
+                    <i class="bi bi-plus-circle"></i> Add New Variant
+                </a>
 
                 <!-- Display existing variants -->
                 <div id="variantsContainer" class="mt-4">
-                    @if (ViewBag.Variants != null)
+                    @if (variants != null && variants.Any())
                     {
-                        foreach (var variant in ViewBag.Variants)
+                        foreach (var variant in variants)
                         {
                             <div class="variant-card">
                                 <div class="variant-grid">
                                     <div class="variant-field">
-                                        <label class="variant-label">Type</label>
-                                        <input type="text" class="form-control-custom" value="@variant.VariantName" readonly />
+                                        <label class="variant-label">Variant Type</label>
+                                        <div class="variant-value">
+                                            @variant.VariantName
+                                        </div>
                                     </div>
                                     <div class="variant-field">
                                         <label class="variant-label">Value</label>
-                                        <input type="text" class="form-control-custom" value="@variant.VariantValue" readonly />
+                                        <div class="variant-value">
+                                            @variant.VariantValue
+                                        </div>
                                     </div>
                                     <div class="variant-field">
-                                        <label class="variant-label">Price (EGP)</label>
-                                        <input type="text" class="form-control-custom" value="@variant.Price.ToString("C")" readonly />
+                                        <label class="variant-label">Price</label>
+                                        <div class="variant-value">
+                                            @variant.Price.ToString("C")
+                                        </div>
                                     </div>
                                     <div class="variant-field">
-                                        <label class="variant-label">Quantity</label>
-                                        <input type="text" class="form-control-custom" value="@variant.Stock" readonly />
+                                        <label class="variant-label">Stock</label>
+                                        <div class="variant-value">
+                                            @variant.Stock units
+                                        </div>
                                     </div>
+                                </div>
+
+                                <!-- Variant Actions -->
+                                <div class="variant-actions">
+                                    <a asp-action="UpdateVariant"
+                                       asp-controller="Products"
+                                       asp-route-VariantId="@variant.Id"
+                                       class="btn-edit-variant">
+                                        <i class="bi bi-pencil"></i>
+                                        Edit Variant
+                                    </a>
+
+                                    <a asp-action="DeleteVariant"
+                                       asp-controller="Products"
+                                       asp-route-variantId="@variant.Id"
+                                       class="btn-delete-variant"
+                                       onclick="return confirm('Are you sure you want to delete this variant? This action cannot be undone.')">
+                                        <i class="bi bi-trash"></i>
+                                        Delete
+                                    </a>
                                 </div>
                             </div>
                         }
                     }
                     else
                     {
-                        <div class="text-center py-4">
-                            <i class="bi bi-box-seam" style="font-size: 3rem; color: var(--text-muted);"></i>
-                            <p class="text-muted mt-3">No variants available</p>
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="bi bi-box-seam"></i>
+                            </div>
+                            <p class="empty-state-text">No variants available</p>
                             <small class="text-muted">Add variants to manage prices and stock</small>
                         </div>
                     }
                 </div>
 
                 <!-- Stock Summary -->
-                <div class="stock-summary" id="stockSummary">
+                <div class="stock-summary">
                     <div class="stock-total">
                         <span>Total Stock Across All Variants:</span>
-                        <span id="totalStockValue">@(ViewBag.TotalStock ?? 0)</span>
+                        <span id="totalStockValue">@totalStock units</span>
                     </div>
                 </div>
             </div>
@@ -685,16 +787,16 @@
         // عرض رسائل التحقق من الـ ModelState
         @if (!ViewData.ModelState.IsValid)
         {
-                <text>
-                document.addEventListener('DOMContentLoaded', function() {
-                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
-                    {
-                            <text>
-                            showToast("Validation Error", "@error.ErrorMessage", "error");
-                            </text>
-                    }
-                });
-                </text>
+                    <text>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                        {
+                                    <text>
+                                    showToast("Validation Error", "@error.ErrorMessage", "error");
+                                    </text>
+                        }
+                    });
+                    </text>
         }
 
         // Show stock summary if there are variants
@@ -705,9 +807,19 @@
             if (variantsContainer && variantsContainer.children.length > 0) {
                 const variantCards = document.querySelectorAll('.variant-card');
                 if (variantCards.length > 0) {
-                    stockSummary.classList.add('show');
+                    stockSummary.style.display = 'block';
                 }
             }
+        });
+
+        // Confirm before deleting variant
+        const deleteButtons = document.querySelectorAll('.btn-delete-variant');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                if (!confirm('Are you sure you want to delete this variant? This action cannot be undone.')) {
+                    e.preventDefault();
+                }
+            });
         });
     </script>
 

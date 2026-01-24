@@ -24,21 +24,14 @@ namespace Application_Layer.CQRS.Products.Commands.AddVariantsToProduct
             try
             {
                 
-                var variants = await _variantRepo.GetByCriteriaQueryable(v => request.VariantIds.Contains(v.Id))
-                                                 .ToListAsync(cancellationToken);
+                var rowsAffected = await _variantRepo.GetByCriteriaQueryable(v => request.VariantIds.Contains(v.Id))
+                    .ExecuteUpdateAsync(setters=> setters
+                        .SetProperty(v => v.ProductId, request.ProductId));
 
-                if (variants == null || !variants.Any())
+                if (rowsAffected == 0)
                 {
                     return RequestRespones<bool>.Fail("No valid variants found to link.", 404);
                 }
-
-                
-                foreach (var variant in variants)
-                {
-                    variant.ProductId = request.ProductId;
-                }
-
-                await _variantRepo.SaveChanges();
 
                 return RequestRespones<bool>.Success(true, 200, "Product variants updated successfully.");
             }

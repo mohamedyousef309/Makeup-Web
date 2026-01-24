@@ -6,7 +6,6 @@ using Application_Layer.CQRS.Products.Commands.UpdateProduct;
 using Application_Layer.CQRS.Products.Queries;
 using Application_Layer.CQRS.Products.Queries.GetProductsByIds;
 using Application_Layer.CQRS.Products.Queries.GetProductsByCategory; // Added Namespace
-using Application_Layer.Orchestrators;
 using Domain_Layer.DTOs;
 using Domain_Layer.DTOs._ِCategoryDtos;
 using Domain_Layer.DTOs.ProductDtos;
@@ -24,12 +23,10 @@ namespace Makeup_Web.Controllers
     public class ProductsController : Controller
     {
         private readonly IMediator _mediator;
-        private readonly ProductOrchestrator _productOrchestrator;
 
-        public ProductsController(IMediator mediator, ProductOrchestrator productOrchestrator)
+        public ProductsController(IMediator mediator)
         {
             _mediator = mediator;
-            _productOrchestrator = productOrchestrator;
         }
 
         #region Queries (Read Operations)
@@ -192,17 +189,17 @@ namespace Makeup_Web.Controllers
             return Json(new { success = false, message = result.Message });
         }
 
-        [HttpPost]
-        [HasPermission("Products.Edit")]
-        public async Task<IActionResult> LinkVariants(int productId, [FromBody] List<int> variantIds)
-        {
-            var result = await _productOrchestrator.LinkVariantsToProductAsync(productId, variantIds);
+        //[HttpPost]
+        //[HasPermission("Products.Edit")]
+        //public async Task<IActionResult> LinkVariants(int productId, [FromBody] List<int> variantIds)
+        //{
+        //    var result = await _productOrchestrator.LinkVariantsToProductAsync(productId, variantIds);
 
-            if (result.IsSuccess)
-                return Json(new { success = true, message = result.Message });
+        //    if (result.IsSuccess)
+        //        return Json(new { success = true, message = result.Message });
 
-            return Json(new { success = false, message = result.Message });
-        }
+        //    return Json(new { success = false, message = result.Message });
+        //}
 
         #endregion
 

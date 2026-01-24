@@ -32,19 +32,7 @@ namespace Makeup_Web.Controllers
         }
 
       
-        [HttpPost]
-        public async Task<IActionResult> UpdateStock(int id, int newStock)
-        {
-           
-            var result = await _mediator.Send(new UpdateVariantStockCommand(id, newStock));
-
-            if (result.IsSuccess)
-            {
-                return Json(new { success = true, message = result.Message });
-            }
-
-            return Json(new { success = false, message = result.Message });
-        }
+       
 
         public async Task<IActionResult> GetAllVariants(int productId, int pageIndex = 1, int pageSize = 10, string? sortBy = "id", string? sortDir = "asc", string? search = null)
         {
