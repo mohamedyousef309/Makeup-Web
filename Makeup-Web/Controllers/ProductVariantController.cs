@@ -1,5 +1,6 @@
 ﻿using Application_Layer.CQRS.Products.Commands.Createvariants;
 using Application_Layer.CQRS.Products.Commands.UpdateVariants;
+using Application_Layer.CQRS.Products.Commands.UpdateVariantStock; // تأكد من إضافة هذا الـ Namespace
 using Application_Layer.CQRS.Products.Queries;
 using Application_Layer.CQRS.Products.Queries.GetProductVariantsByProductid;
 using Application_Layer.CQRS.Products.UpdateProductVariantStock;
@@ -20,15 +21,31 @@ namespace Makeup_Web.Controllers
     {
         private readonly IMediator _mediator;
 
+        public ProductVariantController(IMediator mediator)
+        {
+            this._mediator = mediator;
+        }
+
         public IActionResult Index()
         {
             return View();
         }
 
-        public ProductVariantController(IMediator mediator)
+      
+        [HttpPost]
+        public async Task<IActionResult> UpdateStock(int id, int newStock)
         {
-            this._mediator = mediator;
+           
+            var result = await _mediator.Send(new UpdateVariantStockCommand(id, newStock));
+
+            if (result.IsSuccess)
+            {
+                return Json(new { success = true, message = result.Message });
+            }
+
+            return Json(new { success = false, message = result.Message });
         }
+
         public async Task<IActionResult> GetAllVariants(int productId, int pageIndex = 1, int pageSize = 10, string? sortBy = "id", string? sortDir = "asc", string? search = null)
         {
             var result = await _mediator.Send(new GetAllProductVariantsQuery(productId, pageSize, pageIndex, sortBy, sortDir, search));
@@ -78,27 +95,8 @@ namespace Makeup_Web.Controllers
             return View(model);
         }
 
-        //[HttpPost]
-        //public async Task<IActionResult> CreateVariant(int productId, UpdateProductVariantViewModel model)
-        //{
-        //    var dto = new UpdateProductVariantDto
-        //    {
-        //        VariantName = model.VariantName,
-        //        VariantValue = model.VariantValue,
-        //        Stock = model.Stock
-        //    };
-
-        //    var result = await _mediator.Send(new CreatevariantsCommand(productId, new[] { dto }));
-
-        //    if (!result.IsSuccess)
-        //        TempData["ErrorMessage"] = result.Message;
-
-        //    return RedirectToAction(nameof(GetAllVariants), new { productId });
-        //}
-
         [HttpGet]
-
-        public async Task<IActionResult> UpdateVariant(int VariantId) 
+        public async Task<IActionResult> UpdateVariant(int VariantId)
         {
             var result = await _mediator.Send(new GetProductVariantByIdQuery(VariantId));
             if (!result.IsSuccess)
@@ -110,18 +108,17 @@ namespace Makeup_Web.Controllers
             var model = new UpdateProductVariantViewModel
             {
                 Id = dto.Id,
-                ProductId=dto.ProductId,
+                ProductId = dto.ProductId,
                 VariantName = dto.VariantName,
                 VariantValue = dto.VariantValue,
-                Price=dto.Price,
+                Price = dto.Price,
                 Stock = dto.Stock
             };
             return View(model);
         }
 
-
         [HttpPost]
-        public async Task<IActionResult> UpdateVariant( UpdateProductVariantViewModel model)
+        public async Task<IActionResult> UpdateVariant(UpdateProductVariantViewModel model)
         {
             var dto = new UpdateProductVariantDto
             {
@@ -160,18 +157,14 @@ namespace Makeup_Web.Controllers
         public async Task<IActionResult> EditVariant(int productid)
         {
             var variants = await _mediator.Send(new GetProductVariantsByProductidQuery(productid));
-            if (!variants.IsSuccess||variants.Data==null)
+            if (!variants.IsSuccess || variants.Data == null)
             {
                 TempData["ErrorMessage"] = variants.Message;
-
                 return View();
             }
 
             return View(variants.Data);
-
         }
-
-
 
         [HttpPost]
         public async Task<IActionResult> DeleteVariant(int id, int productId)
