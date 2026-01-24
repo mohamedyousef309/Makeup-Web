@@ -25,9 +25,9 @@ namespace Application_Layer.CQRS.Products.Validators
                 .GreaterThan(0)
                 .WithMessage("Price must be greater than 0");
 
-            RuleFor(x => x.Stock)
-                .GreaterThanOrEqualTo(0)
-                .WithMessage("Stock cannot be negative");
+            //RuleFor(x => x.Stock)
+            //    .GreaterThanOrEqualTo(0)
+            //    .WithMessage("Stock cannot be negative");
         
         }
     }

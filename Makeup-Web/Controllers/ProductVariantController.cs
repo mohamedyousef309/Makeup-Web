@@ -2,12 +2,17 @@
 using Application_Layer.CQRS.Products.Commands.UpdateVariants;
 using Application_Layer.CQRS.Products.Queries;
 using Application_Layer.CQRS.Products.Queries.GetProductVariantsByProductid;
+using Application_Layer.CQRS.Products.UpdateProductVariantStock;
 using Domain_Layer.DTOs;
 using Domain_Layer.DTOs.ProductVariantDtos;
+using Domain_Layer.ViewModels.ProductsViewModels;
 using Domain_Layer.ViewModels.ProductsViewModels.ProductsVariantViewModel;
 using Domain_Layer.ViewModels.ProductsViewModels.UpdateProductsVariantViewModel;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
+//using static Microsoft.CodeAnalysis.CSharp.SyntaxTokenParser;
+
 
 namespace Makeup_Web.Controllers
 {
@@ -126,12 +131,30 @@ namespace Makeup_Web.Controllers
                 Stock = model.Stock
             };
 
-            var result = await _mediator.Send(new UpdateProductVariantCommand(new[] { dto }));
+            var result = await _mediator.Send(new UpdateProductVariantCommand(model.Id,model.VariantName,model.VariantValue,model.Price));
 
             if (!result.IsSuccess)
+            {
                 TempData["ErrorMessage"] = result.Message;
+                return View(model);
+            }
 
-            return RedirectToAction(nameof(GetAllVariants), new { productId });
+            return RedirectToAction("Details", "Products", new { productId = model.ProductId });
+
+        }
+
+        [HttpPost]
+
+        public async Task<IActionResult> UpdateVariantsStock(UpdateProdcutVariantStockViewModle Modle)
+        {
+           var UpdateVariantResult = await _mediator.Send( new UpdateProductVariantStockCommand(Modle.ProductVariantId,Modle.NewStock));
+
+            if (UpdateVariantResult.IsSuccess)
+                return Json(new { success = true, message = UpdateVariantResult.Message });
+
+            return Json(new { success = false, message = UpdateVariantResult.Message });
+
+
         }
 
         public async Task<IActionResult> EditVariant(int productid)
