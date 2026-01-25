@@ -100,7 +100,6 @@ namespace Makeup_Web.Controllers
                 VariantName = dto.VariantName,
                 VariantValue = dto.VariantValue,
                 Price = dto.Price,
-                Stock = dto.Stock
             };
             return View(model);
         }
@@ -108,15 +107,17 @@ namespace Makeup_Web.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateVariant(UpdateProductVariantViewModel model)
         {
-            var dto = new UpdateProductVariantDto
+            if (!ModelState.IsValid)
             {
-                Id = model.Id,
-                VariantName = model.VariantName,
-                VariantValue = model.VariantValue,
-                Stock = model.Stock
-            };
+                // إذا كان هناك أخطاء في النموذج، إرجاعه مع الأخطاء
+                return View(model);
+            }
 
-            var result = await _mediator.Send(new UpdateProductVariantCommand(model.Id,model.VariantName,model.VariantValue,model.Price));
+            var result = await _mediator.Send(new UpdateProductVariantCommand(
+                model.Id,
+                model.VariantName,
+                model.VariantValue,
+                model.Price));
 
             if (!result.IsSuccess)
             {
@@ -124,7 +125,7 @@ namespace Makeup_Web.Controllers
                 return View(model);
             }
 
-            return RedirectToAction("Details", "Products", new { productId = model.ProductId });
+            return RedirectToAction("Details", "Products", new { id = model.ProductId });
 
         }
 
@@ -132,12 +133,20 @@ namespace Makeup_Web.Controllers
 
         public async Task<IActionResult> UpdateVariantsStock(UpdateProdcutVariantStockViewModle Modle)
         {
-           var UpdateVariantResult = await _mediator.Send( new UpdateProductVariantStockCommand(Modle.ProductVariantId,Modle.NewStock));
+            if (!ModelState.IsValid)
+            {
+                return Json(new { success = false, message = "Invalid data" });
+            }
 
-            if (UpdateVariantResult.IsSuccess)
-                return Json(new { success = true, message = UpdateVariantResult.Message });
+            var result = await _mediator.Send(new UpdateProductVariantStockCommand(
+                Modle.ProductVariantId,
+                Modle.NewStock
+            ));
 
-            return Json(new { success = false, message = UpdateVariantResult.Message });
+            if (result.IsSuccess)
+                return Json(new { success = true, message = result.Message });
+
+            return Json(new { success = false, message = result.Message });
 
 
         }

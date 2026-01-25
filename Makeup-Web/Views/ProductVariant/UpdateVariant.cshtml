@@ -2,13 +2,14 @@
 @model UpdateProductVariantViewModel
 
 @{
-    ViewData["Title"] = "Update Variant - Pro Makeup Studio";
+    ViewData["Title"] = "Edit Variant | Pro Makeup Studio";
 }
 
 @section Styles {
     <style>
         :root {
             --primary-pink: #d68a8a;
+            --primary-hover: #c27676;
             --dark-bg: #0f0f0f;
             --card-bg: #1a1a1a;
             --input-bg: #252525;
@@ -16,8 +17,7 @@
             --text-muted: #a0a0a0;
             --accent-gold: #c5a059;
             --danger-red: #ff4d4d;
-            --success-green: #2ecc71;
-            --variant-blue: #6a8fd8;
+            --success-green: #28a745;
         }
 
         body {
@@ -26,37 +26,39 @@
             font-family: 'Inter', sans-serif;
         }
 
-        .variant-header {
-            padding: 60px 0 30px;
+        /* Header Section */
+        .page-header {
+            padding: 40px 0 20px;
             text-align: center;
-            background: linear-gradient(to bottom, #1a1a1a 0%, #0f0f0f 100%);
+            background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
+            border-bottom: 1px solid #252525;
             margin-bottom: 30px;
-            border-bottom: 1px solid #222;
         }
 
-        .variant-title {
+        .page-title {
             font-family: 'Playfair Display', serif;
             font-size: 2.5rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            background: linear-gradient(45deg, #fff 30%, var(--variant-blue) 100%);
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #fff 30%, var(--primary-pink) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            letter-spacing: 2px;
         }
 
-        .variant-subtitle {
+        .page-subtitle {
             color: var(--text-muted);
             font-size: 1rem;
-            margin-top: 10px;
-            font-weight: 300;
+            max-width: 600px;
+            margin: 0 auto;
         }
 
-        .variant-form-container {
-            max-width: 700px;
-            margin: 0 auto 50px;
+        /* Form Container */
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto 60px;
             background: var(--card-bg);
-            border-radius: 20px;
+            border-radius: 16px;
             border: 1px solid #252525;
             overflow: hidden;
         }
@@ -69,141 +71,31 @@
         }
 
         .form-icon {
+            color: var(--primary-pink);
             font-size: 2.5rem;
-            color: var(--variant-blue);
             margin-bottom: 15px;
         }
 
         .form-title {
             font-family: 'Playfair Display', serif;
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             font-weight: 600;
             margin-bottom: 5px;
         }
 
+        /* Form Body */
         .form-body {
-            padding: 40px;
+            padding: 30px;
         }
 
-        .form-group-custom {
-            margin-bottom: 25px;
-        }
-
-        .form-label-custom {
-            display: block;
-            margin-bottom: 10px;
-            font-weight: 600;
-            color: var(--text-light);
-            font-size: 0.95rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .form-control-custom {
-            background: var(--input-bg);
-            border: 1px solid #444;
-            border-radius: 12px;
-            color: var(--text-light);
-            padding: 14px 16px;
-            width: 100%;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-            .form-control-custom:focus {
-                border-color: var(--variant-blue);
-                outline: none;
-                box-shadow: 0 0 0 3px rgba(106, 143, 216, 0.2);
-            }
-
-        .input-group {
-            position: relative;
-        }
-
-        .input-group-text {
-            background: var(--input-bg);
-            border: 1px solid #444;
-            color: var(--text-muted);
-            padding: 14px 16px;
-            border-right: none;
-            border-radius: 12px 0 0 12px;
-            font-weight: 500;
-        }
-
-        .currency-input {
-            border-left: none !important;
-            border-radius: 0 12px 12px 0 !important;
-        }
-
-        .textarea-custom {
-            min-height: 120px;
-            resize: vertical;
-        }
-
-        .form-actions {
-            display: flex;
-            gap: 15px;
-            margin-top: 40px;
-            padding-top: 30px;
-            border-top: 1px solid #333;
-        }
-
-        .btn-update {
-            background: var(--variant-blue);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            padding: 14px 28px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
-            flex: 1;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-            .btn-update:hover {
-                background: #5a7fc9;
-                transform: translateY(-2px);
-                box-shadow: 0 10px 20px rgba(106, 143, 216, 0.2);
-            }
-
-        .btn-cancel {
-            background: transparent;
-            color: var(--text-muted);
-            border: 1px solid #444;
-            border-radius: 12px;
-            padding: 14px 28px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
-            flex: 1;
-            cursor: pointer;
-            text-decoration: none;
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-            .btn-cancel:hover {
-                background: #333;
-                color: var(--text-light);
-                border-color: #555;
-            }
-
+        /* Validation */
         .validation-summary {
             background: rgba(255, 77, 77, 0.1);
-            border: 1px solid rgba(255, 77, 77, 0.3);
+            border: 1px solid var(--danger-red);
             border-radius: 12px;
             padding: 15px;
             margin-bottom: 25px;
+            color: #ff9e9e;
         }
 
             .validation-summary ul {
@@ -212,38 +104,68 @@
             }
 
             .validation-summary li {
-                color: var(--danger-red);
                 font-size: 0.9rem;
+            }
+
+        /* Form Groups */
+        .form-group-custom {
+            margin-bottom: 25px;
+        }
+
+        .form-label-custom {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-light);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-control-custom {
+            width: 100%;
+            background: var(--input-bg);
+            border: 1px solid #333;
+            border-radius: 12px;
+            color: var(--text-light);
+            padding: 12px 15px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+            .form-control-custom:focus {
+                border-color: var(--primary-pink);
+                outline: none;
+                box-shadow: 0 0 0 3px rgba(214, 138, 138, 0.2);
+            }
+
+            .form-control-custom.input-validation-error {
+                border-color: var(--danger-red);
             }
 
         .field-validation-error {
             display: block;
             color: var(--danger-red);
             font-size: 0.85rem;
-            margin-top: 8px;
-            font-weight: 500;
+            margin-top: 5px;
         }
 
-        .input-validation-error {
-            border-color: var(--danger-red) !important;
-        }
-
-        .readonly-info {
-            background: rgba(106, 143, 216, 0.1);
+        /* Read-only Info */
+        .info-section {
+            background: rgba(214, 138, 138, 0.1);
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 25px;
-            border: 1px solid rgba(106, 143, 216, 0.3);
+            border: 1px solid var(--primary-pink);
         }
 
         .info-row {
             display: flex;
-            gap: 15px;
             margin-bottom: 10px;
         }
 
         .info-label {
-            color: var(--variant-blue);
+            color: var(--primary-pink);
             font-weight: 600;
             min-width: 120px;
         }
@@ -252,54 +174,109 @@
             color: var(--text-light);
         }
 
-        /* Toast Notification */
-        .custom-toast {
-            position: fixed;
-            top: 30px;
-            right: 30px;
-            background: var(--card-bg);
+        /* Form Actions */
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #333;
+        }
+
+        .btn-update {
+            flex: 1;
+            background: linear-gradient(45deg, var(--primary-pink), var(--accent-gold));
             color: white;
-            padding: 20px 25px;
+            border: none;
             border-radius: 12px;
-            border-left: 4px solid var(--danger-red);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            z-index: 99999;
+            padding: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
-            gap: 15px;
-            transform: translateX(150%);
-            transition: transform 0.4s ease;
-            max-width: 400px;
+            justify-content: center;
+            gap: 8px;
         }
 
-        .toast-show {
-            transform: translateX(0);
+            .btn-update:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 20px rgba(214, 138, 138, 0.3);
+            }
+
+        .btn-cancel {
+            flex: 1;
+            background: transparent;
+            color: var(--text-light);
+            border: 1px solid #444;
+            border-radius: 12px;
+            padding: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
-        .toast-icon {
-            color: var(--danger-red);
-            font-size: 1.5rem;
+            .btn-cancel:hover {
+                background: #333;
+                border-color: #555;
+            }
+
+        /* Price Input */
+        .price-input-container {
+            position: relative;
         }
 
-        .toast-content h4 {
-            margin: 0 0 5px 0;
-            font-size: 1.1rem;
-        }
-
-        .toast-content p {
-            margin: 0;
+        .price-symbol {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
             color: var(--text-muted);
-            font-size: 0.9rem;
+            font-weight: 600;
         }
 
-        /* Responsive Design */
+        .price-input {
+            padding-left: 40px !important;
+        }
+
+        /* Alert Messages */
+        .alert {
+            max-width: 600px;
+            margin: 20px auto;
+            border-radius: 12px;
+            border: 1px solid;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-success {
+            background: rgba(40, 167, 69, 0.2);
+            border-color: var(--success-green);
+            color: #6fcf97;
+        }
+
+        .alert-danger {
+            background: rgba(255, 77, 77, 0.2);
+            border-color: var(--danger-red);
+            color: #ff9e9e;
+        }
+
+        /* Responsive */
         @@media (max-width: 768px) {
-            .variant-title {
-                font-size: 2rem;
+            .form-container {
+                margin: 0 15px 40px;
             }
 
             .form-body {
-                padding: 25px;
+                padding: 20px;
             }
 
             .form-actions {
@@ -318,41 +295,43 @@
     </style>
 }
 
-<!-- Toast Notification for Error Messages -->
-@if (TempData["ErrorMessage"] != null)
-{
-    <div id="errorToast" class="custom-toast">
-        <div class="toast-icon">
-            <i class="bi bi-exclamation-triangle"></i>
-        </div>
-        <div class="toast-content">
-            <h4>Error</h4>
-            <p>@TempData["ErrorMessage"]</p>
-        </div>
-    </div>
-}
-
-<div class="variant-header">
-    <div class="container">
-        <h1 class="variant-title">Update Product Variant</h1>
-        <p class="variant-subtitle">Edit variant details for your luxury product</p>
-    </div>
-</div>
-
 <div class="container">
-    <div class="variant-form-container">
+    <!-- Alert Messages -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            <i class="bi bi-check-circle me-2"></i>
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1 class="page-title">Edit Product Variant</h1>
+        <p class="page-subtitle">Update the details of your product variant</p>
+    </div>
+
+    <!-- Form Container -->
+    <div class="form-container">
         <!-- Form Header -->
         <div class="form-header">
             <div class="form-icon">
-                <i class="bi bi-tag"></i>
+                <i class="bi bi-pencil-square"></i>
             </div>
-            <h2 class="form-title">Variant Information</h2>
-            <p class="text-muted mb-0">Update the variant properties for your product</p>
+            <h2 class="form-title">Variant Details</h2>
+            <p class="text-muted">Update the name, value, and price of this variant</p>
         </div>
 
         <!-- Form Body -->
         <div class="form-body">
-            <!-- Validation Summary -->
             @if (!ViewData.ModelState.IsValid)
             {
                 <div class="validation-summary">
@@ -360,18 +339,14 @@
                 </div>
             }
 
-            <!-- Read-only Information -->
-            <div class="readonly-info">
+            <!-- Read-only Info -->
+            <div class="info-section">
                 <div class="info-row">
-                    <span class="info-label">
-                        <i class="bi bi-hash"></i> Variant ID:
-                    </span>
+                    <span class="info-label">Variant ID:</span>
                     <span class="info-value">@Model.Id</span>
                 </div>
                 <div class="info-row">
-                    <span class="info-label">
-                        <i class="bi bi-box"></i> Product ID:
-                    </span>
+                    <span class="info-label">Product ID:</span>
                     <span class="info-value">@Model.ProductId</span>
                 </div>
             </div>
@@ -379,78 +354,63 @@
             <form asp-action="UpdateVariant" method="post">
                 @Html.AntiForgeryToken()
 
-                <!-- Hidden fields for Id and ProductId -->
                 <input type="hidden" asp-for="Id" />
                 <input type="hidden" asp-for="ProductId" />
 
                 <!-- Variant Name -->
                 <div class="form-group-custom">
                     <label class="form-label-custom" asp-for="VariantName">
-                        <i class="bi bi-tag me-2"></i>Variant Name
+                        <i class="bi bi-tag me-1"></i>Variant Name
                     </label>
                     <input asp-for="VariantName"
-                           class="form-control-custom @(ViewData.ModelState["VariantName"]?.Errors.Any() == true ? "input-validation-error" : "")"
+                           class="form-control-custom"
                            placeholder="e.g., Color, Size, Type" />
                     <span asp-validation-for="VariantName" class="field-validation-error"></span>
-                    <small class="text-muted mt-2 d-block">The type of variant (e.g., Color, Size, Material)</small>
+                    <small class="text-muted d-block mt-2">The type of variant (e.g., Color, Size, Material)</small>
                 </div>
 
                 <!-- Variant Value -->
                 <div class="form-group-custom">
                     <label class="form-label-custom" asp-for="VariantValue">
-                        <i class="bi bi-card-text me-2"></i>Variant Value
+                        <i class="bi bi-card-text me-1"></i>Variant Value
                     </label>
                     <input asp-for="VariantValue"
-                           class="form-control-custom @(ViewData.ModelState["VariantValue"]?.Errors.Any() == true ? "input-validation-error" : "")"
-                           placeholder="e.g., Red, Large, Premium" />
+                           class="form-control-custom"
+                           placeholder="e.g., Red, Large, Matte" />
                     <span asp-validation-for="VariantValue" class="field-validation-error"></span>
-                    <small class="text-muted mt-2 d-block">The specific value of this variant</small>
+                    <small class="text-muted d-block mt-2">The specific value of this variant</small>
                 </div>
 
-                <!-- Price Input -->
+                <!-- Price -->
                 <div class="form-group-custom">
                     <label class="form-label-custom" asp-for="Price">
-                        <i class="bi bi-currency-dollar me-2"></i>Price
+                        <i class="bi bi-currency-dollar me-1"></i>Price
                     </label>
-                    <div class="input-group">
-                        <span class="input-group-text">$</span>
+                    <div class="price-input-container">
+                        <span class="price-symbol">$</span>
                         <input asp-for="Price"
                                type="number"
                                step="0.01"
                                min="0.01"
-                               class="form-control-custom currency-input @(ViewData.ModelState["Price"]?.Errors.Any() == true ? "input-validation-error" : "")"
+                               class="form-control-custom price-input"
                                placeholder="0.00" />
                     </div>
                     <span asp-validation-for="Price" class="field-validation-error"></span>
-                    <small class="text-muted mt-2 d-block">Price for this specific variant</small>
-                </div>
-
-                <!-- Stock Input -->
-                <div class="form-group-custom">
-                    <label class="form-label-custom" asp-for="Stock">
-                        <i class="bi bi-box-seam me-2"></i>Stock Quantity
-                    </label>
-                    <input asp-for="Stock"
-                           type="number"
-                           min="0"
-                           class="form-control-custom @(ViewData.ModelState["Stock"]?.Errors.Any() == true ? "input-validation-error" : "")"
-                           placeholder="Available quantity" />
-                    <span asp-validation-for="Stock" class="field-validation-error"></span>
-                    <small class="text-muted mt-2 d-block">Current available stock for this variant</small>
+                    <small class="text-muted d-block mt-2">Price for this specific variant in EGP</small>
                 </div>
 
                 <!-- Form Actions -->
                 <div class="form-actions">
                     <button type="submit" class="btn-update">
                         <i class="bi bi-check-circle"></i>
-                        <span>Update Variant</span>
+                        Update Variant
                     </button>
-                    <a asp-action="Details"
-                       asp-controller="Products"
+                    <a asp-controller="Products"
+                       asp-action="Details"
                        asp-route-productId="@Model.ProductId"
                        class="btn-cancel">
                         <i class="bi bi-x-circle"></i>
-                        <span>Cancel</span>
+                        Cancel
                     </a>
                 </div>
             </form>
@@ -462,25 +422,15 @@
     <partial name="_ValidationScriptsPartial" />
 
     <script>
-        // Show error toast if exists
         document.addEventListener('DOMContentLoaded', function() {
-            const errorToast = document.getElementById('errorToast');
-            if (errorToast) {
-                errorToast.classList.add('toast-show');
-
-                setTimeout(() => {
-                    errorToast.classList.remove('toast-show');
-                }, 5000);
-            }
-
-            // Auto-focus on first input field
+            // Auto-focus on first input
             const firstInput = document.querySelector('input[type="text"]');
             if (firstInput) {
                 firstInput.focus();
                 firstInput.select();
             }
 
-            // Format price input
+            // Format price on blur
             const priceInput = document.querySelector('input[name="Price"]');
             if (priceInput) {
                 priceInput.addEventListener('blur', function() {
@@ -491,15 +441,20 @@
                 });
             }
 
-            // Real-time validation feedback
+            // Prevent negative values
+            const numberInputs = document.querySelectorAll('input[type="number"]');
+            numberInputs.forEach(input => {
+                input.addEventListener('change', function() {
+                    if (this.value < 0) {
+                        this.value = Math.abs(this.value);
+                    }
+                });
+            });
+
+            // Remove validation error class when user starts typing
             const inputs = document.querySelectorAll('.form-control-custom');
             inputs.forEach(input => {
-                input.addEventListener('blur', function() {
-                    validateField(this);
-                });
-
                 input.addEventListener('input', function() {
-                    // Remove error class as user types
                     if (this.classList.contains('input-validation-error')) {
                         this.classList.remove('input-validation-error');
                         const errorSpan = this.nextElementSibling;
@@ -510,65 +465,46 @@
                 });
             });
 
-            // Prevent negative values in stock and price
-            const numberInputs = document.querySelectorAll('input[type="number"]');
-            numberInputs.forEach(input => {
-                input.addEventListener('change', function() {
-                    if (this.value < 0) this.value = 0;
-                });
+            // Form validation before submission
+            const form = document.querySelector('form');
+            form.addEventListener('submit', function(e) {
+                let isValid = true;
+
+                // Check VariantName
+                const variantName = document.querySelector('input[name="VariantName"]');
+                if (!variantName.value.trim()) {
+                    showError(variantName, 'Variant name is required');
+                    isValid = false;
+                }
+
+                // Check VariantValue
+                const variantValue = document.querySelector('input[name="VariantValue"]');
+                if (!variantValue.value.trim()) {
+                    showError(variantValue, 'Variant value is required');
+                    isValid = false;
+                }
+
+                // Check Price
+                const price = document.querySelector('input[name="Price"]');
+                const priceValue = parseFloat(price.value);
+                if (!price.value || priceValue < 0.01 || isNaN(priceValue)) {
+                    showError(price, 'Price must be greater than 0');
+                    isValid = false;
+                }
+
+                if (!isValid) {
+                    e.preventDefault();
+                }
             });
-        });
 
-        function validateField(field) {
-            const value = field.value.trim();
-            const fieldName = field.getAttribute('name');
+            function showError(input, message) {
+                input.classList.add('input-validation-error');
 
-            if (fieldName === 'Price' && value) {
-                const price = parseFloat(value);
-                if (price < 0.01) {
-                    showFieldError(field, 'Price must be greater than 0');
+                let errorSpan = input.nextElementSibling;
+                if (errorSpan && errorSpan.classList.contains('field-validation-error')) {
+                    errorSpan.textContent = message;
+                    errorSpan.style.display = 'block';
                 }
-            }
-
-            if (fieldName === 'Stock' && value) {
-                const stock = parseInt(value);
-                if (stock < 0) {
-                    showFieldError(field, 'Stock cannot be negative');
-                }
-            }
-        }
-
-        function showFieldError(field, message) {
-            field.classList.add('input-validation-error');
-
-            // Check if error span already exists
-            let errorSpan = field.nextElementSibling;
-            if (!errorSpan || !errorSpan.classList.contains('field-validation-error')) {
-                errorSpan = document.createElement('span');
-                errorSpan.className = 'field-validation-error';
-                field.parentNode.insertBefore(errorSpan, field.nextSibling);
-            }
-
-            errorSpan.textContent = message;
-            errorSpan.style.display = 'block';
-        }
-
-        // Prevent form submission if there are errors
-        const form = document.querySelector('form');
-        form.addEventListener('submit', function(e) {
-            if (!this.checkValidity()) {
-                e.preventDefault();
-                e.stopPropagation();
-
-                // Show all validation errors
-                const invalidFields = this.querySelectorAll(':invalid');
-                invalidFields.forEach(field => {
-                    field.classList.add('input-validation-error');
-                    const errorSpan = field.nextElementSibling;
-                    if (errorSpan && errorSpan.classList.contains('field-validation-error')) {
-                        errorSpan.style.display = 'block';
-                    }
-                });
             }
         });
     </script>

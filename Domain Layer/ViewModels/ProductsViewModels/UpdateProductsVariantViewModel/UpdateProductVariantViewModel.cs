@@ -29,9 +29,7 @@ namespace Domain_Layer.ViewModels.ProductsViewModels.UpdateProductsVariantViewMo
         [Range(0.01, 1000000, ErrorMessage = "Price must be greater than 0")]
         public decimal Price { get; set; }
 
-        [Required(ErrorMessage = "Stock is required")]
-        [Range(0, int.MaxValue, ErrorMessage = "Stock cannot be negative")]
-        public int Stock { get; set; }
+        
     }
 
 }
