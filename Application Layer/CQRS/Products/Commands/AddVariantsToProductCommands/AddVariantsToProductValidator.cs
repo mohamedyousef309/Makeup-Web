@@ -12,12 +12,10 @@ namespace Application_Layer.CQRS.Products.Commands.AddVariantsToProduct
 
             RuleFor(x => x.VariantIds)
                 .NotEmpty().WithMessage("Variant IDs list cannot be empty.")
-                .Must(ids => ids != null && ids.Count > 0)
+                .Must(ids => ids != null )
                 .WithMessage("At least one Variant ID must be provided.");
 
-            RuleFor(x => x.VariantIds)
-                .Must(ids => ids != null && ids.Distinct().Count() == ids.Count)
-                .WithMessage("Duplicate Variant IDs are not allowed.");
+            
         }
     }
 }

@@ -83,6 +83,29 @@ namespace Makeup_Web.Controllers
             return View(model);
         }
 
+        //[HttpPost]
+
+        //public async Task<IActionResult> CreatVariant(CreateProductVariantViewModel model)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        // إذا كان هناك أخطاء في النموذج، إرجاعه مع الأخطاء
+        //        return View(model);
+        //    }
+        //    var result = await _mediator.Send(new CreateProductVariantCommand(
+        //        model.ProductId,
+        //        model.VariantName,
+        //        model.VariantValue,
+        //        model.Price,
+        //        model.Stock));
+        //    if (!result.IsSuccess)
+        //    {
+        //        TempData["ErrorMessage"] = result.Message;
+        //        return View(model);
+        //    }
+        //    return RedirectToAction("Details", "Products", new { id = model.ProductId });
+        //}
+
         [HttpGet]
         public async Task<IActionResult> UpdateVariant(int VariantId)
         {
@@ -131,7 +154,7 @@ namespace Makeup_Web.Controllers
 
         [HttpPost]
 
-        public async Task<IActionResult> UpdateVariantsStock(UpdateProdcutVariantStockViewModle Modle)
+        public async Task<IActionResult> UpdateVariantsStock([FromBody] UpdateProdcutVariantStockViewModle Modle)
         {
             if (!ModelState.IsValid)
             {

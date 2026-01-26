@@ -8,7 +8,7 @@ using Domain_Layer.Interfaces.Abstraction;
 namespace Application_Layer.CQRS.Products.Commands.AddVariantsToProduct
 {
   
-    public record AddVariantsToProductCommand(int ProductId, List<int> VariantIds) : ICommand<RequestRespones<bool>>;
+    public record AddVariantsToProductCommand(int ProductId, IEnumerable<int> VariantIds) : ICommand<RequestRespones<bool>>;
 
     public class AddVariantsToProductCommandHandler : IRequestHandler<AddVariantsToProductCommand, RequestRespones<bool>>
     {

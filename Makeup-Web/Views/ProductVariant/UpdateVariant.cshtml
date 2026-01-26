@@ -150,28 +150,22 @@
             margin-top: 5px;
         }
 
-        /* Read-only Info */
-        .info-section {
-            background: rgba(214, 138, 138, 0.1);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 25px;
-            border: 1px solid var(--primary-pink);
+        /* Price Input */
+        .price-input-container {
+            position: relative;
         }
 
-        .info-row {
-            display: flex;
-            margin-bottom: 10px;
-        }
-
-        .info-label {
-            color: var(--primary-pink);
+        .price-symbol {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
             font-weight: 600;
-            min-width: 120px;
         }
 
-        .info-value {
-            color: var(--text-light);
+        .price-input {
+            padding-left: 40px !important;
         }
 
         /* Form Actions */
@@ -197,6 +191,7 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
+            text-decoration: none;
         }
 
             .btn-update:hover {
@@ -225,192 +220,93 @@
             .btn-cancel:hover {
                 background: #333;
                 border-color: #555;
+                color: white;
             }
 
-        /* Price Input */
-        .price-input-container {
-            position: relative;
-        }
-
-        .price-symbol {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-            font-weight: 600;
-        }
-
-        .price-input {
-            padding-left: 40px !important;
-        }
-
-        /* Alert Messages */
-        .alert {
-            max-width: 600px;
-            margin: 20px auto;
+        /* Info Area */
+        .info-section {
+            background: rgba(214, 138, 138, 0.1);
             border-radius: 12px;
-            border: 1px solid;
-            padding: 15px 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            padding: 15px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(214, 138, 138, 0.3);
+            font-size: 0.85rem;
         }
 
-        .alert-success {
-            background: rgba(40, 167, 69, 0.2);
-            border-color: var(--success-green);
-            color: #6fcf97;
-        }
-
-        .alert-danger {
-            background: rgba(255, 77, 77, 0.2);
-            border-color: var(--danger-red);
-            color: #ff9e9e;
-        }
-
-        /* Responsive */
         @@media (max-width: 768px) {
-            .form-container {
-                margin: 0 15px 40px;
-            }
-
-            .form-body {
-                padding: 20px;
-            }
-
             .form-actions {
                 flex-direction: column;
-            }
-
-            .info-row {
-                flex-direction: column;
-                gap: 5px;
-            }
-
-            .info-label {
-                min-width: auto;
             }
         }
     </style>
 }
 
 <div class="container">
-    <!-- Alert Messages -->
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <div class="alert alert-success">
-            <i class="bi bi-check-circle me-2"></i>
-            @TempData["SuccessMessage"]
-        </div>
-    }
-
     @if (TempData["ErrorMessage"] != null)
     {
-        <div class="alert alert-danger">
-            <i class="bi bi-exclamation-triangle me-2"></i>
-            @TempData["ErrorMessage"]
+        <div class="alert alert-danger mt-4" style="border-radius: 12px; background: rgba(255, 77, 77, 0.1); color: #ff9e9e; border: 1px solid var(--danger-red); padding: 15px;">
+            <i class="bi bi-exclamation-triangle me-2"></i> @TempData["ErrorMessage"]
         </div>
     }
 
-    <!-- Page Header -->
     <div class="page-header">
         <h1 class="page-title">Edit Product Variant</h1>
-        <p class="page-subtitle">Update the details of your product variant</p>
+        <p class="page-subtitle">Update the pricing and identification of your variant</p>
     </div>
 
-    <!-- Form Container -->
     <div class="form-container">
-        <!-- Form Header -->
         <div class="form-header">
             <div class="form-icon">
                 <i class="bi bi-pencil-square"></i>
             </div>
-            <h2 class="form-title">Variant Details</h2>
-            <p class="text-muted">Update the name, value, and price of this variant</p>
+            <h2 class="form-title">Variant Settings</h2>
         </div>
 
-        <!-- Form Body -->
         <div class="form-body">
-            @if (!ViewData.ModelState.IsValid)
-            {
-                <div class="validation-summary">
-                    <div asp-validation-summary="All"></div>
-                </div>
-            }
-
-            <!-- Read-only Info -->
             <div class="info-section">
-                <div class="info-row">
-                    <span class="info-label">Variant ID:</span>
-                    <span class="info-value">@Model.Id</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Product ID:</span>
-                    <span class="info-value">@Model.ProductId</span>
+                <div class="d-flex justify-content-between">
+                    <span><strong class="text-pink">Variant ID:</strong> @Model.Id</span>
+                    <span><strong class="text-pink">Product ID:</strong> @Model.ProductId</span>
                 </div>
             </div>
 
             <form asp-action="UpdateVariant" method="post">
                 @Html.AntiForgeryToken()
-
                 <input type="hidden" asp-for="Id" />
                 <input type="hidden" asp-for="ProductId" />
 
-                <!-- Variant Name -->
                 <div class="form-group-custom">
-                    <label class="form-label-custom" asp-for="VariantName">
-                        <i class="bi bi-tag me-1"></i>Variant Name
-                    </label>
-                    <input asp-for="VariantName"
-                           class="form-control-custom"
-                           placeholder="e.g., Color, Size, Type" />
+                    <label class="form-label-custom" asp-for="VariantName">Variant Name</label>
+                    <input asp-for="VariantName" class="form-control-custom" placeholder="e.g., Color, Size" />
                     <span asp-validation-for="VariantName" class="field-validation-error"></span>
-                    <small class="text-muted d-block mt-2">The type of variant (e.g., Color, Size, Material)</small>
                 </div>
 
-                <!-- Variant Value -->
                 <div class="form-group-custom">
-                    <label class="form-label-custom" asp-for="VariantValue">
-                        <i class="bi bi-card-text me-1"></i>Variant Value
-                    </label>
-                    <input asp-for="VariantValue"
-                           class="form-control-custom"
-                           placeholder="e.g., Red, Large, Matte" />
+                    <label class="form-label-custom" asp-for="VariantValue">Variant Value</label>
+                    <input asp-for="VariantValue" class="form-control-custom" placeholder="e.g., Matte Crimson" />
                     <span asp-validation-for="VariantValue" class="field-validation-error"></span>
-                    <small class="text-muted d-block mt-2">The specific value of this variant</small>
                 </div>
 
-                <!-- Price -->
                 <div class="form-group-custom">
-                    <label class="form-label-custom" asp-for="Price">
-                        <i class="bi bi-currency-dollar me-1"></i>Price
-                    </label>
+                    <label class="form-label-custom" asp-for="Price">Price (EGP)</label>
                     <div class="price-input-container">
-                        <span class="price-symbol">$</span>
-                        <input asp-for="Price"
-                               type="number"
-                               step="0.01"
-                               min="0.01"
-                               class="form-control-custom price-input"
-                               placeholder="0.00" />
+                        <span class="price-symbol">£</span>
+                        <input asp-for="Price" type="number" step="0.01" class="form-control-custom price-input" />
                     </div>
                     <span asp-validation-for="Price" class="field-validation-error"></span>
-                    <small class="text-muted d-block mt-2">Price for this specific variant in EGP</small>
                 </div>
 
-                <!-- Form Actions -->
                 <div class="form-actions">
                     <button type="submit" class="btn-update">
-                        <i class="bi bi-check-circle"></i>
-                        Update Variant
+                        <i class="bi bi-check-circle"></i> Save Changes
                     </button>
+
+                    @* العودة لصفحة تفاصيل المنتج باستخدام الـ id الصحيح *@
                     <a asp-controller="Products"
                        asp-action="Details"
-                       asp-route-productId="@Model.ProductId"
+                       asp-route-id="@Model.ProductId"
                        class="btn-cancel">
-                        <i class="bi bi-x-circle"></i>
-                        Cancel
+                        <i class="bi bi-x-circle"></i> Cancel
                     </a>
                 </div>
             </form>
@@ -420,92 +316,4 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Auto-focus on first input
-            const firstInput = document.querySelector('input[type="text"]');
-            if (firstInput) {
-                firstInput.focus();
-                firstInput.select();
-            }
-
-            // Format price on blur
-            const priceInput = document.querySelector('input[name="Price"]');
-            if (priceInput) {
-                priceInput.addEventListener('blur', function() {
-                    let value = parseFloat(this.value);
-                    if (!isNaN(value)) {
-                        this.value = value.toFixed(2);
-                    }
-                });
-            }
-
-            // Prevent negative values
-            const numberInputs = document.querySelectorAll('input[type="number"]');
-            numberInputs.forEach(input => {
-                input.addEventListener('change', function() {
-                    if (this.value < 0) {
-                        this.value = Math.abs(this.value);
-                    }
-                });
-            });
-
-            // Remove validation error class when user starts typing
-            const inputs = document.querySelectorAll('.form-control-custom');
-            inputs.forEach(input => {
-                input.addEventListener('input', function() {
-                    if (this.classList.contains('input-validation-error')) {
-                        this.classList.remove('input-validation-error');
-                        const errorSpan = this.nextElementSibling;
-                        if (errorSpan && errorSpan.classList.contains('field-validation-error')) {
-                            errorSpan.style.display = 'none';
-                        }
-                    }
-                });
-            });
-
-            // Form validation before submission
-            const form = document.querySelector('form');
-            form.addEventListener('submit', function(e) {
-                let isValid = true;
-
-                // Check VariantName
-                const variantName = document.querySelector('input[name="VariantName"]');
-                if (!variantName.value.trim()) {
-                    showError(variantName, 'Variant name is required');
-                    isValid = false;
-                }
-
-                // Check VariantValue
-                const variantValue = document.querySelector('input[name="VariantValue"]');
-                if (!variantValue.value.trim()) {
-                    showError(variantValue, 'Variant value is required');
-                    isValid = false;
-                }
-
-                // Check Price
-                const price = document.querySelector('input[name="Price"]');
-                const priceValue = parseFloat(price.value);
-                if (!price.value || priceValue < 0.01 || isNaN(priceValue)) {
-                    showError(price, 'Price must be greater than 0');
-                    isValid = false;
-                }
-
-                if (!isValid) {
-                    e.preventDefault();
-                }
-            });
-
-            function showError(input, message) {
-                input.classList.add('input-validation-error');
-
-                let errorSpan = input.nextElementSibling;
-                if (errorSpan && errorSpan.classList.contains('field-validation-error')) {
-                    errorSpan.textContent = message;
-                    errorSpan.style.display = 'block';
-                }
-            }
-        });
-    </script>
 }
