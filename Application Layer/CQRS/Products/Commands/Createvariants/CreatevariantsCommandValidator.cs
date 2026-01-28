@@ -1,4 +1,5 @@
-﻿using Domain_Layer.DTOs.ProductVariantDtos;
+﻿using Domain_Layer.DTOs.Attribute;
+using Domain_Layer.DTOs.ProductVariantDtos;
 using FluentValidation;
 using System;
 using System.Collections.Generic;
@@ -12,15 +13,17 @@ namespace Application_Layer.CQRS.Products.Commands.Createvariants
     {
         public CreatevariantsCommandValidator()
         {
-           
+
+
+            RuleFor(x => x.productid)
+            .GreaterThan(0)
+            .WithMessage("Invalid Product Id");
 
             RuleFor(x => x.UpdateProductVariantDtos)
                 .NotNull()
-                .WithMessage("Variants list cannot be null.")
                 .NotEmpty()
-                .WithMessage("At least one variant is required.");
+                .WithMessage("At least one product variant is required");
 
-            // validate each variant
             RuleForEach(x => x.UpdateProductVariantDtos)
                 .SetValidator(new CreateProductVariantDtoValidator());
         }
@@ -31,27 +34,55 @@ namespace Application_Layer.CQRS.Products.Commands.Createvariants
     {
         public CreateProductVariantDtoValidator()
         {
-           
+
 
             RuleFor(x => x.VariantName)
-                .NotEmpty()
-                .WithMessage("Variant name is required.")
-                .MaximumLength(100)
-                .WithMessage("Variant name must not exceed 100 characters.");
+                      .NotEmpty()
+                      .MaximumLength(50);
 
             RuleFor(x => x.VariantValue)
                 .NotEmpty()
-                .WithMessage("Variant value is required.")
-                .MaximumLength(100)
-                .WithMessage("Variant value must not exceed 100 characters.");
-
-            RuleFor(x => x.Price)
-                .GreaterThanOrEqualTo(0)
-                .WithMessage("Variant price cannot be negative.");
+                .MaximumLength(50);
 
             RuleFor(x => x.Stock)
-                .GreaterThanOrEqualTo(0)
-                .WithMessage("Variant stock cannot be negative.");
+                .GreaterThanOrEqualTo(0);
+
+            RuleFor(x => x.Price)
+                .GreaterThan(0);
+
+            RuleFor(x => x.AttributeValueId)
+                .NotNull()
+                .NotEmpty()
+                .WithMessage("Each variant must have attribute values");
+
+            RuleFor(x => x.AttributeValueId.Count())
+                .GreaterThan(0)
+                .WithMessage("Variant must contain at least one attribute value");
+
+            // منع تكرار نفس الـ AttributeValue داخل نفس Variant
+            RuleFor(x => x.AttributeValueId)
+                .Must(values => values.Distinct().Count() == values.Count())
+                .WithMessage("Duplicate attribute values are not allowed in the same variant");
+
+            // منع إرسال IDs صفر أو سالبة
+            RuleForEach(x => x.AttributeValueId)
+                .GreaterThan(0)
+                .WithMessage("Invalid AttributeValueId");
         }
     }
+
+
+    public class VariantAttributeValueDtoValidator
+    : AbstractValidator<VariantAttributeValueDto>
+    {
+        public VariantAttributeValueDtoValidator()
+        {
+            RuleFor(x => x.AttributeValueId)
+                .GreaterThan(0)
+                .WithMessage("Invalid AttributeValueId");
+
+           
+        }
+    }
+
 }

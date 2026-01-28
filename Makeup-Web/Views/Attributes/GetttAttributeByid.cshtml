@@ -1,0 +1,697 @@
+﻿@using Domain_Layer.DTOs.Attribute
+@model AttributeWithValueDTo
+
+@{
+    ViewData["Title"] = "Attribute Details | Pro Makeup Studio";
+}
+
+@section Styles {
+    <style>
+        :root {
+            --primary-pink: #d68a8a;
+            --primary-hover: #c27676;
+            --dark-bg: #0f0f0f;
+            --card-bg: #1a1a1a;
+            --input-bg: #252525;
+            --text-light: #ffffff;
+            --text-muted: #a0a0a0;
+            --accent-gold: #c5a059;
+            --danger-red: #ff4d4d;
+            --success-green: #28a745;
+            --warning-yellow: #ffc107;
+            --info-blue: #6a8fd8;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Page Header */
+        .page-header {
+            padding: 60px 0 30px;
+            background: linear-gradient(135deg, rgba(214, 138, 138, 0.1), rgba(197, 160, 89, 0.05));
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .page-header::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 1px;
+                background: linear-gradient(90deg, transparent, var(--primary-pink), transparent);
+            }
+
+        .page-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #fff 30%, var(--primary-pink) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        /* Details Container */
+        .details-container {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 40px;
+            border: 1px solid #252525;
+            margin-bottom: 40px;
+        }
+
+        .details-section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-light);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #252525;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+            .section-title i {
+                color: var(--primary-pink);
+            }
+
+        /* Info Cards */
+        .info-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid #252525;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+            .info-card:hover {
+                border-color: var(--primary-pink);
+                background: rgba(214, 138, 138, 0.05);
+            }
+
+        .info-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .info-value {
+            color: var(--text-light);
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        /* Values Table */
+        .values-table-container {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+
+        .values-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+            .values-table thead {
+                background: rgba(214, 138, 138, 0.1);
+            }
+
+            .values-table th {
+                padding: 15px 20px;
+                text-align: left;
+                color: var(--text-light);
+                font-weight: 600;
+                font-size: 0.95rem;
+                border-bottom: 2px solid var(--primary-pink);
+            }
+
+            .values-table td {
+                padding: 15px 20px;
+                color: var(--text-light);
+                border-bottom: 1px solid #252525;
+            }
+
+            .values-table tbody tr {
+                transition: all 0.3s ease;
+            }
+
+                .values-table tbody tr:hover {
+                    background: rgba(214, 138, 138, 0.05);
+                }
+
+        .value-badge {
+            display: inline-block;
+            background: rgba(214, 138, 138, 0.2);
+            color: var(--primary-pink);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        /* Stats Cards */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(214, 138, 138, 0.1), rgba(197, 160, 89, 0.05));
+            border: 1px solid #252525;
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+            .stat-card:hover {
+                transform: translateY(-5px);
+                border-color: var(--primary-pink);
+            }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            color: var(--primary-pink);
+            margin-bottom: 15px;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-light);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+            .empty-state i {
+                font-size: 4rem;
+                color: var(--text-muted);
+                margin-bottom: 20px;
+                opacity: 0.5;
+            }
+
+            .empty-state h4 {
+                color: var(--text-light);
+                margin-bottom: 10px;
+                font-size: 1.5rem;
+            }
+
+            .empty-state p {
+                color: var(--text-muted);
+                margin-bottom: 30px;
+                max-width: 400px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid #252525;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--primary-pink), var(--accent-gold));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 12px 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+            .btn-primary:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 15px 30px rgba(214, 138, 138, 0.3);
+                color: white;
+                text-decoration: none;
+            }
+
+        .btn-secondary {
+            background: var(--input-bg);
+            border: 1px solid #333;
+            color: var(--text-light);
+            border-radius: 12px;
+            padding: 12px 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+            .btn-secondary:hover {
+                background: #333;
+                color: white;
+                text-decoration: none;
+            }
+
+        .btn-danger {
+            background: rgba(255, 77, 77, 0.2);
+            border: 1px solid var(--danger-red);
+            color: var(--danger-red);
+            border-radius: 12px;
+            padding: 12px 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+            .btn-danger:hover {
+                background: var(--danger-red);
+                color: white;
+                text-decoration: none;
+            }
+
+        /* Alert Messages */
+        .alert {
+            border-radius: 12px;
+            margin-bottom: 30px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+        }
+
+        .alert-success {
+            background: rgba(40, 167, 69, 0.2);
+            border: 1px solid var(--success-green);
+            color: #6fcf97;
+        }
+
+        .alert-info {
+            background: rgba(106, 143, 216, 0.2);
+            border: 1px solid var(--info-blue);
+            color: #8ab4f8;
+        }
+
+        /* Badge */
+        .id-badge {
+            background: rgba(197, 160, 89, 0.2);
+            color: var(--accent-gold);
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        /* Animations */
+        @@keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-up {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .details-container {
+                padding: 20px;
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+                .action-buttons a, .action-buttons button {
+                    width: 100%;
+                    justify-content: center;
+                }
+
+            .values-table {
+                font-size: 0.9rem;
+            }
+
+                .values-table th,
+                .values-table td {
+                    padding: 10px;
+                }
+        }
+    </style>
+}
+
+<div class="container-fluid px-4">
+    <!-- Page Header -->
+    <div class="page-header animate-up">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="page-title">Attribute Details</h1>
+                    <p class="page-subtitle">View attribute information and its values</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <a asp-controller="Attributes" asp-action="GetAllAttributes" class="btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Back to Attributes
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Success Alert -->
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show animate-up" role="alert">
+                <i class="bi bi-check-circle me-2"></i>
+                @TempData["SuccessMessage"]
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        <!-- Info Alert -->
+        @if (TempData["InfoMessage"] != null)
+        {
+            <div class="alert alert-info alert-dismissible fade show animate-up" role="alert">
+                <i class="bi bi-info-circle me-2"></i>
+                @TempData["InfoMessage"]
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        <!-- Details Container -->
+        <div class="details-container animate-up" style="animation-delay: 0.1s">
+            <!-- Stats Section -->
+            <div class="stats-container">
+                <div class="stat-card animate-up" style="animation-delay: 0.2s">
+                    <div class="stat-icon">
+                        <i class="bi bi-tag"></i>
+                    </div>
+                    <div class="stat-number">
+                        @Model.Attributeid
+                    </div>
+                    <div class="stat-label">
+                        Attribute ID
+                    </div>
+                </div>
+
+                <div class="stat-card animate-up" style="animation-delay: 0.3s">
+                    <div class="stat-icon">
+                        <i class="bi bi-list-check"></i>
+                    </div>
+                    <div class="stat-number">
+                        @Model.Attributes.Count()
+                    </div>
+                    <div class="stat-label">
+                        Total Values
+                    </div>
+                </div>
+
+                <div class="stat-card animate-up" style="animation-delay: 0.4s">
+                    <div class="stat-icon">
+                        <i class="bi bi-calendar"></i>
+                    </div>
+                    <div class="stat-number">
+                        @DateTime.Now.ToString("dd/MM")
+                    </div>
+                    <div class="stat-label">
+                        Viewed Today
+                    </div>
+                </div>
+            </div>
+
+            <!-- Attribute Information Section -->
+            <div class="details-section">
+                <h3 class="section-title">
+                    <i class="bi bi-info-circle"></i>
+                    Attribute Information
+                </h3>
+
+                <div class="info-card animate-up" style="animation-delay: 0.2s">
+                    <div class="info-label">Attribute Name</div>
+                    <div class="info-value">
+                        @Model.Name
+                        <span class="id-badge">ID: @Model.Attributeid</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Attribute Values Section -->
+            <div class="details-section">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="section-title mb-0" style="border: none">
+                        <i class="bi bi-list-ul"></i>
+                        Attribute Values
+                    </h3>
+                    <span class="text-muted">
+                        @Model.Attributes.Count() value(s) found
+                    </span>
+                </div>
+
+                @if (Model.Attributes != null && Model.Attributes.Any())
+                {
+                    <div class="values-table-container animate-up" style="animation-delay: 0.3s">
+                        <table class="values-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Value</th>
+                                    <th>Value ID</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    int counter = 1;
+                                }
+                                @foreach (var attributeValue in Model.Attributes)
+                                {
+                                    <tr>
+                                        <td>@counter</td>
+                                        <td>
+                                            <span class="value-badge">
+                                                @attributeValue.Value
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="text-muted">
+                                                @attributeValue.AttributeId
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex gap-2">
+                                                <button class="btn btn-sm btn-outline-primary"
+                                                        onclick="editValue(@attributeValue.AttributeId, '@attributeValue.Value')">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger"
+                                                        onclick="deleteValue(@attributeValue.AttributeId)">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    counter++;
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="empty-state animate-up" style="animation-delay: 0.3s">
+                        <i class="bi bi-inboxes"></i>
+                        <h4>No Values Found</h4>
+                        <p>This attribute doesn't have any values assigned yet. You can add values using the edit button below.</p>
+                        <a asp-controller="Attributes"
+                           asp-action="EditAttribute"
+                           asp-route-id="@Model.Attributeid"
+                           class="btn-primary">
+                            <i class="bi bi-plus-circle"></i>
+                            Add Values
+                        </a>
+                    </div>
+                }
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <a asp-controller="Attributes"
+                   asp-action="GetAllAttributes"
+                   class="btn-secondary">
+                    <i class="bi bi-arrow-left"></i>
+                    Back to List
+                </a>
+
+                <a asp-controller="Attributes"
+                   asp-action="EditAttribute"
+                   asp-route-id="@Model.Attributeid"
+                   class="btn-primary">
+                    <i class="bi bi-pencil"></i>
+                    Edit Attribute
+                </a>
+
+                <button type="button"
+                        class="btn-danger"
+                        onclick="confirmDelete(@Model.Attributeid)">
+                    <i class="bi bi-trash"></i>
+                    Delete Attribute
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Function to edit value
+            window.editValue = function (valueId, currentValue) {
+                const newValue = prompt('Edit value:', currentValue);
+                if (newValue && newValue.trim() !== '') {
+                    // Here you would typically make an API call to update the value
+                    console.log(`Editing value ${valueId} to: ${newValue}`);
+                    // For now, show a success message
+                    showAlert('success', 'Value updated successfully!');
+                }
+            };
+
+            // Function to delete value
+            window.deleteValue = function (valueId) {
+                if (confirm('Are you sure you want to delete this value?')) {
+                    // Here you would typically make an API call to delete the value
+                    console.log(`Deleting value: ${valueId}`);
+                    // For now, show a success message
+                    showAlert('success', 'Value deleted successfully!');
+                }
+            };
+
+            // Function to confirm attribute deletion
+            window.confirmDelete = function (attributeId) {
+                if (confirm('Are you sure you want to delete this attribute? This action cannot be undone.')) {
+                    // Here you would typically redirect to delete action
+                    console.log(`Deleting attribute: ${attributeId}`);
+                    // For example: window.location.href = `/Attributes/DeleteAttribute/${attributeId}`;
+                    showAlert('danger', 'Attribute deletion requested. Redirecting...');
+
+                    // Simulate redirect
+                    setTimeout(() => {
+                        showAlert('info', 'This would redirect to delete page in a real application.');
+                    }, 1500);
+                }
+            };
+
+            // Function to show alerts
+            function showAlert(type, message) {
+                // Remove existing alerts
+                const existingAlerts = document.querySelectorAll('.alert');
+                existingAlerts.forEach(alert => alert.remove());
+
+                // Create alert element
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `alert alert-${type} alert-dismissible fade show animate-up`;
+                alertDiv.innerHTML = `
+                    <i class="bi ${type === 'success' ? 'bi-check-circle' : type === 'danger' ? 'bi-exclamation-triangle' : 'bi-info-circle'} me-2"></i>
+                    ${message}
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                `;
+
+                // Insert alert
+                const container = document.querySelector('.container');
+                const detailsContainer = document.querySelector('.details-container');
+                if (container && detailsContainer) {
+                    container.insertBefore(alertDiv, detailsContainer);
+
+                    // Auto-remove after 5 seconds
+                    setTimeout(() => {
+                        if (alertDiv.parentNode) {
+                            alertDiv.remove();
+                        }
+                    }, 5000);
+                }
+            }
+
+            // Initialize tooltips
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+
+            // Copy attribute ID to clipboard
+            document.querySelector('.id-badge').addEventListener('click', function () {
+                const attributeId = @Model.Attributeid;
+                navigator.clipboard.writeText(attributeId.toString()).then(() => {
+                    const originalText = this.textContent;
+                    this.textContent = 'Copied!';
+                    setTimeout(() => {
+                        this.textContent = originalText;
+                    }, 2000);
+                });
+            });
+        });
+    </script>
+}

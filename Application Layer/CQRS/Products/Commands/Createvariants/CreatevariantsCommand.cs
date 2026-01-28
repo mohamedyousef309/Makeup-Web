@@ -25,14 +25,21 @@ namespace Application_Layer.CQRS.Products.Commands.Createvariants
         }
         public async Task<RequestRespones<bool>> Handle(CreatevariantsCommand request, CancellationToken cancellationToken)
         {
-            var variants = request.UpdateProductVariantDtos.Select(dto => new ProductVariant
-            {
-                ProductId = request.productid,
-                VariantName = dto.VariantName,
-                VariantValue = dto.VariantValue,
-                Price = dto.Price,
-                Stock = dto.Stock,    
-            }).ToList();
+
+            var variants = request.UpdateProductVariantDtos
+                .Select(dto =>
+                new ProductVariant
+                {ProductId = request.productid
+                ,Price = dto.Price
+                ,Stock = dto.Stock
+                ,ProductVariantAttributeValues = dto.AttributeValueId.Select(avId => new VariantAttributeValue
+                {
+                    AttributeValueId = avId
+                }).ToList()
+                }).ToList();
+
+
+
 
             await genaricRepository.AddRangeAsync(variants);
 

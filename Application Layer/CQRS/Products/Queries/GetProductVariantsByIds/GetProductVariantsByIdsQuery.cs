@@ -32,7 +32,7 @@ namespace Application_Layer.CQRS.Products.Queries.GetProductVariantsByIds
                     price=x.Price,
                     productid=x.Product.Id,
                     ProductName =x.Product.Name,
-                    VariantValue = x.VariantValue,
+                    //VariantValue = x.VariantValue,
                 }).ToListAsync(cancellationToken);
 
             if (!ProductVariants.Any())

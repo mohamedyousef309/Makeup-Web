@@ -1,7 +1,283 @@
-﻿
+﻿@using System.Security.Claims
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Admin Dashboard";
+
+    // التحقق من وجود المستخدم و Role في Claims
+    var isAuthenticated = User.Identity?.IsAuthenticated ?? false;
+    var isAdmin = false;
+    var username = "";
+
+    if (isAuthenticated)
+    {
+        // جلب اسم المستخدم من Identity
+        username = User.Identity.Name;
+
+        // جلب الـ Roles من Claims (من الـ Token في الـ Cookie)
+        var claims = User.Claims.ToList();
+
+        // طريقة 1: التحقق من claim الـ role
+        var roleClaims = claims.Where(c =>
+            c.Type == "role" ||
+            c.Type == "Role" ||
+            c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role" ||
+            c.Type == ClaimTypes.Role
+        ).ToList();
+
+        // طريقة 2: يمكنك أيضًا التحقق من claim مخصص
+        // مثل claim باسم "Admin" أو claim بقيمة معينة
+
+        // التحقق إذا كان لديه role "Admin"
+        isAdmin = roleClaims.Any(c =>
+            c.Value.Equals("Admin", StringComparison.OrdinalIgnoreCase) ||
+            c.Value.Equals("Administrator", StringComparison.OrdinalIgnoreCase)
+        );
+
+        // إذا لم نجد role claim، يمكن التحقق من claim آخر حسب نظامك
+        if (!isAdmin)
+        {
+            // مثال: التحقق من claim باسم "isAdmin"
+            var isAdminClaim = claims.FirstOrDefault(c =>
+                c.Type == "isAdmin" ||
+                c.Type == "IsAdmin" ||
+                c.Type == "user_role"
+            );
+
+            if (isAdminClaim != null)
+            {
+                isAdmin = isAdminClaim.Value.Equals("true", StringComparison.OrdinalIgnoreCase) ||
+                          isAdminClaim.Value.Equals("admin", StringComparison.OrdinalIgnoreCase);
+            }
+        }
+    }
 }
 
-<h1>Index</h1>
+@if (isAuthenticated && isAdmin)
+{
+    <div class="container-fluid px-4">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="display-6 fw-bold text-white">Admin Dashboard</h1>
+                <p class="text-muted">Welcome back, <span class="text-pink">@username</span>!</p>
+            </div>
+            <div class="d-flex gap-2">
+                <span class="badge bg-pink p-2">Admin Role</span>
+                <span class="badge bg-secondary p-2">@DateTime.Now.ToString("dd MMM yyyy")</span>
+            </div>
+        </div>
 
+        <!-- Attributes Management Card - فقط للادمن -->
+        <div class="row g-4 mb-4">
+            <div class="col-12">
+                <div class="card bg-dark border-pink">
+                    <div class="card-header border-pink d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 text-white">
+                            <i class="bi bi-tags text-pink"></i> Attributes Management (Admin Only)
+                        </h5>
+                        <span class="badge bg-pink">Admin Privilege</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <h4 class="text-white mb-3">Manage Product Attributes</h4>
+                                <p class="text-muted mb-4">
+                                    Access the attributes management panel to add, edit, or remove
+                                    product attributes, categories, and specifications. This feature
+                                    is exclusively available for administrators.
+                                </p>
+                                <a asp-controller="Attributes" asp-action="GetAllAttributes"
+                                   class="btn btn-pink btn-lg">
+                                    <i class="bi bi-gear"></i> Go to Attributes Management
+                                </a>
+                            </div>
+                            <div class="col-md-4 text-center">
+                                <div class="bg-dark-secondary p-4 rounded">
+                                    <i class="bi bi-shield-lock display-3 text-pink mb-3"></i>
+                                    <h6 class="text-white">Administrator Access</h6>
+                                    <p class="text-muted small mt-2">
+                                        Only users with Administrator role can access this feature.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Quick Actions -->
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="card bg-dark border-secondary h-100">
+                    <div class="card-header border-secondary">
+                        <h5 class="mb-0 text-white">
+                            <i class="bi bi-receipt text-primary"></i> Order Management
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted mb-3">View and manage all customer orders and bookings.</p>
+                        <a asp-controller="Order" asp-action="GetAllOrders"
+                           class="btn btn-outline-primary">
+                            <i class="bi bi-eye"></i> View All Orders
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card bg-dark border-secondary h-100">
+                    <div class="card-header border-secondary">
+                        <h5 class="mb-0 text-white">
+                            <i class="bi bi-people text-success"></i> User Management
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted mb-3">Manage user accounts, permissions, and roles.</p>
+                        <a asp-controller="User" asp-action="ManageUsers"
+                           class="btn btn-outline-success">
+                            <i class="bi bi-person-gear"></i> Manage Users
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Information -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card bg-dark border-secondary">
+                    <div class="card-body">
+                        <h5 class="text-white mb-3">
+                            <i class="bi bi-info-circle text-info"></i> Session Information
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <strong class="text-muted">Username:</strong>
+                                    <span class="text-white d-block mt-1">@username</span>
+                                </div>
+                                <div class="mb-3">
+                                    <strong class="text-muted">Role:</strong>
+                                    <span class="badge bg-pink mt-1">Administrator</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <strong class="text-muted">Current Time:</strong>
+                                    <span class="text-white d-block mt-1">@DateTime.Now.ToString("dd MMM yyyy HH:mm:ss")</span>
+                                </div>
+                                <div class="mb-3">
+                                    <strong class="text-muted">Authentication Method:</strong>
+                                    <span class="text-white d-block mt-1">JWT Token</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else if (isAuthenticated)
+{
+    <!-- User ليس Admin -->
+    <div class="container-fluid px-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="card bg-dark border-warning mt-5">
+                    <div class="card-body text-center py-5">
+                        <div class="mb-4">
+                            <i class="bi bi-person-x display-1 text-warning"></i>
+                        </div>
+                        <h1 class="text-white mb-3">Access Restricted</h1>
+                        <p class="text-muted mb-4">
+                            Hello <span class="text-info">@username</span>,
+                            you are logged in but don't have Administrator privileges.
+                        </p>
+                        <p class="text-muted mb-4">
+                            The Admin Dashboard is only accessible to users with Administrator role.
+                        </p>
+                        <div class="d-flex justify-content-center gap-3">
+                            <a asp-controller="Home" asp-action="Index" class="btn btn-primary">
+                                <i class="bi bi-house-door"></i> Go to Home
+                            </a>
+                            <a asp-controller="Account" asp-action="Logout" class="btn btn-outline-secondary">
+                                <i class="bi bi-box-arrow-right"></i> Logout
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <!-- User غير مسجل الدخول -->
+    <div class="container-fluid px-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="card bg-dark border-danger mt-5">
+                    <div class="card-body text-center py-5">
+                        <div class="mb-4">
+                            <i class="bi bi-shield-x display-1 text-danger"></i>
+                        </div>
+                        <h1 class="text-white mb-3">Authentication Required</h1>
+                        <p class="text-muted mb-4">
+                            Please log in with an Administrator account to access the Admin Dashboard.
+                        </p>
+                        <div class="d-flex justify-content-center gap-3">
+                            <a asp-controller="Home" asp-action="Index" class="btn btn-primary">
+                                <i class="bi bi-house-door"></i> Go to Home
+                            </a>
+                            <a asp-controller="Account" asp-action="Login" class="btn btn-pink">
+                                <i class="bi bi-box-arrow-in-right"></i> Login
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Styles {
+    <style>
+        .btn-pink {
+            background-color: var(--brand-pink);
+            color: white;
+            border: none;
+        }
+
+            .btn-pink:hover {
+                background-color: #c87a7a;
+                color: white;
+            }
+
+        .bg-pink {
+            background-color: var(--brand-pink) !important;
+        }
+
+        .text-pink {
+            color: var(--brand-pink) !important;
+        }
+
+        .border-pink {
+            border-color: var(--brand-pink) !important;
+        }
+
+        .bg-dark-secondary {
+            background-color: #1e1e1e !important;
+        }
+
+        .card {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .btn-lg {
+            padding: 12px 30px;
+            font-size: 1.1rem;
+        }
+    </style>
+}

@@ -69,7 +69,7 @@ namespace Application_Layer.CQRS.Products.Queries.GetProductsByCategory
                 {
                     Id = v!.Id,
                     ProductId = v.ProductId,
-                    VariantName = v.VariantName ?? "",
+                    //VariantName = v.VariantName ?? "",
                     Price = v.Price,
                     Stock = v.Stock
                 }).ToList()
