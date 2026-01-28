@@ -37,11 +37,11 @@ namespace Application_Layer.CQRS.Products.Commands.UpdateVariants
                 return RequestRespones<bool>.Fail("There is no Variant with this id", 404);
             }
 
-            Variant.VariantValue=request.VariantValue;
+            //Variant.VariantValue=request.VariantValue;
             Variant.Price=request.Price;
-            Variant.VariantName=request.VariantName;
+            //Variant.VariantName=request.VariantName;
 
-            _variantRepo.SaveInclude(Variant,nameof(Variant.VariantName),nameof(Variant.VariantValue),nameof(Variant.Price));
+            //_variantRepo.SaveInclude(Variant,nameof(Variant.VariantName),nameof(Variant.VariantValue),nameof(Variant.Price));
 
             await _variantRepo.SaveChanges();
 

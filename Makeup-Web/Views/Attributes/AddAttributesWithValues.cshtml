@@ -1,0 +1,853 @@
+﻿@using Domain_Layer.ViewModels.AttributesViewModle
+@model AddAttributesWithValuesViewModel
+
+@{
+    ViewData["Title"] = "Add Attribute with Values | Pro Makeup Studio";
+}
+
+@section Styles {
+    <style>
+        :root {
+            --primary-pink: #d68a8a;
+            --primary-hover: #c27676;
+            --dark-bg: #0f0f0f;
+            --card-bg: #1a1a1a;
+            --input-bg: #252525;
+            --text-light: #ffffff;
+            --text-muted: #a0a0a0;
+            --accent-gold: #c5a059;
+            --danger-red: #ff4d4d;
+            --success-green: #28a745;
+            --warning-yellow: #ffc107;
+            --info-blue: #6a8fd8;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Page Header */
+        .page-header {
+            padding: 60px 0 30px;
+            background: linear-gradient(135deg, rgba(214, 138, 138, 0.1), rgba(197, 160, 89, 0.05));
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .page-header::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 1px;
+                background: linear-gradient(90deg, transparent, var(--primary-pink), transparent);
+            }
+
+        .page-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #fff 30%, var(--primary-pink) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        /* Form Container */
+        .form-container {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 40px;
+            border: 1px solid #252525;
+            margin-bottom: 40px;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+        }
+
+        .form-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-light);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #252525;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+            .form-title i {
+                color: var(--primary-pink);
+            }
+
+        /* Form Groups */
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        .required::after {
+            content: " *";
+            color: var(--danger-red);
+        }
+
+        .form-input {
+            width: 100%;
+            background: var(--input-bg);
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 12px 15px;
+            color: var(--text-light);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+            .form-input:focus {
+                outline: none;
+                border-color: var(--primary-pink);
+                box-shadow: 0 0 0 3px rgba(214, 138, 138, 0.1);
+            }
+
+            .form-input.input-error {
+                border-color: var(--danger-red);
+                background: rgba(255, 77, 77, 0.05);
+            }
+
+        .form-text {
+            margin-top: 6px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .form-error {
+            color: var(--danger-red);
+            font-size: 0.85rem;
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            opacity: 1;
+            transform: translateY(0);
+            transition: all 0.3s ease;
+        }
+
+        /* Values Container */
+        .values-container {
+            margin-top: 30px;
+        }
+
+        .values-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .values-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-light);
+        }
+
+        .add-value-btn {
+            background: rgba(40, 167, 69, 0.2);
+            border: 1px solid var(--success-green);
+            color: var(--success-green);
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+            .add-value-btn:hover {
+                background: var(--success-green);
+                color: white;
+                transform: translateY(-2px);
+            }
+
+        .value-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid #252525;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+            .value-item:hover {
+                border-color: var(--primary-pink);
+                background: rgba(214, 138, 138, 0.05);
+            }
+
+        .value-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .value-number {
+            font-weight: 600;
+            color: var(--primary-pink);
+            font-size: 1.1rem;
+        }
+
+        .remove-value-btn {
+            background: rgba(255, 77, 77, 0.2);
+            border: 1px solid var(--danger-red);
+            color: var(--danger-red);
+            border-radius: 6px;
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+            .remove-value-btn:hover {
+                background: var(--danger-red);
+                color: white;
+            }
+
+        /* Form Actions */
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid #252525;
+        }
+
+        .btn-submit {
+            background: linear-gradient(45deg, var(--primary-pink), var(--accent-gold));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+            .btn-submit:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 15px 30px rgba(214, 138, 138, 0.3);
+            }
+
+        .btn-cancel {
+            background: var(--input-bg);
+            border: 1px solid #333;
+            color: var(--text-light);
+            border-radius: 12px;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .btn-cancel:hover {
+                background: #333;
+                color: white;
+                text-decoration: none;
+            }
+
+        /* Empty State */
+        .empty-values {
+            text-align: center;
+            padding: 40px 20px;
+            border: 2px dashed #252525;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+            .empty-values i {
+                font-size: 3rem;
+                color: var(--text-muted);
+                margin-bottom: 15px;
+                opacity: 0.5;
+            }
+
+            .empty-values p {
+                color: var(--text-muted);
+                margin-bottom: 20px;
+            }
+
+        /* Validation Summary */
+        .validation-summary {
+            background: rgba(255, 77, 77, 0.1);
+            border: 1px solid var(--danger-red);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+            .validation-summary ul {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            .validation-summary li {
+                color: var(--danger-red);
+                margin-bottom: 5px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+                .validation-summary li:before {
+                    content: "•";
+                    color: var(--danger-red);
+                    font-weight: bold;
+                }
+
+        /* Alert Messages */
+        .alert {
+            border-radius: 12px;
+            margin-bottom: 30px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+        }
+
+        .alert-danger {
+            background: rgba(255, 77, 77, 0.2);
+            border: 1px solid var(--danger-red);
+            color: #ff9e9e;
+        }
+
+        .alert-success {
+            background: rgba(40, 167, 69, 0.2);
+            border: 1px solid var(--success-green);
+            color: #6fcf97;
+        }
+
+        .btn-close-white {
+            filter: invert(1);
+            position: absolute;
+            right: 15px;
+            top: 15px;
+        }
+
+        /* Optional Badge */
+        .optional-badge {
+            display: inline-block;
+            background: rgba(255, 193, 7, 0.2);
+            color: var(--warning-yellow);
+            font-size: 0.75rem;
+            padding: 3px 8px;
+            border-radius: 12px;
+            margin-left: 8px;
+            font-weight: 600;
+        }
+
+        /* Info Box */
+        .info-box {
+            background: rgba(106, 143, 216, 0.1);
+            border: 1px solid var(--info-blue);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 20px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+            .info-box i {
+                color: var(--info-blue);
+                font-size: 1.3rem;
+                flex-shrink: 0;
+                margin-top: 2px;
+            }
+
+            .info-box .info-content {
+                flex: 1;
+            }
+
+                .info-box .info-content h6 {
+                    color: var(--text-light);
+                    margin-bottom: 5px;
+                    font-weight: 600;
+                }
+
+                .info-box .info-content p {
+                    color: var(--text-muted);
+                    margin: 0;
+                    font-size: 0.9rem;
+                    line-height: 1.5;
+                }
+
+        /* Animations */
+        @@keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-up {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .form-container {
+                padding: 20px;
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .btn-submit, .btn-cancel {
+                padding: 12px 25px;
+                font-size: 1rem;
+            }
+
+            .values-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+        }
+    </style>
+}
+
+<div class="container-fluid px-4">
+    <!-- Page Header -->
+    <div class="page-header animate-up">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="page-title">Add New Attribute</h1>
+                    <p class="page-subtitle">Create attribute with optional values</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <a asp-controller="Attributes" asp-action="GetAllAttributes" class="btn-cancel">
+                        <i class="bi bi-arrow-left"></i> Back to List
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Success Alert -->
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show animate-up" role="alert">
+                <i class="bi bi-check-circle me-2"></i>
+                @TempData["SuccessMessage"]
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        <!-- Error Alert -->
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show animate-up" role="alert">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                @Html.Raw(TempData["ErrorMessage"])
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        <!-- Validation Summary -->
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="validation-summary animate-up">
+                <h5 class="text-danger mb-3">
+                    <i class="bi bi-exclamation-triangle"></i> Please correct the following errors:
+                </h5>
+                <ul>
+                    @foreach (var key in ViewData.ModelState.Keys)
+                    {
+                        foreach (var error in ViewData.ModelState[key].Errors)
+                        {
+                            <li>@error.ErrorMessage</li>
+                        }
+                    }
+                </ul>
+            </div>
+        }
+
+        <!-- Form Container -->
+        <div class="form-container animate-up" style="animation-delay: 0.1s">
+            <form asp-action="AddAttributesWithValues" method="post" id="addAttributeForm">
+                @Html.AntiForgeryToken()
+
+                <!-- Attribute Name -->
+                <div class="form-section">
+                    <h3 class="form-title">
+                        <i class="bi bi-tag"></i>
+                        Attribute Details
+                    </h3>
+
+                    <div class="form-group">
+                        <label asp-for="AttributeName" class="form-label required">Attribute Name</label>
+                        <input asp-for="AttributeName"
+                               class="form-input @(ViewData.ModelState["AttributeName"]?.Errors?.Any() == true ? "input-error" : "")"
+                               placeholder="e.g. Color, Size, Material"
+                               autocomplete="off"
+                               value="@Model?.AttributeName" />
+                        <span asp-validation-for="AttributeName" class="form-error">
+                            <i class="bi bi-exclamation-circle"></i>
+                            <span class="field-validation-valid" data-valmsg-for="AttributeName" data-valmsg-replace="true">
+                                @Html.ValidationMessageFor(m => m.AttributeName)
+                            </span>
+                        </span>
+                        <div class="form-text">
+                            Enter a unique name for the attribute
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Attribute Values -->
+                <div class="form-section">
+                    <div class="values-header">
+                        <h3 class="form-title">
+                            <i class="bi bi-list-check"></i>
+                            Attribute Values
+                            <span class="optional-badge">OPTIONAL</span>
+                        </h3>
+                        <button type="button" id="addValueBtn" class="add-value-btn">
+                            <i class="bi bi-plus-circle"></i>
+                            Add Value
+                        </button>
+                    </div>
+
+                    <!-- Information Box -->
+                    <div class="info-box animate-up" style="animation-delay: 0.2s">
+                        <i class="bi bi-info-circle"></i>
+                        <div class="info-content">
+                            <h6>Values are Optional</h6>
+                            <p>
+                                You can create an attribute without any values. Values can be added later when needed.
+                                If you add values now, they will be available immediately for this attribute.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Values Container -->
+                    <div class="values-container" id="valuesContainer">
+                        @if (Model?.Values != null && Model.Values.Any(v => !string.IsNullOrEmpty(v)))
+                        {
+                            var valuesList = Model.Values.Where(v => !string.IsNullOrEmpty(v)).ToList();
+                            for (int i = 0; i < valuesList.Count; i++)
+                            {
+                                var value = valuesList[i];
+                                var hasError = ViewData.ModelState[$"Values[{i}]"]?.Errors?.Any() == true;
+                                <div class="value-item" data-index="@i">
+                                    <div class="value-header">
+                                        <span class="value-number">Value #@(i + 1)</span>
+                                        <button type="button" class="remove-value-btn" onclick="removeValueField(@i)">
+                                            <i class="bi bi-trash"></i>
+                                            Remove
+                                        </button>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Value</label>
+                                        <input type="text"
+                                               name="Values[@i]"
+                                               value="@value"
+                                               class="form-input @(hasError ? "input-error" : "")"
+                                               placeholder="e.g. Red, Small, Leather"
+                                               autocomplete="off" />
+                                        @if (hasError)
+                                        {
+                                            <span class="form-error">
+                                                <i class="bi bi-exclamation-circle"></i>
+                                                <span class="field-validation-valid" data-valmsg-for="Values[@i]" data-valmsg-replace="true">
+                                                    @Html.ValidationMessage($"Values[{i}]")
+                                                </span>
+                                            </span>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+
+                    <!-- Empty State -->
+                    <div class="empty-values" id="emptyValuesMessage">
+                        <i class="bi bi-inboxes"></i>
+                        <p>No values added yet</p>
+                        <p class="small">Click "Add Value" to add values, or submit without values</p>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions">
+                    <a asp-controller="Attributes" asp-action="GetAllAttributes" class="btn-cancel">
+                        Cancel
+                    </a>
+                    <button type="submit" class="btn-submit">
+                        <i class="bi bi-plus-circle"></i>
+                        Create Attribute
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const valuesContainer = document.getElementById('valuesContainer');
+            const addValueBtn = document.getElementById('addValueBtn');
+            const emptyValuesMessage = document.getElementById('emptyValuesMessage');
+
+            // Function to update field indices and numbers
+            function updateFieldIndices() {
+                const valueItems = valuesContainer.querySelectorAll('.value-item');
+
+                valueItems.forEach((item, index) => {
+                    item.setAttribute('data-index', index);
+
+                    // Update the number display
+                    const numberSpan = item.querySelector('.value-number');
+                    if (numberSpan) {
+                        numberSpan.textContent = `Value #${index + 1}`;
+                    }
+
+                    // Update input name
+                    const input = item.querySelector('input[type="text"]');
+                    if (input) {
+                        input.name = `Values[${index}]`;
+                        // Update validation message target
+                        const errorSpan = item.querySelector('.field-validation-valid');
+                        if (errorSpan) {
+                            errorSpan.setAttribute('data-valmsg-for', `Values[${index}]`);
+                        }
+                    }
+
+                    // Update remove button onclick
+                    const removeBtn = item.querySelector('.remove-value-btn');
+                    if (removeBtn) {
+                        removeBtn.setAttribute('onclick', `removeValueField(${index})`);
+                    }
+                });
+
+                // Show/hide empty message
+                toggleEmptyMessage();
+            }
+
+            // Function to add a new value field
+            function addValueField() {
+                const valueItems = valuesContainer.querySelectorAll('.value-item');
+                const newIndex = valueItems.length;
+
+                const valueItem = document.createElement('div');
+                valueItem.className = 'value-item';
+                valueItem.setAttribute('data-index', newIndex);
+                valueItem.innerHTML = `
+                    <div class="value-header">
+                        <span class="value-number">Value #${newIndex + 1}</span>
+                        <button type="button" class="remove-value-btn" onclick="removeValueField(${newIndex})">
+                            <i class="bi bi-trash"></i>
+                            Remove
+                        </button>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Value</label>
+                        <input type="text"
+                               name="Values[${newIndex}]"
+                               class="form-input"
+                               placeholder="e.g. Red, Small, Leather"
+                               autocomplete="off" />
+                        <span class="form-error">
+                            <i class="bi bi-exclamation-circle"></i>
+                            <span class="field-validation-valid" data-valmsg-for="Values[${newIndex}]" data-valmsg-replace="true"></span>
+                        </span>
+                    </div>
+                `;
+
+                valuesContainer.appendChild(valueItem);
+                updateFieldIndices();
+
+                // Focus on the new input
+                setTimeout(() => {
+                    const newInput = valueItem.querySelector('input[type="text"]');
+                    if (newInput) newInput.focus();
+                }, 100);
+            }
+
+            // Function to remove a value field
+            window.removeValueField = function (index) {
+                const valueItem = valuesContainer.querySelector(`.value-item[data-index="${index}"]`);
+                if (valueItem) {
+                    if (confirm('Are you sure you want to remove this value?')) {
+                        valueItem.remove();
+                        updateFieldIndices();
+                    }
+                }
+            };
+
+            // Function to toggle empty message visibility
+            function toggleEmptyMessage() {
+                const valueItems = valuesContainer.querySelectorAll('.value-item');
+                if (valueItems.length === 0) {
+                    emptyValuesMessage.style.display = 'block';
+                } else {
+                    emptyValuesMessage.style.display = 'none';
+                }
+            }
+
+            // Add event listener to the add button
+            addValueBtn.addEventListener('click', addValueField);
+
+            // Client-side validation
+            const form = document.getElementById('addAttributeForm');
+            form.addEventListener('submit', function (e) {
+                let isValid = true;
+                const errors = [];
+
+                // Validate attribute name
+                const attributeNameInput = document.querySelector('[name="AttributeName"]');
+                const attributeNameValue = attributeNameInput ? attributeNameInput.value.trim() : '';
+
+                if (!attributeNameValue) {
+                    isValid = false;
+                    errors.push('Attribute name is required');
+                    showError(attributeNameInput, 'Attribute name is required');
+                } else if (attributeNameValue.length < 2 || attributeNameValue.length > 50) {
+                    isValid = false;
+                    errors.push('Attribute name must be between 2 and 50 characters');
+                    showError(attributeNameInput, 'Attribute name must be between 2 and 50 characters');
+                } else {
+                    clearError(attributeNameInput);
+                }
+
+                // Validate values (only if they have content)
+                const valueInputs = valuesContainer.querySelectorAll('input[type="text"]');
+                valueInputs.forEach((input, index) => {
+                    const value = input.value.trim();
+                    if (value && value.length > 50) {
+                        isValid = false;
+                        errors.push(`Value #${index + 1} must be less than 50 characters`);
+                        showError(input, 'Value must be less than 50 characters');
+                    } else {
+                        clearError(input);
+                    }
+                });
+
+                if (!isValid) {
+                    e.preventDefault();
+
+                    // Show error summary
+                    showErrorSummary(errors);
+                } else {
+                    // Show loading state
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    const originalText = submitBtn.innerHTML;
+                    submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Creating...';
+                    submitBtn.disabled = true;
+                }
+            });
+
+            // Helper functions
+            function showError(input, message) {
+                input.classList.add('input-error');
+                const errorSpan = input.parentElement.querySelector('.form-error');
+                if (errorSpan) {
+                    const icon = errorSpan.querySelector('i');
+                    const validationSpan = errorSpan.querySelector('.field-validation-valid');
+                    if (validationSpan) {
+                        validationSpan.textContent = message;
+                        validationSpan.style.display = 'block';
+                    }
+                    errorSpan.style.display = 'flex';
+                }
+            }
+
+            function clearError(input) {
+                input.classList.remove('input-error');
+                const errorSpan = input.parentElement.querySelector('.form-error');
+                if (errorSpan) {
+                    const validationSpan = errorSpan.querySelector('.field-validation-valid');
+                    if (validationSpan) {
+                        validationSpan.textContent = '';
+                        validationSpan.style.display = 'none';
+                    }
+                    errorSpan.style.display = 'none';
+                }
+            }
+
+            function showErrorSummary(errors) {
+                // Remove existing summary if any
+                const existingSummary = document.querySelector('.validation-summary');
+                if (existingSummary) {
+                    existingSummary.remove();
+                }
+
+                const container = document.querySelector('.container');
+                const formContainer = document.querySelector('.form-container');
+
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'validation-summary animate-up';
+                errorDiv.innerHTML = `
+                    <h5 class="text-danger mb-3">
+                        <i class="bi bi-exclamation-triangle"></i> Please fix the following errors:
+                    </h5>
+                    <ul>
+                        ${errors.map(error => `<li>${error}</li>`).join('')}
+                    </ul>
+                `;
+
+                if (container && formContainer) {
+                    container.insertBefore(errorDiv, formContainer);
+                    errorDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
+
+            // Initialize
+            updateFieldIndices();
+        });
+    </script>
+}

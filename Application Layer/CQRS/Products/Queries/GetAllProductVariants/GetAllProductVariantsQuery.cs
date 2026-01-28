@@ -45,14 +45,14 @@ namespace Application_Layer.CQRS.Products.Queries
            
             if (!string.IsNullOrEmpty(request.SearchTerm))
             {
-                query = ApplySearch(query, request.SearchTerm, v => v.VariantName);
+                //query = ApplySearch(query, request.SearchTerm, v => v.VariantName);
             }
 
             var sortColumns = new Dictionary<string, System.Linq.Expressions.Expression<System.Func<ProductVariant, object>>>
             {
                 { "id", v => v.Id },
-                { "variantname", v => v.VariantName },
-                { "variantvalue", v => v.VariantValue },
+                //{ "variantname", v => v.VariantName },
+                //{ "variantvalue", v => v.VariantValue },
                 { "stock", v => v.Stock }
             };
 
@@ -68,8 +68,8 @@ namespace Application_Layer.CQRS.Products.Queries
             var items = await query.Select(v => new ProductVariantDto
             {
                 Id = v.Id,
-                VariantName = v.VariantName,
-                VariantValue = v.VariantValue,
+                //VariantName = v.VariantName,
+                //VariantValue = v.VariantValue,
                 Price=v.Price,
                 Stock = v.Stock
             }).ToListAsync(cancellationToken);

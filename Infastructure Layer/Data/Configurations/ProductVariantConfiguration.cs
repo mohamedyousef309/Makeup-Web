@@ -26,7 +26,10 @@ namespace Infastructure_Layer.Data.Configurations
                    .HasColumnType("decimal(18,2)")
                    .IsRequired();
 
-
+            builder.HasMany(x=>x.ProductVariantAttributeValues)
+                   .WithOne(x=>x.ProductVariant)
+                   .HasForeignKey(x=>x.ProductVariantId)
+                   .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne(x => x.Product)
                    .WithMany(x => x.Variants)

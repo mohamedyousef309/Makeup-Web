@@ -29,8 +29,8 @@ namespace Application_Layer.CQRS.Products.Queries.GetProductVariantsByProductid
                 .Select(x => new ProductVariantDto
                 {
                     Id = x.Id,
-                    VariantName = x.VariantName,
-                    VariantValue = x.VariantValue,
+                    //VariantName = x.VariantName,
+                    //VariantValue = x.VariantValue,
                     Price=x.Price,
                     Stock=x.Stock
                 }).ToListAsync();
