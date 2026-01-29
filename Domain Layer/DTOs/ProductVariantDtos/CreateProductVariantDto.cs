@@ -1,4 +1,5 @@
 ﻿using Domain_Layer.DTOs.Attribute;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +15,8 @@ namespace Domain_Layer.DTOs.ProductVariantDtos
         public int Stock { get; set; }
 
         public decimal Price { get; set; } 
+
+        public IFormFile? Variantpucture { get; set; }
 
         public IEnumerable<int> AttributeValueId { get; set; } = new List<int>();
     }

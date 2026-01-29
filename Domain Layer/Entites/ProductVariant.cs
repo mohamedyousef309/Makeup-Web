@@ -19,7 +19,8 @@ namespace Domain_Layer.Entites
 
         public int Stock { get; set; }
 
-        public string? SKU { get; set; }
+
+        public string? ImageUrl { get; set; }
 
         public ICollection<VariantAttributeValue> ProductVariantAttributeValues { get; set; } = new HashSet<VariantAttributeValue>();
         public bool ReduceStock(int quantity)

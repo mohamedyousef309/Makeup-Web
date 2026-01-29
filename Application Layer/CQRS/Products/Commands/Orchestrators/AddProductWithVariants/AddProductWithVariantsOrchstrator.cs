@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Application_Layer.CQRS.Products.Commands.Orchestrators.AddProductWithVariants
 {
-    public record AddProductWithVariantsOrchstrator(CreateProductDto CreateProductDto, IEnumerable<CreateProductVariantDto?> UpdateProductVariantDtos) :ICommand<RequestRespones<bool>>;
+    public record AddProductWithVariantsOrchstrator(CreateProductDto CreateProductDto, IEnumerable<CreateProductVariantDto?> CreateProductVariantDtos) :ICommand<RequestRespones<bool>>;
 
     public class AddProductWithVariantsOrchstratorHandler : IRequestHandler<AddProductWithVariantsOrchstrator, RequestRespones<bool>>
     {
@@ -31,9 +31,9 @@ namespace Application_Layer.CQRS.Products.Commands.Orchestrators.AddProductWithV
             {
                 return RequestRespones<bool>.Fail(addProductReslut.Message ?? "Failed to add product", addProductReslut.StatusCode);
             }
-            if (request.UpdateProductVariantDtos!=null)
+            if (request.CreateProductVariantDtos != null)
             {
-                var addProductVariantsReslut = await mediator.Send(new CreatevariantsCommand(addProductReslut.Data.Id, request.UpdateProductVariantDtos));
+                var addProductVariantsReslut = await mediator.Send(new CreatevariantsCommand(addProductReslut.Data.Id, request.CreateProductVariantDtos!));
 
                 if (!addProductVariantsReslut.IsSuccess)
                 {

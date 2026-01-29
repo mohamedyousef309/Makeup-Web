@@ -2,20 +2,15 @@
 @{
     ViewData["Title"] = "Admin Dashboard";
 
-    // التحقق من وجود المستخدم و Role في Claims
     var isAuthenticated = User.Identity?.IsAuthenticated ?? false;
     var isAdmin = false;
     var username = "";
 
     if (isAuthenticated)
     {
-        // جلب اسم المستخدم من Identity
         username = User.Identity.Name;
 
-        // جلب الـ Roles من Claims (من الـ Token في الـ Cookie)
         var claims = User.Claims.ToList();
-
-        // طريقة 1: التحقق من claim الـ role
         var roleClaims = claims.Where(c =>
             c.Type == "role" ||
             c.Type == "Role" ||
@@ -23,19 +18,13 @@
             c.Type == ClaimTypes.Role
         ).ToList();
 
-        // طريقة 2: يمكنك أيضًا التحقق من claim مخصص
-        // مثل claim باسم "Admin" أو claim بقيمة معينة
-
-        // التحقق إذا كان لديه role "Admin"
         isAdmin = roleClaims.Any(c =>
             c.Value.Equals("Admin", StringComparison.OrdinalIgnoreCase) ||
             c.Value.Equals("Administrator", StringComparison.OrdinalIgnoreCase)
         );
 
-        // إذا لم نجد role claim، يمكن التحقق من claim آخر حسب نظامك
         if (!isAdmin)
         {
-            // مثال: التحقق من claim باسم "isAdmin"
             var isAdminClaim = claims.FirstOrDefault(c =>
                 c.Type == "isAdmin" ||
                 c.Type == "IsAdmin" ||
@@ -66,7 +55,125 @@
             </div>
         </div>
 
-        <!-- Attributes Management Card - فقط للادمن -->
+        <!-- Quick Stats -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-3">
+                <div class="card bg-dark border-primary">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-muted mb-2">Total Products</h6>
+                                <h3 class="text-white mb-0">150</h3>
+                            </div>
+                            <div class="bg-primary bg-opacity-25 p-3 rounded">
+                                <i class="bi bi-box-seam display-6 text-primary"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-dark border-success">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-muted mb-2">Total Orders</h6>
+                                <h3 class="text-white mb-0">1,234</h3>
+                            </div>
+                            <div class="bg-success bg-opacity-25 p-3 rounded">
+                                <i class="bi bi-receipt display-6 text-success"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-dark border-warning">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-muted mb-2">Active Users</h6>
+                                <h3 class="text-white mb-0">89</h3>
+                            </div>
+                            <div class="bg-warning bg-opacity-25 p-3 rounded">
+                                <i class="bi bi-people display-6 text-warning"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-dark border-pink">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-muted mb-2">Categories</h6>
+                                <h3 class="text-white mb-0">15</h3>
+                            </div>
+                            <div class="bg-pink bg-opacity-25 p-3 rounded">
+                                <i class="bi bi-tags display-6 text-pink"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Quick Actions -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-4">
+                <div class="card bg-dark border-primary h-100">
+                    <div class="card-header border-primary d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 text-white">
+                            <i class="bi bi-plus-circle text-primary"></i> Create Product
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted mb-3">Add new products to your store with variants and attributes.</p>
+                        <a asp-controller="Products" asp-action="Create"
+                           class="btn btn-primary w-100">
+                            <i class="bi bi-plus-lg"></i> Create New Product
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card bg-dark border-success h-100">
+                    <div class="card-header border-success">
+                        <h5 class="mb-0 text-white">
+                            <i class="bi bi-receipt text-success"></i> Order Management
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted mb-3">View and manage all customer orders and bookings.</p>
+                        <a asp-controller="Order" asp-action="GetAllOrders"
+                           class="btn btn-outline-success w-100">
+                            <i class="bi bi-eye"></i> View All Orders
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card bg-dark border-warning h-100">
+                    <div class="card-header border-warning">
+                        <h5 class="mb-0 text-white">
+                            <i class="bi bi-people text-warning"></i> User Management
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted mb-3">Manage user accounts, permissions, and roles.</p>
+                        <a asp-controller="User" asp-action="ManageUsers"
+                           class="btn btn-outline-warning w-100">
+                            <i class="bi bi-person-gear"></i> Manage Users
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Attributes Management Card -->
         <div class="row g-4 mb-4">
             <div class="col-12">
                 <div class="card bg-dark border-pink">
@@ -105,72 +212,71 @@
             </div>
         </div>
 
-        <!-- Admin Quick Actions -->
+        <!-- Recent Activities -->
         <div class="row g-4">
-            <div class="col-md-6">
-                <div class="card bg-dark border-secondary h-100">
+            <div class="col-md-8">
+                <div class="card bg-dark border-secondary">
                     <div class="card-header border-secondary">
                         <h5 class="mb-0 text-white">
-                            <i class="bi bi-receipt text-primary"></i> Order Management
+                            <i class="bi bi-clock-history text-info"></i> Recent Activities
                         </h5>
                     </div>
                     <div class="card-body">
-                        <p class="text-muted mb-3">View and manage all customer orders and bookings.</p>
-                        <a asp-controller="Order" asp-action="GetAllOrders"
-                           class="btn btn-outline-primary">
-                            <i class="bi bi-eye"></i> View All Orders
-                        </a>
+                        <div class="list-group list-group-flush">
+                            <div class="list-group-item bg-dark border-secondary text-white">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">New product created</h6>
+                                    <small class="text-muted">2 hours ago</small>
+                                </div>
+                                <p class="mb-1 text-muted">"Luxury Lipstick Set" added to inventory</p>
+                            </div>
+                            <div class="list-group-item bg-dark border-secondary text-white">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">Order processed</h6>
+                                    <small class="text-muted">5 hours ago</small>
+                                </div>
+                                <p class="mb-1 text-muted">Order #ORD-7894 shipped to customer</p>
+                            </div>
+                            <div class="list-group-item bg-dark border-secondary text-white">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">User registered</h6>
+                                    <small class="text-muted">Yesterday</small>
+                                </div>
+                                <p class="mb-1 text-muted">New user "Sarah Johnson" created account</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="col-md-6">
-                <div class="card bg-dark border-secondary h-100">
-                    <div class="card-header border-secondary">
-                        <h5 class="mb-0 text-white">
-                            <i class="bi bi-people text-success"></i> User Management
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <p class="text-muted mb-3">Manage user accounts, permissions, and roles.</p>
-                        <a asp-controller="User" asp-action="ManageUsers"
-                           class="btn btn-outline-success">
-                            <i class="bi bi-person-gear"></i> Manage Users
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Admin Information -->
-        <div class="row mt-4">
-            <div class="col-12">
+            <!-- Admin Information -->
+            <div class="col-md-4">
                 <div class="card bg-dark border-secondary">
                     <div class="card-body">
                         <h5 class="text-white mb-3">
                             <i class="bi bi-info-circle text-info"></i> Session Information
                         </h5>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <strong class="text-muted">Username:</strong>
-                                    <span class="text-white d-block mt-1">@username</span>
-                                </div>
-                                <div class="mb-3">
-                                    <strong class="text-muted">Role:</strong>
-                                    <span class="badge bg-pink mt-1">Administrator</span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <strong class="text-muted">Current Time:</strong>
-                                    <span class="text-white d-block mt-1">@DateTime.Now.ToString("dd MMM yyyy HH:mm:ss")</span>
-                                </div>
-                                <div class="mb-3">
-                                    <strong class="text-muted">Authentication Method:</strong>
-                                    <span class="text-white d-block mt-1">JWT Token</span>
-                                </div>
-                            </div>
+                        <div class="mb-3">
+                            <strong class="text-muted">Username:</strong>
+                            <span class="text-white d-block mt-1">@username</span>
+                        </div>
+                        <div class="mb-3">
+                            <strong class="text-muted">Role:</strong>
+                            <span class="badge bg-pink mt-1">Administrator</span>
+                        </div>
+                        <div class="mb-3">
+                            <strong class="text-muted">Current Time:</strong>
+                            <span class="text-white d-block mt-1">@DateTime.Now.ToString("HH:mm:ss")</span>
+                        </div>
+                        <div class="mb-3">
+                            <strong class="text-muted">Date:</strong>
+                            <span class="text-white d-block mt-1">@DateTime.Now.ToString("dddd, dd MMM yyyy")</span>
+                        </div>
+                        <div class="mt-4">
+                            <a asp-controller="Account" asp-action="Logout"
+                               class="btn btn-outline-danger w-100">
+                                <i class="bi bi-box-arrow-right"></i> Logout
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -180,7 +286,6 @@
 }
 else if (isAuthenticated)
 {
-    <!-- User ليس Admin -->
     <div class="container-fluid px-4">
         <div class="row justify-content-center">
             <div class="col-md-8 col-lg-6">
@@ -213,7 +318,6 @@ else if (isAuthenticated)
 }
 else
 {
-    <!-- User غير مسجل الدخول -->
     <div class="container-fluid px-4">
         <div class="row justify-content-center">
             <div class="col-md-8 col-lg-6">
@@ -273,11 +377,34 @@ else
         .card {
             border-radius: 10px;
             overflow: hidden;
+            transition: transform 0.3s ease;
         }
+
+            .card:hover {
+                transform: translateY(-5px);
+            }
 
         .btn-lg {
             padding: 12px 30px;
             font-size: 1.1rem;
+        }
+
+        .list-group-item {
+            background-color: transparent;
+            border-color: #333;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            padding: 5px 10px;
+        }
+
+        .display-6 {
+            font-size: 2.5rem;
+        }
+
+        .card-header {
+            background-color: rgba(255, 255, 255, 0.03);
         }
     </style>
 }

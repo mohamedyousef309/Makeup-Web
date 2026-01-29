@@ -2,8 +2,10 @@
 using Domain_Layer.Entites;
 using Domain_Layer.Interfaces.Abstraction;
 using Domain_Layer.Interfaces.Repositryinterfaces;
+using Domain_Layer.Interfaces.ServiceInterfaces;
 using Domain_Layer.Respones;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,25 +20,76 @@ namespace Application_Layer.CQRS.Products.Commands.Createvariants
     public class CreatevariantsCommandHandler : IRequestHandler<CreatevariantsCommand, RequestRespones<bool>>
 {
         private readonly IGenaricRepository<ProductVariant> genaricRepository;
+        private readonly IAttachmentService attachmentService;
 
-        public CreatevariantsCommandHandler(IGenaricRepository<ProductVariant> genaricRepository)
+        public CreatevariantsCommandHandler(IGenaricRepository<ProductVariant> genaricRepository,IAttachmentService attachmentService)
         {
             this.genaricRepository = genaricRepository;
+            this.attachmentService = attachmentService;
         }
         public async Task<RequestRespones<bool>> Handle(CreatevariantsCommand request, CancellationToken cancellationToken)
         {
 
-            var variants = request.UpdateProductVariantDtos
-                .Select(dto =>
-                new ProductVariant
-                {ProductId = request.productid
-                ,Price = dto.Price
-                ,Stock = dto.Stock
-                ,ProductVariantAttributeValues = dto.AttributeValueId.Select(avId => new VariantAttributeValue
+            var variants = new List<ProductVariant>();
+
+            var currentRequestImages = new Dictionary<string, string>();
+
+            foreach (var item in request.UpdateProductVariantDtos)
+            {
+                string? imageUrl = null;
+
+                if (item.Variantpucture != null)
                 {
-                    AttributeValueId = avId
-                }).ToList()
-                }).ToList();
+                    var originalFileName = Path.GetFileName(item.Variantpucture.FileName);
+
+                    if (currentRequestImages.ContainsKey(originalFileName))
+                    {
+                        imageUrl = currentRequestImages[originalFileName];
+                    }
+
+                    else
+                    {
+                        var existingPath = await genaricRepository.GetAll()
+                            .Where(v => v.ImageUrl != null && v.ImageUrl.EndsWith("_" + originalFileName))
+                            .Select(v => v.ImageUrl)
+                            .FirstOrDefaultAsync(cancellationToken);
+
+                        if (existingPath!=null)
+                        {
+                            var fullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", existingPath.TrimStart('/'));
+                            if (File.Exists(fullPath))
+                            {
+                                imageUrl = existingPath;
+                                currentRequestImages[originalFileName] = imageUrl;
+                            }
+
+                        }
+
+                        if (imageUrl == null)
+                        {
+                            imageUrl = attachmentService.UploadImage(item.Variantpucture, "Images/VariantImges");
+                        }
+
+                        if (imageUrl != null)
+                        {
+                            currentRequestImages[originalFileName] = imageUrl;
+                        }
+
+                    }
+                }
+
+                variants.Add(new ProductVariant
+                {
+                    ProductId = request.productid,
+                    Price = item.Price,
+                    Stock = item.Stock,
+                    ImageUrl = imageUrl,
+                    ProductVariantAttributeValues = item.AttributeValueId.Select(avId => new VariantAttributeValue
+                    {
+                        AttributeValueId = avId
+                    }).ToList()
+                });
+            }
 
 
 

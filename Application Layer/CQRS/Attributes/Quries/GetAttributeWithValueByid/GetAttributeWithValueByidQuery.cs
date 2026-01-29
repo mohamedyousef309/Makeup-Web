@@ -30,6 +30,7 @@ namespace Application_Layer.CQRS.Attributes.Quries.GetAttributeWithValueByid
               Name=x.Name,
                 Attributes = x.Values.Select(av => new AttributeValueDto
                 {
+                   id = av.Id,
                     AttributeId = av.Id,
                     Value = av.Value
                 }).ToList()

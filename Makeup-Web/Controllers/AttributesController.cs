@@ -1,11 +1,13 @@
 ﻿using Application_Layer.CQRS.Attributes.Commands.addAttribute;
 using Application_Layer.CQRS.Attributes.Commands.AddAttributesWithValues;
 using Application_Layer.CQRS.Attributes.Quries.GetAttributes;
+using Application_Layer.CQRS.Attributes.Quries.GetAttributesLookup;
 using Application_Layer.CQRS.Attributes.Quries.GetAttributeWithValueByid;
 using Domain_Layer.DTOs.Attribute;
 using Domain_Layer.ViewModels.AttributesViewModle;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+//using static Microsoft.CodeAnalysis.CSharp.SyntaxTokenParser;
 //using static Microsoft.CodeAnalysis.CSharp.SyntaxTokenParser;
 
 namespace Makeup_Web.Controllers
@@ -32,12 +34,41 @@ namespace Makeup_Web.Controllers
             if (!response.IsSuccess)
             {
                 ViewBag.ErrorMessage = response.Message;
-                return View("Error"); 
+                return View(); 
             }
 
             return View(response.Data);
 
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAttributesLookup()
+        {
+            var result = await mediator.Send(new GetAttributesLookupQuery());
+
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result.Message);
+            }
+
+            // إرجاع البيانات كـ JSON صافي (Array of Objects)
+            return Json(result.Data);
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> GetAttributeByidlookUpValue(int id)
+        {
+            var GetAttributeByidResult = await mediator.Send(new GetAttributeWithValueByidQuery(id));
+            if (!GetAttributeByidResult.IsSuccess)
+            {
+                return BadRequest(GetAttributeByidResult.Message);
+
+            }
+            return Json(GetAttributeByidResult.Data);
+        }
+
+
         [HttpGet]
         public async Task<IActionResult> GetAttributeByid(int id) 
         {
@@ -45,10 +76,11 @@ namespace Makeup_Web.Controllers
             if (!GetAttributeByidResult.IsSuccess)
             {
                 ViewBag.ErrorMessage = GetAttributeByidResult.Message;
-                return View("Error");
+                return View();
             }
             return View(GetAttributeByidResult.Data);
         }
+
         public IActionResult AddAttributesWithValues() 
         {
             return View(new AddAttributesWithValuesViewModel());

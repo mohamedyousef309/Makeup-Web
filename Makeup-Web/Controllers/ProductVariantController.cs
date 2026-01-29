@@ -49,8 +49,8 @@ namespace Makeup_Web.Controllers
                 Items = result.Data.Items.Select(v => new ProductVariantViewModel
                 {
                     Id = v.Id,
-                    VariantName = v.VariantName,
-                    VariantValue = v.VariantValue,
+                    //VariantName = v.VariantName,
+                    //VariantValue = v.VariantValue,
                     Stock = v.Stock
                 }).ToList(),
                 PageNumber = result.Data.PageNumber,
@@ -75,8 +75,8 @@ namespace Makeup_Web.Controllers
             var model = new ProductVariantViewModel
             {
                 Id = dto.Id,
-                VariantName = dto.VariantName,
-                VariantValue = dto.VariantValue,
+                //VariantName = dto.VariantName,
+                //VariantValue = dto.VariantValue,
                 Stock = dto.Stock
             };
 
@@ -120,8 +120,8 @@ namespace Makeup_Web.Controllers
             {
                 Id = dto.Id,
                 ProductId = dto.ProductId,
-                VariantName = dto.VariantName,
-                VariantValue = dto.VariantValue,
+                //VariantName = dto.VariantName,
+                //VariantValue = dto.VariantValue,
                 Price = dto.Price,
             };
             return View(model);

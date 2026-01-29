@@ -1,13 +1,16 @@
-﻿using Application_Layer.CQRS.Caegories.Queries.GetCategoriesLookupQuery;
+﻿using Application_Layer.CQRS.Attributes.Quries.GetAttributes;
+using Application_Layer.CQRS.Attributes.Quries.GetAttributesLookup;
+using Application_Layer.CQRS.Caegories.Queries.GetCategoriesLookupQuery;
 using Application_Layer.CQRS.Products.Commands;
 using Application_Layer.CQRS.Products.Commands.CreateProduct;
 using Application_Layer.CQRS.Products.Commands.Orchestrators.AddProductWithVariants;
 using Application_Layer.CQRS.Products.Commands.UpdateProduct;
 using Application_Layer.CQRS.Products.Queries;
-using Application_Layer.CQRS.Products.Queries.GetProductsByIds;
 using Application_Layer.CQRS.Products.Queries.GetProductsByCategory; // Added Namespace
+using Application_Layer.CQRS.Products.Queries.GetProductsByIds;
 using Domain_Layer.DTOs;
 using Domain_Layer.DTOs._ِCategoryDtos;
+using Domain_Layer.DTOs.Attribute;
 using Domain_Layer.DTOs.ProductDtos;
 using Domain_Layer.DTOs.ProductVariantDtos;
 using Domain_Layer.Respones;
@@ -17,6 +20,7 @@ using Domain_Layer.ViewModels.ProductsViewModels.UpdateProductsViewModel;
 using Infastructure_Layer.DynamicRBASystem;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace Makeup_Web.Controllers
 {
@@ -49,9 +53,7 @@ namespace Makeup_Web.Controllers
             return View(result.Data);
         }
 
-        /// <summary>
-        /// Retrieves products belonging to a specific category with pagination and filtering.
-        /// </summary>
+       
         [HttpGet]
         public async Task<IActionResult> GetByCategory(int categoryId, int pageIndex = 1, int pageSize = 10, string? sortBy = "id", string? sortDir = "desc", string? search = null)
         {
@@ -88,15 +90,35 @@ namespace Makeup_Web.Controllers
         #region Commands (Write Operations)
 
         [HttpGet]
-        [HasPermission("Products.Create")]
-        public IActionResult Create() => View();
+        //[HasPermission("Products.Create")]
+        public async Task<IActionResult> Create() 
+        {
+            var attributesResult = await _mediator.Send(new GetAttributesLookupQuery());
+            if (attributesResult.IsSuccess)
+            {
+                ViewBag.Attributes = attributesResult.Data;
+            }
+            else 
+            {
+                ViewBag.Attributes = new List<Domain_Layer.DTOs.Attribute.AttributeDto>();
+            }
+                return View();
+        }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [HasPermission("Products.Create")]
+        //[HasPermission("Products.Create")]
         public async Task<IActionResult> Create(CreateProductWithVariantsDto model)
         {
-            if (!ModelState.IsValid) return View(model);
+            if (!ModelState.IsValid) 
+            {
+                var attributesResult = await _mediator.Send(new GetAttributesLookupQuery());
+
+                ViewBag.Attributes = attributesResult.IsSuccess ? attributesResult.Data : new List<AttributeDto>();
+
+
+                return View(model);
+            };
 
             var productDto = new CreateProductDto
             {
@@ -116,6 +138,8 @@ namespace Makeup_Web.Controllers
             return View(model);
         }
 
+
+
         [HttpGet]
         [HasPermission("Products.Edit")]
         public async Task<IActionResult> Edit(int id)
@@ -129,8 +153,8 @@ namespace Makeup_Web.Controllers
                 Id = productDto.Id,
                 Name = productDto.Name,
                 Description = productDto.Description,
-                CategoryId = productDto.CategoryId,
-                IsActive = productDto.IsActive
+                //CategoryId = productDto.CategoryId,
+                //IsActive = productDto.IsActive
             };
 
             var categoriesResult = await _mediator.Send(new GetCategoryLookupQuery());
