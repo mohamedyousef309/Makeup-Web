@@ -1,0 +1,1012 @@
+﻿@using Domain_Layer.ViewModels.AttributesViewModle
+@model AddValuesToAttributeViewModel
+
+@{
+    ViewData["Title"] = "Add Values to Attribute - Makeup Studio";
+    var attributeId = Model.AttributeId;
+    var attributeName = Model.AttributeName ?? "Attribute";
+}
+
+@section Styles {
+    <style>
+        :root {
+            --primary-pink: #d68a8a;
+            --primary-hover: #c27676;
+            --dark-bg: #0f0f0f;
+            --card-bg: #1a1a1a;
+            --input-bg: #252525;
+            --text-light: #ffffff;
+            --text-muted: #a0a0a0;
+            --accent-gold: #c5a059;
+            --danger-red: #ff4d4d;
+            --success-green: #2ecc71;
+            --info-blue: #3498db;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .add-values-header {
+            padding: 60px 0 30px;
+            text-align: center;
+            background: linear-gradient(to bottom, #1a1a1a 0%, #0f0f0f 100%);
+            margin-bottom: 30px;
+            border-bottom: 1px solid #222;
+        }
+
+        .add-values-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.8rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            background: linear-gradient(45deg, #fff 30%, var(--primary-pink) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 2px;
+        }
+
+        .add-values-subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-top: 10px;
+            font-weight: 300;
+        }
+
+        .add-values-form-container {
+            max-width: 800px;
+            margin: 0 auto 60px;
+        }
+
+        .add-values-form-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 40px;
+            border: 1px solid #252525;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .form-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, rgba(214, 138, 138, 0.1) 0%, rgba(197, 160, 89, 0.1) 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            border: 2px solid var(--primary-pink);
+        }
+
+            .form-icon i {
+                font-size: 2.5rem;
+                color: var(--primary-pink);
+            }
+
+        .form-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: var(--text-light);
+            margin-bottom: 10px;
+        }
+
+        .form-subtitle {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            color: var(--text-light);
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-control-custom {
+            width: 100%;
+            background: var(--input-bg);
+            border: 1px solid #333;
+            border-radius: 12px;
+            color: var(--text-light);
+            padding: 14px 18px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+            .form-control-custom:focus {
+                border-color: var(--primary-pink);
+                outline: none;
+                box-shadow: 0 0 0 3px rgba(214, 138, 138, 0.2);
+            }
+
+            .form-control-custom::placeholder {
+                color: #666;
+            }
+
+        .form-readonly {
+            background: rgba(37, 37, 37, 0.5);
+            border: 1px solid #444;
+            color: var(--text-muted);
+            cursor: not-allowed;
+        }
+
+        .validation-summary-errors {
+            background: rgba(255, 77, 77, 0.1);
+            border: 1px solid rgba(255, 77, 77, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 25px;
+            color: #ff9e9e;
+        }
+
+            .validation-summary-errors ul {
+                margin: 0;
+                padding-left: 20px;
+            }
+
+            .validation-summary-errors li {
+                margin-bottom: 5px;
+            }
+
+        .text-danger {
+            color: #ff6b6b !important;
+            font-size: 0.85rem;
+            margin-top: 5px;
+            display: block;
+            font-weight: 500;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid #333;
+        }
+
+        .btn-add {
+            flex: 1;
+            background: linear-gradient(45deg, var(--info-blue), var(--primary-pink));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 16px 24px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .btn-add:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 25px rgba(52, 152, 219, 0.3);
+            }
+
+            .btn-add::after {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 5px;
+                height: 5px;
+                background: rgba(255, 255, 255, 0.5);
+                opacity: 0;
+                border-radius: 100%;
+                transform: scale(1, 1) translate(-50%);
+                transform-origin: 50% 50%;
+            }
+
+            .btn-add:focus:not(:active)::after {
+                animation: ripple 1s ease-out;
+            }
+
+        .btn-cancel {
+            flex: 1;
+            background: transparent;
+            color: var(--text-light);
+            border: 1px solid #444;
+            border-radius: 12px;
+            padding: 16px 24px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+        }
+
+            .btn-cancel:hover {
+                background: #333;
+                border-color: #555;
+                transform: translateY(-2px);
+            }
+
+        @@keyframes ripple {
+            0% {
+                transform: scale(0, 0);
+                opacity: 0.5;
+            }
+
+            100% {
+                transform: scale(50, 50);
+                opacity: 0;
+            }
+        }
+
+        .required-indicator {
+            color: var(--danger-red);
+            margin-left: 4px;
+        }
+
+        /* Toast Notification */
+        .custom-toast {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: var(--card-bg);
+            color: white;
+            padding: 20px 25px;
+            border-radius: 12px;
+            border-left: 4px solid var(--info-blue);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transform: translateX(150%);
+            transition: transform 0.4s ease;
+            max-width: 400px;
+        }
+
+        .toast-show {
+            transform: translateX(0);
+        }
+
+        .toast-icon {
+            color: var(--info-blue);
+            font-size: 1.5rem;
+        }
+
+        .toast-content h4 {
+            margin: 0 0 5px 0;
+            font-size: 1.1rem;
+        }
+
+        .toast-content p {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .toast-success {
+            border-left: 4px solid var(--success-green);
+        }
+
+            .toast-success .toast-icon {
+                color: var(--success-green);
+            }
+
+        .toast-error {
+            border-left: 4px solid var(--danger-red);
+        }
+
+            .toast-error .toast-icon {
+                color: var(--danger-red);
+            }
+
+        /* Loading Animation */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 15, 15, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+            .loading-overlay.active {
+                opacity: 1;
+                pointer-events: all;
+            }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(52, 152, 219, 0.3);
+            border-top: 4px solid var(--info-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @@keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Attribute Info Box */
+        .attribute-info {
+            background: rgba(37, 37, 37, 0.5);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid #333;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #333;
+        }
+
+            .info-item:last-child {
+                border-bottom: none;
+            }
+
+        .info-label {
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .info-value {
+            color: var(--text-light);
+            font-weight: 600;
+        }
+
+        /* Values Input Section */
+        .values-input-section {
+            background: rgba(37, 37, 37, 0.3);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 2px dashed #444;
+        }
+
+        .values-input-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .values-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+            .values-title i {
+                color: var(--info-blue);
+            }
+
+        .btn-add-field {
+            background: var(--info-blue);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+            .btn-add-field:hover {
+                background: #2980b9;
+                transform: translateY(-1px);
+            }
+
+        .value-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+
+        .value-input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        .value-counter {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .btn-remove-field {
+            background: transparent;
+            border: 1px solid var(--danger-red);
+            color: var(--danger-red);
+            border-radius: 8px;
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .btn-remove-field:hover {
+                background: rgba(255, 77, 77, 0.1);
+            }
+
+        .no-values-message {
+            color: var(--text-muted);
+            text-align: center;
+            padding: 20px;
+            font-style: italic;
+        }
+
+        /* Existing Values Section */
+        .existing-values-section {
+            background: rgba(37, 37, 37, 0.5);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid #333;
+        }
+
+        .existing-values-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-light);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+            .existing-values-title i {
+                color: var(--accent-gold);
+            }
+
+        .existing-values-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 0;
+        }
+
+        .value-tag {
+            background: rgba(197, 160, 89, 0.1);
+            border: 1px solid rgba(197, 160, 89, 0.3);
+            border-radius: 20px;
+            padding: 8px 15px;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive Design */
+        @@media (max-width: 768px) {
+            .add-values-title {
+                font-size: 2rem;
+            }
+
+            .add-values-form-card {
+                padding: 25px;
+            }
+
+            .form-title {
+                font-size: 1.5rem;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .btn-add,
+            .btn-cancel {
+                width: 100%;
+            }
+
+            .value-input-group {
+                flex-direction: column;
+            }
+
+            .btn-remove-field {
+                width: 100%;
+            }
+        }
+    </style>
+}
+
+<!-- Toast Notification -->
+@if (TempData["ErrorMessage"] != null)
+{
+    <div id="errorToast" class="custom-toast toast-error">
+        <div class="toast-icon">
+            <i class="bi bi-exclamation-triangle"></i>
+        </div>
+        <div class="toast-content">
+            <h4>Error</h4>
+            <p>@TempData["ErrorMessage"]</p>
+        </div>
+    </div>
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div id="successToast" class="custom-toast toast-success">
+        <div class="toast-icon">
+            <i class="bi bi-check-circle"></i>
+        </div>
+        <div class="toast-content">
+            <h4>Success</h4>
+            <p>@TempData["SuccessMessage"]</p>
+        </div>
+    </div>
+}
+
+<!-- Loading Overlay -->
+<div id="loadingOverlay" class="loading-overlay">
+    <div class="loading-spinner"></div>
+</div>
+
+<div class="add-values-header">
+    <div class="container">
+        <h1 class="add-values-title">Add New Values</h1>
+        <p class="add-values-subtitle">Add multiple values to your existing attribute</p>
+    </div>
+</div>
+
+<div class="container add-values-form-container">
+    <div class="add-values-form-card">
+        <div class="form-header">
+            <div class="form-icon">
+                <i class="bi bi-plus-circle-fill"></i>
+            </div>
+            <h2 class="form-title">Add Values to Attribute</h2>
+            <p class="form-subtitle">Enter new values for your attribute. You can add multiple values at once.</p>
+        </div>
+
+        <!-- Validation Summary -->
+        <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
+
+        <!-- Attribute Information -->
+        <div class="attribute-info">
+            <div class="info-item">
+                <span class="info-label">Attribute Name:</span>
+                <span class="info-value">@attributeName</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Attribute ID:</span>
+                <span class="info-value">@attributeId</span>
+            </div>
+        </div>
+
+        <!-- Existing Values (if any) -->
+        <div class="existing-values-section">
+            <div class="existing-values-title">
+                <i class="bi bi-list-stars"></i>
+                Current Values
+            </div>
+            <div id="existingValuesList" class="existing-values-list">
+                <!-- سيتم تحميل القيم الحالية عبر JavaScript -->
+                <div class="no-values-message">Loading existing values...</div>
+            </div>
+        </div>
+
+        <!-- Values Input Section -->
+        <div class="values-input-section">
+            <div class="values-input-header">
+                <div class="values-title">
+                    <i class="bi bi-plus-lg"></i>
+                    New Values
+                </div>
+                <button type="button" id="btnAddMoreFields" class="btn-add-field">
+                    <i class="bi bi-plus-lg"></i>Add Another Field
+                </button>
+            </div>
+
+            <div id="valuesInputContainer">
+                <!-- الحقول الديناميكية ستضاف هنا -->
+                <div class="value-input-group">
+                    <div class="value-input-wrapper">
+                        <input type="text"
+                               class="form-control-custom value-input"
+                               placeholder="Enter a value (e.g., Red, Large, Premium)"
+                               maxlength="100"
+                               data-index="0" />
+                        <div class="value-counter"><span id="charCount0">0</span>/100</div>
+                    </div>
+                    <button type="button" class="btn-remove-field" onclick="removeValueField(0)" disabled>
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div id="noFieldsMessage" class="no-values-message" style="display: none;">
+                Click "Add Another Field" to add values
+            </div>
+        </div>
+
+        <!-- Hidden Form -->
+        <form id="addValuesForm">
+            @Html.AntiForgeryToken()
+            <input type="hidden" id="attributeId" name="AttributeId" value="@Model.AttributeId" />
+            <input type="hidden" id="newValues" name="NewValues" />
+        </form>
+
+        <div class="form-actions">
+            <button type="button" id="btnSubmitValues" class="btn-add">
+                <i class="bi bi-check-circle me-2"></i>Add Values
+            </button>
+            <a href="@Url.Action("GetAttributeByid", "Attributes", new { id = Model.AttributeId })" class="btn-cancel">
+                <i class="bi bi-x-circle me-2"></i>Cancel
+            </a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.13/jquery.validate.unobtrusive.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const attributeId = @Model.AttributeId;
+            const valuesInputContainer = document.getElementById('valuesInputContainer');
+            const btnAddMoreFields = document.getElementById('btnAddMoreFields');
+            const btnSubmitValues = document.getElementById('btnSubmitValues');
+            const noFieldsMessage = document.getElementById('noFieldsMessage');
+            const existingValuesList = document.getElementById('existingValuesList');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+
+            let valueFieldCounter = 1; // بدأنا بـ 0 بالفعل في الحقل الأول
+
+            // تحميل القيم الحالية للصفة
+            loadExistingValues(attributeId);
+
+            // عرض الـ Toasts الحالية
+            showToasts();
+
+            // إضافة حقل جديد
+            btnAddMoreFields.addEventListener('click', addValueField);
+
+            // إرسال القيم
+            btnSubmitValues.addEventListener('click', submitValues);
+
+            // تأثير الدخول
+            const formCard = document.querySelector('.add-values-form-card');
+            formCard.style.opacity = '0';
+            formCard.style.transform = 'translateY(20px)';
+
+            setTimeout(() => {
+                formCard.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                formCard.style.opacity = '1';
+                formCard.style.transform = 'translateY(0)';
+            }, 100);
+
+            // دالة تحميل القيم الحالية
+            async function loadExistingValues(attrId) {
+                try {
+                    const response = await fetch(`/Attributes/GetAttributeByidlookUpValue/${attrId}`);
+                    if (!response.ok) {
+                        throw new Error('Failed to load existing values');
+                    }
+
+                    const result = await response.json();
+
+                    if (result.values && result.values.length > 0) {
+                        existingValuesList.innerHTML = '';
+                        result.values.forEach(value => {
+                            const valueTag = document.createElement('div');
+                            valueTag.className = 'value-tag';
+                            valueTag.textContent = value.value;
+                            existingValuesList.appendChild(valueTag);
+                        });
+                    } else {
+                        existingValuesList.innerHTML = '<div class="no-values-message">No existing values found</div>';
+                    }
+                } catch (error) {
+                    console.error('Error loading existing values:', error);
+                    existingValuesList.innerHTML = '<div class="no-values-message">Failed to load existing values</div>';
+                }
+            }
+
+            // دالة إضافة حقل إدخال جديد
+            function addValueField() {
+                const newIndex = valueFieldCounter;
+                const newField = document.createElement('div');
+                newField.className = 'value-input-group';
+                newField.innerHTML = `
+                    <div class="value-input-wrapper">
+                        <input type="text"
+                               class="form-control-custom value-input"
+                               placeholder="Enter a value (e.g., Red, Large, Premium)"
+                               maxlength="100"
+                               data-index="${newIndex}" />
+                        <div class="value-counter"><span id="charCount${newIndex}">0</span>/100</div>
+                    </div>
+                    <button type="button" class="btn-remove-field" onclick="removeValueField(${newIndex})">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                `;
+
+                valuesInputContainer.appendChild(newField);
+
+                // إضافة مستمع للأحداث للحقل الجديد
+                const inputField = newField.querySelector('.value-input');
+                const charCounter = newField.querySelector(`#charCount${newIndex}`);
+
+                inputField.addEventListener('input', function() {
+                    updateCharacterCounter(this, charCounter);
+                });
+
+                inputField.addEventListener('focus', function() {
+                    this.parentElement.style.boxShadow = '0 0 0 3px rgba(214, 138, 138, 0.2)';
+                });
+
+                inputField.addEventListener('blur', function() {
+                    this.parentElement.style.boxShadow = 'none';
+                });
+
+                // إخفاء رسالة "لا توجد حقول"
+                noFieldsMessage.style.display = 'none';
+
+                // التركيز على الحقل الجديد
+                inputField.focus();
+
+                valueFieldCounter++;
+
+                // تمكين زر الحذف للحقل الأول إذا كان معطلًا
+                const firstRemoveBtn = document.querySelector('.btn-remove-field');
+                if (firstRemoveBtn && firstRemoveBtn.disabled) {
+                    firstRemoveBtn.disabled = false;
+                }
+            }
+
+            // دالة إزالة حقل (معرّفة بشكل عام للوصول من onclick)
+            window.removeValueField = function(index) {
+                const fieldToRemove = document.querySelector(`.value-input[data-index="${index}"]`)?.closest('.value-input-group');
+                if (fieldToRemove) {
+                    fieldToRemove.remove();
+                }
+
+                // التحقق إذا لم يتبقَ أي حقول، عرض الرسالة
+                const remainingFields = document.querySelectorAll('.value-input-group');
+                if (remainingFields.length === 0) {
+                    noFieldsMessage.style.display = 'block';
+                }
+            };
+
+            // دالة تحديث عداد الأحرف
+            function updateCharacterCounter(input, counter) {
+                const currentLength = input.value.length;
+                counter.textContent = currentLength;
+
+                if (currentLength > 100) {
+                    input.value = input.value.substring(0, 100);
+                    counter.textContent = 100;
+                }
+            }
+
+            // إضافة مستمعات الأحداث للحقول الحالية
+            document.querySelectorAll('.value-input').forEach(input => {
+                const index = input.dataset.index;
+                const counter = document.getElementById(`charCount${index}`);
+
+                input.addEventListener('input', function() {
+                    updateCharacterCounter(this, counter);
+                });
+
+                input.addEventListener('focus', function() {
+                    this.parentElement.style.boxShadow = '0 0 0 3px rgba(214, 138, 138, 0.2)';
+                });
+
+                input.addEventListener('blur', function() {
+                    this.parentElement.style.boxShadow = 'none';
+                });
+            });
+
+            // دالة إرسال القيم
+            async function submitValues() {
+                // جمع القيم من الحقول
+                const valueInputs = document.querySelectorAll('.value-input');
+                const values = Array.from(valueInputs)
+                    .map(input => input.value.trim())
+                    .filter(value => value.length > 0);
+
+                // التحقق من وجود قيم
+                if (values.length === 0) {
+                    showToast('error', 'Validation Error', 'Please enter at least one value');
+                    return;
+                }
+
+                // التحقق من التكرارات
+                const uniqueValues = [...new Set(values.map(v => v.toLowerCase()))];
+                if (uniqueValues.length !== values.length) {
+                    showToast('error', 'Validation Error', 'Duplicate values are not allowed');
+                    return;
+                }
+
+                try {
+                    // إظهار حالة التحميل
+                    loadingOverlay.classList.add('active');
+                    btnSubmitValues.disabled = true;
+                    btnSubmitValues.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Adding Values...';
+
+                    // إعداد البيانات
+                    const requestData = {
+                        attributeId: attributeId,
+                        newValues: values
+                    };
+
+                    // إرسال الطلب
+                    const response = await fetch('/Attributes/AddValuesToAttribute', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                        },
+                        body: JSON.stringify(requestData)
+                    });
+
+                    const result = await response.json();
+
+                    if (result.isSuccess) {
+                        showToast('success', 'Success', 'Values added successfully!');
+
+                        // إعادة تحميل القيم الحالية
+                        await loadExistingValues(attributeId);
+
+                        // إعادة تعيين الحقول
+                        resetValueFields();
+
+                        // إعادة تعيين الزر بعد تأخير
+                        setTimeout(() => {
+                            btnSubmitValues.disabled = false;
+                            btnSubmitValues.innerHTML = '<i class="bi bi-check-circle me-2"></i>Add Values';
+                        }, 2000);
+
+                        // إمكانية إعادة التوجيه بعد النجاح
+                        // setTimeout(() => {
+                        //     window.location.href = `/Attributes/GetAttributeByid/${attributeId}`;
+                        // }, 1500);
+
+                    } else {
+                        showToast('error', 'Error', result.message || 'Failed to add values');
+                        btnSubmitValues.disabled = false;
+                        btnSubmitValues.innerHTML = '<i class="bi bi-check-circle me-2"></i>Add Values';
+                    }
+                } catch (error) {
+                    showToast('error', 'Error', 'Failed to add values: ' + error.message);
+                    btnSubmitValues.disabled = false;
+                    btnSubmitValues.innerHTML = '<i class="bi bi-check-circle me-2"></i>Add Values';
+                } finally {
+                    loadingOverlay.classList.remove('active');
+                }
+            }
+
+            // دالة إعادة تعيين الحقول
+            function resetValueFields() {
+                valuesInputContainer.innerHTML = `
+                    <div class="value-input-group">
+                        <div class="value-input-wrapper">
+                            <input type="text"
+                                   class="form-control-custom value-input"
+                                   placeholder="Enter a value (e.g., Red, Large, Premium)"
+                                   maxlength="100"
+                                   data-index="0" />
+                            <div class="value-counter"><span id="charCount0">0</span>/100</div>
+                        </div>
+                        <button type="button" class="btn-remove-field" onclick="removeValueField(0)" disabled>
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                `;
+
+                // إعادة تهيئة العداد
+                valueFieldCounter = 1;
+
+                // إعادة إضافة مستمعات الأحداث للحقل الأول
+                const firstInput = document.querySelector('.value-input[data-index="0"]');
+                const firstCounter = document.getElementById('charCount0');
+
+                if (firstInput) {
+                    firstInput.addEventListener('input', function() {
+                        updateCharacterCounter(this, firstCounter);
+                    });
+                }
+            }
+
+            // دالة عرض Toast
+            function showToast(type, title, message) {
+                const toast = document.createElement('div');
+                toast.className = `custom-toast toast-${type}`;
+                toast.innerHTML = `
+                    <div class="toast-icon">
+                        <i class="bi ${type === 'success' ? 'bi-check-circle' : 'bi-exclamation-triangle'}"></i>
+                    </div>
+                    <div class="toast-content">
+                        <h4>${title}</h4>
+                        <p>${message}</p>
+                    </div>
+                `;
+
+                document.body.appendChild(toast);
+
+                setTimeout(() => {
+                    toast.classList.add('toast-show');
+                }, 10);
+
+                setTimeout(() => {
+                    toast.classList.remove('toast-show');
+                    setTimeout(() => {
+                        toast.remove();
+                    }, 400);
+                }, 5000);
+            }
+
+            // دالة عرض Toasts الحالية
+            function showToasts() {
+                const errorToast = document.getElementById('errorToast');
+                const successToast = document.getElementById('successToast');
+
+                if (errorToast) {
+                    errorToast.classList.add('toast-show');
+                    setTimeout(() => {
+                        errorToast.classList.remove('toast-show');
+                        setTimeout(() => {
+                            errorToast.remove();
+                        }, 400);
+                    }, 5000);
+                }
+
+                if (successToast) {
+                    successToast.classList.add('toast-show');
+                    setTimeout(() => {
+                        successToast.classList.remove('toast-show');
+                        setTimeout(() => {
+                            successToast.remove();
+                        }, 400);
+                    }, 5000);
+                }
+            }
+        });
+    </script>
+}
