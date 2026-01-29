@@ -1,10 +1,10 @@
 ﻿using Application_Layer.CQRS.Attributes.Commands.addAttribute;
 using Application_Layer.CQRS.Attributes.Commands.AddAttributesWithValues;
-using Application_Layer.CQRS.Attributes.Commands.updateAttribute; // جديد
-using Application_Layer.CQRS.Attributes.Commands.deleteAttribute; // جديد
-using Application_Layer.CQRS.Attributes.Commands.AddValuesToAttribute; // جديد
-using Application_Layer.CQRS.Attributes.Commands.UpdateAttributeValue; // جديد
-using Application_Layer.CQRS.Attributes.Commands.DeleteAttributeValue; // جديد
+using Application_Layer.CQRS.Attributes.Commands.updateAttribute;
+using Application_Layer.CQRS.Attributes.Commands.deleteAttribute;
+using Application_Layer.CQRS.Attributes.Commands.AddValuesToAttribute;
+using Application_Layer.CQRS.Attributes.Commands.UpdateAttributeValue;
+using Application_Layer.CQRS.Attributes.Commands.DeleteAttributeValue;
 using Application_Layer.CQRS.Attributes.Quries.GetAttributes;
 using Application_Layer.CQRS.Attributes.Quries.GetAttributesLookup;
 using Application_Layer.CQRS.Attributes.Quries.GetAttributeWithValueByid;
@@ -32,7 +32,6 @@ namespace Makeup_Web.Controllers
         public async Task<IActionResult> GetAllAttributes(int pageNumber = 1, int pageSize = 10)
         {
             var query = new GetAttributesQuery(pageNumber, pageSize);
-
             var response = await mediator.Send(query);
 
             if (!response.IsSuccess)
@@ -48,12 +47,7 @@ namespace Makeup_Web.Controllers
         public async Task<IActionResult> GetAttributesLookup()
         {
             var result = await mediator.Send(new GetAttributesLookupQuery());
-
-            if (!result.IsSuccess)
-            {
-                return BadRequest(result.Message);
-            }
-
+            if (!result.IsSuccess) return BadRequest(result.Message);
             return Json(result.Data);
         }
 
@@ -61,10 +55,7 @@ namespace Makeup_Web.Controllers
         public async Task<IActionResult> GetAttributeByidlookUpValue(int id)
         {
             var GetAttributeByidResult = await mediator.Send(new GetAttributeWithValueByidQuery(id));
-            if (!GetAttributeByidResult.IsSuccess)
-            {
-                return BadRequest(GetAttributeByidResult.Message);
-            }
+            if (!GetAttributeByidResult.IsSuccess) return BadRequest(GetAttributeByidResult.Message);
             return Json(GetAttributeByidResult.Data);
         }
 
@@ -90,17 +81,12 @@ namespace Makeup_Web.Controllers
         {
             if (!ModelState.IsValid)
             {
-                var validationErrors = ModelState.Values
-                    .SelectMany(v => v.Errors)
-                    .Select(e => e.ErrorMessage)
-                    .ToList();
-
+                var validationErrors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
                 TempData["ErrorMessage"] = string.Join("<br/>", validationErrors);
                 return View(Modle);
             }
 
-            var AddAttributesWithValuesResult = await mediator.Send(
-                new addAttributeCommand(Modle.AttributeName, Modle.Values));
+            var AddAttributesWithValuesResult = await mediator.Send(new addAttributeCommand(Modle.AttributeName, Modle.Values));
 
             if (!AddAttributesWithValuesResult.IsSuccess)
             {
@@ -112,12 +98,13 @@ namespace Makeup_Web.Controllers
             return RedirectToAction("GetAllAttributes");
         }
 
-        
+      
 
         [HttpPost]
-        public async Task<IActionResult> UpdateAttribute([FromBody] UpdateAttributeDto updateDto)
+        public async Task<IActionResult> UpdateAttribute([FromBody] UpdateAttributeViewModel model)
         {
-            var result = await mediator.Send(new updateAttributeCommand(updateDto));
+            
+            var result = await mediator.Send(new updateAttributeCommand(new UpdateAttributeDto { Id = model.Id, AttributeName = model.AttributeName }));
             if (result.IsSuccess) return Ok(result);
             return BadRequest(result.Message);
         }
@@ -131,24 +118,18 @@ namespace Makeup_Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddValuesToAttribute([FromBody] AddValuesToAttributeDto addValuesDto)
+        public async Task<IActionResult> AddValuesToAttribute([FromBody] AddValuesToAttributeViewModel model)
         {
-            var result = await mediator.Send(new AddValuesToAttributeCommand(addValuesDto));
+            
+            var result = await mediator.Send(new AddValuesToAttributeCommand(new AddValuesToAttributeDto { AttributeId = model.AttributeId, Values = model.NewValues }));
             if (result.IsSuccess) return Ok(result);
             return BadRequest(result.Message);
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateAttributeValue([FromBody] AttributeValueDto updateValueDto)
+        public async Task<IActionResult> UpdateAttributeValue([FromBody] UpdateAttributeValueViewModel model)
         {
-           
-            var result = await mediator.Send(new UpdateAttributeValueCommand(new UpdateAttributeValueDto
-            {
-                Id = updateValueDto.id,
-                AttributeId = updateValueDto.AttributeId,
-                Value = updateValueDto.Value
-            }));
-
+            var result = await mediator.Send(new UpdateAttributeValueCommand(new UpdateAttributeValueDto { Id = model.Id, AttributeId = model.AttributeId, Value = model.Value }));
             if (result.IsSuccess) return Ok(result);
             return BadRequest(result.Message);
         }
