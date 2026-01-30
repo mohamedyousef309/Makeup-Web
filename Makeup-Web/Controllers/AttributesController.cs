@@ -1,5 +1,10 @@
 ﻿using Application_Layer.CQRS.Attributes.Commands.addAttribute;
 using Application_Layer.CQRS.Attributes.Commands.AddAttributesWithValues;
+using Application_Layer.CQRS.Attributes.Commands.updateAttribute;
+using Application_Layer.CQRS.Attributes.Commands.deleteAttribute;
+using Application_Layer.CQRS.Attributes.Commands.AddValuesToAttribute;
+using Application_Layer.CQRS.Attributes.Commands.UpdateAttributeValue;
+using Application_Layer.CQRS.Attributes.Commands.DeleteAttributeValue;
 using Application_Layer.CQRS.Attributes.Quries.GetAttributes;
 using Application_Layer.CQRS.Attributes.Quries.GetAttributesLookup;
 using Application_Layer.CQRS.Attributes.Quries.GetAttributeWithValueByid;
@@ -7,8 +12,6 @@ using Domain_Layer.DTOs.Attribute;
 using Domain_Layer.ViewModels.AttributesViewModle;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-//using static Microsoft.CodeAnalysis.CSharp.SyntaxTokenParser;
-//using static Microsoft.CodeAnalysis.CSharp.SyntaxTokenParser;
 
 namespace Makeup_Web.Controllers
 {
@@ -20,59 +23,46 @@ namespace Makeup_Web.Controllers
         {
             this.mediator = mediator;
         }
+
         public IActionResult Index()
         {
             return View();
         }
 
-        public async Task<IActionResult> GetAllAttributes(int pageNumber = 1, int pageSize = 10) 
+        public async Task<IActionResult> GetAllAttributes(int pageNumber = 1, int pageSize = 10)
         {
             var query = new GetAttributesQuery(pageNumber, pageSize);
-
             var response = await mediator.Send(query);
 
             if (!response.IsSuccess)
             {
                 ViewBag.ErrorMessage = response.Message;
-                return View(); 
+                return View();
             }
 
             return View(response.Data);
-
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAttributesLookup()
         {
             var result = await mediator.Send(new GetAttributesLookupQuery());
-
-            if (!result.IsSuccess)
-            {
-                return BadRequest(result.Message);
-            }
-
-            // إرجاع البيانات كـ JSON صافي (Array of Objects)
+            if (!result.IsSuccess) return BadRequest(result.Message);
             return Json(result.Data);
         }
-
 
         [HttpGet]
         public async Task<IActionResult> GetAttributeByidlookUpValue(int id)
         {
             var GetAttributeByidResult = await mediator.Send(new GetAttributeWithValueByidQuery(id));
-            if (!GetAttributeByidResult.IsSuccess)
-            {
-                return BadRequest(GetAttributeByidResult.Message);
-
-            }
+            if (!GetAttributeByidResult.IsSuccess) return BadRequest(GetAttributeByidResult.Message);
             return Json(GetAttributeByidResult.Data);
         }
 
-
         [HttpGet]
-        public async Task<IActionResult> GetAttributeByid(int id) 
+        public async Task<IActionResult> GetAttributeByid(int id)
         {
-           var GetAttributeByidResult = await mediator.Send(new GetAttributeWithValueByidQuery(id));
+            var GetAttributeByidResult = await mediator.Send(new GetAttributeWithValueByidQuery(id));
             if (!GetAttributeByidResult.IsSuccess)
             {
                 ViewBag.ErrorMessage = GetAttributeByidResult.Message;
@@ -81,28 +71,22 @@ namespace Makeup_Web.Controllers
             return View(GetAttributeByidResult.Data);
         }
 
-        public IActionResult AddAttributesWithValues() 
+        public IActionResult AddAttributesWithValues()
         {
             return View(new AddAttributesWithValuesViewModel());
         }
 
         [HttpPost]
-
-        public async Task<IActionResult> AddAttributesWithValues(AddAttributesWithValuesViewModel Modle) 
+        public async Task<IActionResult> AddAttributesWithValues(AddAttributesWithValuesViewModel Modle)
         {
             if (!ModelState.IsValid)
             {
-                var validationErrors = ModelState.Values
-                    .SelectMany(v => v.Errors)
-                    .Select(e => e.ErrorMessage)
-                    .ToList();
-
+                var validationErrors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
                 TempData["ErrorMessage"] = string.Join("<br/>", validationErrors);
                 return View(Modle);
             }
 
-            var AddAttributesWithValuesResult = await mediator.Send(
-                new addAttributeCommand(Modle.AttributeName, Modle.Values));
+            var AddAttributesWithValuesResult = await mediator.Send(new addAttributeCommand(Modle.AttributeName, Modle.Values));
 
             if (!AddAttributesWithValuesResult.IsSuccess)
             {
@@ -111,10 +95,51 @@ namespace Makeup_Web.Controllers
             }
 
             TempData["SuccessMessage"] = AddAttributesWithValuesResult.Message ?? "Attribute added successfully";
-            return RedirectToAction("GetAllAttributes"); 
-
+            return RedirectToAction("GetAllAttributes");
         }
 
+      
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateAttribute([FromBody] UpdateAttributeViewModel model)
+        {
+            
+            var result = await mediator.Send(new updateAttributeCommand(new UpdateAttributeDto { Id = model.Id, AttributeName = model.AttributeName }));
+            if (result.IsSuccess) return Ok(result);
+            return BadRequest(result.Message);
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteAttribute(int id)
+        {
+            var result = await mediator.Send(new deleteAttributeCommand(id));
+            if (result.IsSuccess) return Ok(result);
+            return BadRequest(result.Message);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddValuesToAttribute([FromBody] AddValuesToAttributeViewModel model)
+        {
+            
+            var result = await mediator.Send(new AddValuesToAttributeCommand(new AddValuesToAttributeDto { AttributeId = model.AttributeId, Values = model.NewValues }));
+            if (result.IsSuccess) return Ok(result);
+            return BadRequest(result.Message);
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateAttributeValue([FromBody] UpdateAttributeValueViewModel model)
+        {
+            var result = await mediator.Send(new UpdateAttributeValueCommand(new UpdateAttributeValueDto { Id = model.Id, AttributeId = model.AttributeId, Value = model.Value }));
+            if (result.IsSuccess) return Ok(result);
+            return BadRequest(result.Message);
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteAttributeValue(int id)
+        {
+            var result = await mediator.Send(new DeleteAttributeValueCommand(id));
+            if (result.IsSuccess) return Ok(result);
+            return BadRequest(result.Message);
+        }
     }
 }
-
