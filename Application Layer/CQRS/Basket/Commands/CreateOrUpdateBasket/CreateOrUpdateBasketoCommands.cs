@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Application_Layer.CQRS.Basket.Commands.CreateOrUpdateBasket
 {
-    public record CreateOrUpdateBasketoCommands( int userid,int ProductId,int ProductVariantid, string productVariant, string ProductName, decimal Price, int Quantity): ICommand<RequestRespones<bool>>;
+    public record CreateOrUpdateBasketoCommands( int userid,int ProductId,int ProductVariantid, string VariantImageUrl, IEnumerable<string> productVariantValues, string ProductName, decimal Price, int Quantity): ICommand<RequestRespones<bool>>;
 
     public class CreateOrUpdateBasketoCommandsHandler : IRequestHandler<CreateOrUpdateBasketoCommands, RequestRespones<bool>>
     {
@@ -33,29 +33,27 @@ namespace Application_Layer.CQRS.Basket.Commands.CreateOrUpdateBasket
                     Items = new List<Domain_Layer.Entites.Basket.CartItem>()
                 };
             }
-                var existingItem = basket.Items.FirstOrDefault(i => i.ProductId == request.ProductId);
+            var existingItem = basket.Items.FirstOrDefault(i => i.ProductVariantid == request.ProductVariantid);
 
-                if (existingItem != null)
+            if (existingItem != null)
+            {
+                existingItem.Quantity += request.Quantity;
+                existingItem.Price = request.Price;
+            }
+            else
+            {
+                basket.Items.Add(new Domain_Layer.Entites.Basket.CartItem
                 {
-                    existingItem.Quantity += request.Quantity;
-                    existingItem.Price = request.Price;
-
-                }
-                else 
-                {
-                    basket.Items.Add(new Domain_Layer.Entites.Basket.CartItem
-                    {
-                        ProductId = request.ProductId,
-                        Price = request.Price,
-                        ProductName = request.ProductName,
-                        Quantity = request.Quantity,
-                        ProductVariantid=request.ProductVariantid,
-                        ProductVariant = request.productVariant,
-                        UserCartId = request.userid.ToString(),
-
-                    });
-
-                }
+                    ProductId = request.ProductId,
+                    ProductVariantid = request.ProductVariantid,
+                    VariantImageUrl = request.VariantImageUrl,
+                    ProductName = request.ProductName,
+                    Price = request.Price,
+                    Quantity = request.Quantity,
+                    ProductVariantValues = request.productVariantValues,
+                    UserCartId = request.userid.ToString(),
+                });
+            }
             var updatedCart = await basketRepository.UpdateOrCreateCustomerBasket(basket);
 
             if (updatedCart == null)

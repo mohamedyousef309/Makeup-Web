@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Application_Layer.CQRS.Basket.Commands.CreateOrUpdateBasket
 {
-    public record CreateOrUpdateBasketOrchestrator(int userid, int Productid,int ProductVariantId,string productVariant,string ProductName,decimal ProductPrice,int Quantity) : ICommand<RequestRespones<bool>>;
+    public record CreateOrUpdateBasketOrchestrator(int userid, int Productid,int ProductVariantId,string VariantImageUrl, IEnumerable<string> ProductVariantValues, string ProductName,decimal ProductPrice,int Quantity) : ICommand<RequestRespones<bool>>;
 
     public class CreateOrUpdateBasketOrchestratorHandler : IRequestHandler<CreateOrUpdateBasketOrchestrator, RequestRespones<bool>>
     {
@@ -29,7 +29,8 @@ namespace Application_Layer.CQRS.Basket.Commands.CreateOrUpdateBasket
                 request.userid,
                 request.Productid,
                 request.ProductVariantId,
-                request.productVariant,
+                request.VariantImageUrl,
+                request.ProductVariantValues,
                 request.ProductName,
                 request.ProductPrice,
                 Quantity: request.Quantity));

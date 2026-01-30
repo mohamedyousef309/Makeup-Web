@@ -55,21 +55,47 @@
             border-radius: 16px;
             padding: 20px;
             border: 1px solid #252525;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             height: 500px;
             overflow: hidden;
+            position: relative;
+        }
+
+        .image-wrapper {
+            width: 100%;
+            height: 100%;
+            position: relative;
         }
 
         .product-image {
-            max-width: 100%;
-            max-height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             object-fit: contain;
             border-radius: 12px;
+            opacity: 0;
+            transform: scale(0.95);
+            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), 
+                        transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: opacity, transform;
+        }
+
+        .product-image.active {
+            opacity: 1;
+            transform: scale(1);
+            z-index: 2;
+        }
+
+        .product-image.loading {
+            opacity: 0.3;
+            filter: blur(2px);
         }
 
         .image-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
             display: flex;
@@ -77,6 +103,34 @@
             justify-content: center;
             color: var(--text-muted);
             font-size: 1.2rem;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+            z-index: 1;
+        }
+
+        .image-placeholder.active {
+            opacity: 1;
+            z-index: 2;
+        }
+
+        /* Loading Animation */
+        .image-loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(214, 138, 138, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary-pink);
+            animation: spin 1.2s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
+            z-index: 10;
+            display: none;
+        }
+
+        @@keyframes spin {
+            to { transform: translate(-50%, -50%) rotate(360deg); }
         }
 
         /* Product Info */
@@ -308,6 +362,15 @@
             color: var(--accent-gold);
         }
 
+        /* Selected Options Summary */
+        .selected-options-summary {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            border: 1px solid #252525;
+        }
+
         /* Empty State */
         .empty-state {
             text-align: center;
@@ -339,9 +402,11 @@
         @@keyframes fadeIn {
             from {
                 opacity: 0;
+                transform: translateY(10px);
             }
             to {
                 opacity: 1;
+                transform: translateY(0);
             }
         }
 
@@ -358,6 +423,7 @@
             align-items: center;
             gap: 10px;
             position: relative;
+            animation: fadeIn 0.5s ease;
         }
 
         .alert-info {
@@ -370,6 +436,11 @@
             background: rgba(40, 167, 69, 0.2);
             border: 1px solid var(--success-green);
             color: #6fcf97;
+        }
+
+        /* Form hidden elements */
+        .hidden-form-elements {
+            display: none;
         }
 
         /* Responsive */
@@ -447,20 +518,53 @@
         </div>
     }
 
+    <!-- Hidden Form for Basket Submission -->
+    <form id="addToBasketForm" method="post" action="@Url.Action("AddToBasket", "Basket")" class="hidden-form-elements">
+        @Html.AntiForgeryToken()
+        
+        <!-- Hidden Fields for Basket Data -->
+        <input type="hidden" id="formProductId" name="ProductId" value="@Model.Id" />
+        <input type="hidden" id="formProductVariantId" name="ProductVariantId" />
+        <input type="hidden" id="formVariantImageUrl" name="VariantImageUrl" />
+        <input type="hidden" id="formProductName" name="ProductName" value="@Model.Name" />
+        <input type="hidden" id="formProductPrice" name="ProductPrice" />
+        <input type="hidden" id="formQuantity" name="Quantity" value="1" />
+        
+        <!-- ProductVariantValues will be added dynamically via JavaScript -->
+        <div id="formVariantValuesContainer">
+            <!-- Will be populated with selected values -->
+        </div>
+    </form>
+
     <div class="product-grid">
         <!-- Product Image -->
         <div class="product-image-section">
             <div class="product-image-container animate-fade">
-                @if (!string.IsNullOrEmpty(Model.ImageUrl))
-                {
-                    <img src="@Model.ImageUrl" alt="@Model.Name" class="product-image" />
-                }
-                else
-                {
-                    <div class="image-placeholder">
+                <div class="image-wrapper">
+                    <!-- Loading spinner -->
+                    <div class="image-loading" id="imageLoading"></div>
+                    
+                    <!-- Main product image -->
+                    <img src="@Model.ImageUrl" 
+                         alt="@Model.Name" 
+                         class="product-image active" 
+                         id="mainProductImage" 
+                         onload="handleImageLoad(this)" 
+                         onerror="handleImageError(this)" />
+                    
+                    <!-- Variant image (preloaded but hidden) -->
+                    <img src="" 
+                         alt="" 
+                         class="product-image" 
+                         id="variantImage" 
+                         onload="handleImageLoad(this)" 
+                         onerror="handleImageError(this)" />
+                         
+                    <!-- Placeholder (hidden by default) -->
+                    <div class="image-placeholder" id="imagePlaceholder">
                         <i class="bi bi-image"></i>
                     </div>
-                }
+                </div>
             </div>
         </div>
 
@@ -510,6 +614,17 @@
                     }
                 </div>
 
+                <!-- Selected Options Summary -->
+                <div class="selected-options-summary animate-fade" id="selectedOptionsSummary" style="display: none;">
+                    <div class="option-title">
+                        <i class="bi bi-check-circle"></i>
+                        Selected Options
+                    </div>
+                    <div id="selectedOptionsList" class="variant-attributes" style="margin-top: 10px;">
+                        <!-- سيتم ملؤها بالجافاسكريبت -->
+                    </div>
+                </div>
+
                 <!-- Stock Info -->
                 <div class="stock-info animate-fade" id="stockInfo" style="display: none;">
                     <div class="stock-indicator" id="stockIndicator"></div>
@@ -518,11 +633,11 @@
 
                 <!-- Actions -->
                 <div class="actions-section animate-fade">
-                    <button class="btn-add-to-cart" id="addToCartBtn" onclick="addToCart()" disabled>
+                    <button type="button" class="btn-add-to-cart" id="addToCartBtn" onclick="addToCart()" disabled>
                         <i class="bi bi-cart-plus"></i>
                         Add to Cart
                     </button>
-                    <button class="btn-wishlist" onclick="addToWishlist()">
+                    <button type="button" class="btn-wishlist" onclick="addToWishlist()">
                         <i class="bi bi-heart"></i>
                     </button>
                 </div>
@@ -536,7 +651,7 @@
                 </div>
             }
 
-            <!-- Selected Variant Summary -->
+            <!-- Available Variants Summary -->
             @if (Model.Variants != null && Model.Variants.Any())
             {
                 <div class="variants-summary animate-fade">
@@ -576,6 +691,48 @@
             window.selectedOptions = {};
             window.selectedVariant = null;
             window.allVariants = @Html.Raw(Json.Serialize(Model.Variants));
+            window.currentImageType = 'main'; // 'main' or 'variant'
+            window.imagesLoaded = {
+                main: false,
+                variant: false
+            };
+
+            // Log variants for debugging
+            console.log('All variants:', window.allVariants);
+
+            // Function to handle image load
+            window.handleImageLoad = function(imgElement) {
+                const loadingElement = document.getElementById('imageLoading');
+                if (loadingElement) {
+                    loadingElement.style.display = 'none';
+                }
+                
+                // Remove loading class
+                imgElement.classList.remove('loading');
+                
+                // Mark as loaded
+                if (imgElement.id === 'mainProductImage') {
+                    window.imagesLoaded.main = true;
+                } else if (imgElement.id === 'variantImage') {
+                    window.imagesLoaded.variant = true;
+                }
+            };
+
+            // Function to handle image error
+            window.handleImageError = function(imgElement) {
+                const loadingElement = document.getElementById('imageLoading');
+                if (loadingElement) {
+                    loadingElement.style.display = 'none';
+                }
+                
+                // Hide the broken image and show placeholder
+                imgElement.style.display = 'none';
+                const placeholder = document.getElementById('imagePlaceholder');
+                if (placeholder) {
+                    placeholder.classList.add('active');
+                    placeholder.style.display = 'flex';
+                }
+            };
 
             // Function to select an option
             window.selectOption = function (attributeName, value, valueId, element) {
@@ -603,7 +760,26 @@
 
                 // Update UI based on selection
                 updateVariantInfo();
+                updateSelectedOptionsSummary();
             };
+
+            // Function to update selected options summary
+            function updateSelectedOptionsSummary() {
+                const summary = document.getElementById('selectedOptionsSummary');
+                const list = document.getElementById('selectedOptionsList');
+                
+                if (Object.keys(window.selectedOptions).length > 0) {
+                    summary.style.display = 'block';
+                    
+                    let html = '';
+                    for (const [attributeName, option] of Object.entries(window.selectedOptions)) {
+                        html += `<span class="attribute-badge">${attributeName}: ${option.value}</span>`;
+                    }
+                    list.innerHTML = html;
+                } else {
+                    summary.style.display = 'none';
+                }
+            }
 
             // Function to find matching variant
             window.findMatchingVariant = function () {
@@ -625,6 +801,159 @@
                 return null;
             };
 
+            // Function to smoothly switch between images
+            function switchImage(newImageType, newImageUrl = null) {
+                const mainImage = document.getElementById('mainProductImage');
+                const variantImage = document.getElementById('variantImage');
+                const placeholder = document.getElementById('imagePlaceholder');
+                const loadingElement = document.getElementById('imageLoading');
+                
+                // Check if we're requesting the same image URL
+                if (newImageType === 'variant' && newImageUrl) {
+                    if (variantImage.src === newImageUrl && window.currentImageType === 'variant') {
+                        // Same variant image is already showing, do nothing
+                        return;
+                    }
+                } else if (newImageType === 'main' && window.currentImageType === 'main') {
+                    // Main image is already showing, do nothing
+                    return;
+                }
+                
+                // Hide current active image
+                if (window.currentImageType === 'main' && mainImage) {
+                    mainImage.classList.remove('active');
+                    mainImage.style.opacity = '0';
+                } else if (window.currentImageType === 'variant' && variantImage) {
+                    variantImage.classList.remove('active');
+                    variantImage.style.opacity = '0';
+                }
+                
+                // Hide placeholder if showing
+                if (placeholder && placeholder.classList.contains('active')) {
+                    placeholder.classList.remove('active');
+                    placeholder.style.opacity = '0';
+                }
+                
+                // Show loading spinner
+                if (loadingElement) {
+                    loadingElement.style.display = 'block';
+                }
+                
+                if (newImageType === 'main') {
+                    // Show main product image
+                    setTimeout(() => {
+                        if (mainImage) {
+                            // Reset display and opacity
+                            mainImage.style.display = 'block';
+                            mainImage.style.opacity = '1';
+                            
+                            // Set alt text
+                            mainImage.alt = '@Model.Name';
+                            
+                            // Show image with animation
+                            setTimeout(() => {
+                                mainImage.classList.add('active');
+                            }, 10);
+                            
+                            // Hide variant image
+                            if (variantImage) {
+                                variantImage.style.display = 'none';
+                            }
+                            
+                            // Hide loading
+                            if (loadingElement) {
+                                loadingElement.style.display = 'none';
+                            }
+                        }
+                        window.currentImageType = 'main';
+                    }, 300);
+                    
+                } else if (newImageType === 'variant' && newImageUrl) {
+                    // Check if variant image is already loaded with the same URL
+                    if (variantImage.src === newImageUrl && window.imagesLoaded.variant) {
+                        // Image already loaded, just switch to it
+                        setTimeout(() => {
+                            variantImage.style.display = 'block';
+                            variantImage.style.opacity = '1';
+                            
+                            // Show image with animation
+                            setTimeout(() => {
+                                variantImage.classList.add('active');
+                            }, 10);
+                            
+                            // Hide main image
+                            if (mainImage) {
+                                mainImage.style.display = 'none';
+                            }
+                            
+                            // Hide loading
+                            if (loadingElement) {
+                                loadingElement.style.display = 'none';
+                            }
+                            
+                            window.currentImageType = 'variant';
+                        }, 300);
+                        
+                    } else {
+                        // Load new variant image
+                        variantImage.src = newImageUrl;
+                        variantImage.alt = '@Model.Name';
+                        variantImage.classList.add('loading');
+                        variantImage.style.display = 'block';
+                        
+                        // Set alt text based on selected attributes
+                        if (window.selectedVariant && window.selectedVariant.selectedAttributes) {
+                            const attributes = window.selectedVariant.selectedAttributes.map(attr => attr.value).join(', ');
+                            variantImage.alt = '@Model.Name - ' + attributes;
+                        }
+                        
+                        // Once image loads, show it
+                        variantImage.onload = function() {
+                            setTimeout(() => {
+                                variantImage.classList.remove('loading');
+                                variantImage.style.opacity = '1';
+                                
+                                // Show image with animation
+                                setTimeout(() => {
+                                    variantImage.classList.add('active');
+                                }, 10);
+                                
+                                // Hide main image
+                                if (mainImage) {
+                                    mainImage.style.display = 'none';
+                                }
+                                
+                                // Hide loading spinner
+                                if (loadingElement) {
+                                    loadingElement.style.display = 'none';
+                                }
+                                
+                                window.currentImageType = 'variant';
+                                window.imagesLoaded.variant = true;
+                            }, 300);
+                        };
+                        
+                        variantImage.onerror = function() {
+                            // Show placeholder if image fails to load
+                            if (placeholder) {
+                                placeholder.style.display = 'flex';
+                                placeholder.style.opacity = '1';
+                                setTimeout(() => {
+                                    placeholder.classList.add('active');
+                                }, 10);
+                            }
+                            if (loadingElement) {
+                                loadingElement.style.display = 'none';
+                            }
+                            
+                            // Hide both images
+                            if (mainImage) mainImage.style.display = 'none';
+                            if (variantImage) variantImage.style.display = 'none';
+                        };
+                    }
+                }
+            }
+
             // Function to update variant information
             window.updateVariantInfo = function () {
                 const allOptionsSelected = Object.keys(window.selectedOptions).length === @Model.AllOptions.Count();
@@ -634,8 +963,22 @@
                     
                     if (window.selectedVariant) {
                         // Update price
-                        document.getElementById('selectedPrice').textContent = 
-                            '$' + window.selectedVariant.price.toFixed(2);
+                        const priceElement = document.getElementById('selectedPrice');
+                        const formattedPrice = '$' + window.selectedVariant.price.toFixed(2);
+                        priceElement.textContent = formattedPrice;
+                        
+                        // Update form fields
+                        document.getElementById('formProductPrice').value = window.selectedVariant.price;
+                        document.getElementById('formProductVariantId').value = window.selectedVariant.id;
+                        document.getElementById('formVariantImageUrl').value = window.selectedVariant.variantImage || '';
+                        
+                        // Update product image
+                        if (window.selectedVariant.variantImage) {
+                            switchImage('variant', window.selectedVariant.variantImage);
+                        } else {
+                            // If variant doesn't have specific image, show main product image
+                            switchImage('main');
+                        }
                         
                         // Update stock info
                         const stockInfo = document.getElementById('stockInfo');
@@ -659,16 +1002,34 @@
                         document.getElementById('selectedPrice').textContent = 'Not Available';
                         document.getElementById('stockInfo').style.display = 'none';
                         document.getElementById('addToCartBtn').disabled = true;
+                        
+                        // Reset form fields
+                        document.getElementById('formProductPrice').value = '';
+                        document.getElementById('formProductVariantId').value = '';
+                        document.getElementById('formVariantImageUrl').value = '';
+                        
+                        // Reset to main product image
+                        switchImage('main');
                     }
                 } else {
                     // Not all options selected
                     document.getElementById('selectedPrice').textContent = 'Select options to see price';
                     document.getElementById('stockInfo').style.display = 'none';
                     document.getElementById('addToCartBtn').disabled = true;
+                    
+                    // Reset form fields
+                    document.getElementById('formProductPrice').value = '';
+                    document.getElementById('formProductVariantId').value = '';
+                    document.getElementById('formVariantImageUrl').value = '';
+                    
+                    // Reset to main product image if no options selected
+                    if (Object.keys(window.selectedOptions).length === 0) {
+                        switchImage('main');
+                    }
                 }
             };
 
-            // Function to add to cart
+            // Function to add to cart - UPDATED
             window.addToCart = function () {
                 if (!window.selectedVariant) {
                     showAlert('Please select all options first', 'info');
@@ -680,21 +1041,60 @@
                     return;
                 }
 
-                // Here you would typically make an API call to add to cart
-                console.log('Adding to cart:', window.selectedVariant);
-                showAlert('Product added to cart successfully!', 'success');
-                
-                // Simulate API call
-                setTimeout(() => {
-                    // You can update cart count or show confirmation here
-                }, 500);
+                // Add loading state to button
+                const addToCartBtn = document.getElementById('addToCartBtn');
+                const originalText = addToCartBtn.innerHTML;
+                addToCartBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Adding...';
+                addToCartBtn.disabled = true;
+
+                // Clear existing variant values from form
+                const variantValuesContainer = document.getElementById('formVariantValuesContainer');
+                variantValuesContainer.innerHTML = '';
+
+                // Add selected variant values to form
+                const selectedValues = [];
+                for (const [attributeName, option] of Object.entries(window.selectedOptions)) {
+                    selectedValues.push(option.value);
+                    
+                    // Create hidden input for each selected value
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'ProductVariantValues';
+                    input.value = option.value;
+                    variantValuesContainer.appendChild(input);
+                }
+
+                console.log('Adding to basket with data:', {
+                    ProductId: document.getElementById('formProductId').value,
+                    ProductVariantId: document.getElementById('formProductVariantId').value,
+                    VariantImageUrl: document.getElementById('formVariantImageUrl').value,
+                    ProductVariantValues: selectedValues,
+                    ProductName: document.getElementById('formProductName').value,
+                    ProductPrice: document.getElementById('formProductPrice').value,
+                    Quantity: document.getElementById('formQuantity').value
+                });
+
+                // Submit the form
+                document.getElementById('addToBasketForm').submit();
             };
 
             // Function to add to wishlist
             window.addToWishlist = function () {
                 const productId = @Model.Id;
+                const wishlistBtn = document.querySelector('.btn-wishlist');
+                
+                // Add animation effect
+                wishlistBtn.innerHTML = '<i class="bi bi-heart-fill text-danger"></i>';
+                wishlistBtn.style.color = 'var(--danger-red)';
+                
                 console.log('Adding to wishlist:', productId);
                 showAlert('Product added to wishlist!', 'success');
+                
+                // Reset after animation
+                setTimeout(() => {
+                    wishlistBtn.innerHTML = '<i class="bi bi-heart"></i>';
+                    wishlistBtn.style.color = '';
+                }, 1000);
             };
 
             // Function to show alerts
@@ -705,9 +1105,14 @@
 
                 // Create alert element
                 const alertDiv = document.createElement('div');
-                alertDiv.className = `alert alert-${type} alert-dismissible fade show animate-fade`;
+                alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+                
+                let iconClass = 'bi-info-circle';
+                if (type === 'success') iconClass = 'bi-check-circle';
+                if (type === 'danger') iconClass = 'bi-exclamation-triangle';
+                
                 alertDiv.innerHTML = `
-                    <i class="bi ${type === 'success' ? 'bi-check-circle' : 'danger' ? 'bi-exclamation-triangle' : 'bi-info-circle'} me-2"></i>
+                    <i class="bi ${iconClass} me-2"></i>
                     ${message}
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
                 `;
@@ -723,20 +1128,19 @@
                 // Auto-remove after 5 seconds
                 setTimeout(() => {
                     if (alertDiv.parentNode) {
-                        alertDiv.remove();
+                        alertDiv.style.opacity = '0';
+                        setTimeout(() => alertDiv.remove(), 300);
                     }
                 }, 5000);
             }
 
-            // Update unavailable options based on selected variants
-            function updateOptionAvailability() {
-                // This function would disable options that don't exist in any variant
-                // For simplicity, we're showing all options as available
-                // In a real implementation, you would check which combinations exist
-            }
-
-            // Initial call to update availability
-            updateOptionAvailability();
+            // Initialize: ensure main image is visible
+            setTimeout(() => {
+                const mainImage = document.getElementById('mainProductImage');
+                if (mainImage && !mainImage.src) {
+                    mainImage.src = '@Model.ImageUrl';
+                }
+            }, 100);
         });
     </script>
 }

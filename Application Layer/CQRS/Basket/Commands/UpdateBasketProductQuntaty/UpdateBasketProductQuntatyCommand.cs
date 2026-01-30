@@ -69,7 +69,6 @@ namespace Application_Layer.CQRS.Basket.Commands.UpdateBasketProductQuntaty
                     ProductName = i.ProductName,
                     Price = i.Price,
                     Quantity = i.Quantity,
-                    PictureUrl = i.PictureUrl 
                 }).ToList()
             };
         }

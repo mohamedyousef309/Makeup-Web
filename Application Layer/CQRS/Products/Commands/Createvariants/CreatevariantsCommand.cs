@@ -38,9 +38,9 @@ namespace Application_Layer.CQRS.Products.Commands.Createvariants
             {
                 string? imageUrl = null;
 
-                if (item.Variantpucture != null)
+                if (item.Variantpecture != null)
                 {
-                    var originalFileName = Path.GetFileName(item.Variantpucture.FileName);
+                    var originalFileName = Path.GetFileName(item.Variantpecture.FileName);
 
                     if (currentRequestImages.ContainsKey(originalFileName))
                     {
@@ -67,7 +67,7 @@ namespace Application_Layer.CQRS.Products.Commands.Createvariants
 
                         if (imageUrl == null)
                         {
-                            imageUrl = attachmentService.UploadImage(item.Variantpucture, "Images/VariantImges");
+                            imageUrl = attachmentService.UploadImage(item.Variantpecture, "Images/VariantImges");
                         }
 
                         if (imageUrl != null)

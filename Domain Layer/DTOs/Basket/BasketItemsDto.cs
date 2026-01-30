@@ -10,13 +10,13 @@ namespace Domain_Layer.DTOs.Basket
          public int ProductVariantid{ get; set; }
         public int Quantity { get; set; }
 
-        public string ProductVariant { get; set; }
+        public IEnumerable<string> ProductVariantValues { get; set; }
 
 
         public decimal Price { get; set; }
 
         
-        public string? PictureUrl { get; set; }
+        public string? VariantImageUrl { get; set; }
 
 
     }

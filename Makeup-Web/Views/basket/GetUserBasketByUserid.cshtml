@@ -23,6 +23,7 @@
             --accent-gold: #c5a059;
             --danger-red: #ff4d4d;
             --variant-blue: #6a8fd8;
+            --success-green: #28a745;
         }
 
         body {
@@ -75,6 +76,7 @@
             border-radius: 12px;
             object-fit: cover;
             border: 1px solid #333;
+            background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
         }
 
         .item-details {
@@ -90,6 +92,7 @@
         .item-name {
             font-size: 1.2rem;
             margin-bottom: 5px;
+            font-weight: 600;
         }
 
         /* تنسيق معلومات المتغير */
@@ -101,6 +104,29 @@
             display: inline-block;
             border: 1px solid rgba(106, 143, 216, 0.3);
         }
+
+        .variant-values-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 5px;
+        }
+
+        .variant-value-badge {
+            background: rgba(214, 138, 138, 0.2);
+            color: var(--primary-pink);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+            .variant-value-badge i {
+                font-size: 0.8rem;
+            }
 
         .variant-badge {
             display: inline-flex;
@@ -498,6 +524,10 @@
                 text-align: center;
                 width: 100%;
             }
+
+            .variant-values-container {
+                justify-content: center;
+            }
         }
     </style>
 }
@@ -548,9 +578,23 @@
                 @foreach (var item in Model.items)
                 {
                     <div class="basket-item" id="item-row-@item.productid">
-                        <img src="@(string.IsNullOrEmpty(item.PictureUrl) ? "/Files/Images/default-product.jpg" : item.PictureUrl)"
-                             class="item-image"
-                             alt="@item.ProductName">
+                        @if (!string.IsNullOrEmpty(item.VariantImageUrl))
+                        {
+                            <img src="@item.VariantImageUrl"
+                                 class="item-image"
+                                 alt="@item.ProductName"
+                                 loading="lazy"
+                                 onerror="this.onerror=null; this.src='https://via.placeholder.com/130x130/1a1a1a/d68a8a?text=Pro+Makeup+Studio'">
+                        }
+                        else
+                        {
+                            <div class="item-image d-flex align-items-center justify-content-center">
+                                <div class="text-center text-muted">
+                                    <i class="bi bi-image fs-1"></i>
+                                    <div class="small mt-1">No Image</div>
+                                </div>
+                            </div>
+                        }
 
                         <div class="item-details">
                             <div class="item-header">
@@ -558,13 +602,30 @@
                                     <h3 class="item-name">@item.ProductName</h3>
 
                                     <!-- عرض معلومات المتغير إذا كانت موجودة -->
-                                    @if (!string.IsNullOrEmpty(item.ProductVariant))
+                                    @if (item.ProductVariantValues != null && item.ProductVariantValues.Any())
                                     {
                                         <div class="variant-info">
                                             <span class="variant-badge">
-                                                <i class="bi bi-tag"></i>
-                                                <span>Variant:</span>
-                                                <span class="variant-text">@item.ProductVariant</span>
+                                                <i class="bi bi-tags"></i>
+                                                <span>Selected Options:</span>
+                                            </span>
+                                            <div class="variant-values-container">
+                                                @foreach (var value in item.ProductVariantValues)
+                                                {
+                                                    <span class="variant-value-badge">
+                                                        <i class="bi bi-check-circle"></i>
+                                                        @value
+                                                    </span>
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="variant-info">
+                                            <span class="variant-badge">
+                                                <i class="bi bi-info-circle"></i>
+                                                <span>No variant selected</span>
                                             </span>
                                         </div>
                                     }
@@ -790,6 +851,25 @@
             if (event.key === 'Escape') {
                 closeConfirmModal();
             }
+        });
+
+        // Lazy loading for images
+        document.addEventListener('DOMContentLoaded', function() {
+            const images = document.querySelectorAll('.item-image[src]');
+
+            const imageObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        if (!img.classList.contains('loaded')) {
+                            img.classList.add('loaded');
+                        }
+                        observer.unobserve(img);
+                    }
+                });
+            });
+
+            images.forEach(img => imageObserver.observe(img));
         });
     </script>
 }

@@ -64,7 +64,6 @@ namespace Application_Layer.CQRS.Products.Queries.GetProductsByCategory
                 ImageUrl = p.ImageUrl ?? "",
                 IsActive = p.IsActive,
                 CategoryId = p.CategoryId,
-                ProductStock = p.Variants.Sum(v => v != null ? v.Stock : 0),
                 Variants = p.Variants.Select(v => new ProductVariantDto
                 {
                     Id = v!.Id,

@@ -36,7 +36,6 @@ namespace Application_Layer.CQRS.Products.Queries
                     Description = p.Description,
                     ImageUrl = p.ImageUrl,
 
-                    // 1. تجميع كل الخيارات المتاحة للمنتج ده (زي كاتالوج الألوان والمقاسات)
                     AllOptions = p.Variants.SelectMany(v => v.ProductVariantAttributeValues)
                     .Select(va => va.AttributeValue).
                     GroupBy(av => av.Attribute.Name)
@@ -48,18 +47,19 @@ namespace Application_Layer.CQRS.Products.Queries
                             Id = v.Id,
                             Value = v.Value
                         })
-                    .Distinct() // عشان القيمة متتكررش (مثلاً لو كذا فاريانت لونهم أحمر)
+                    .Distinct() 
                     .ToList()
                     }).ToList(),
-                    // 2. لستة الـ Variants الفعلية (عشان الـ Logic والسعر)
                     Variants = p.Variants.Select(v => new ProductVariantDto
                     {
                         Id = v.Id,
                         ProductId = v.ProductId,
                         Price = v.Price,
                         Stock = v.Stock,
+                        VariantImage= v.ImageUrl,
 
-                        // هنا بنعرف الـ Variant ده "توليفة" من إيه بالظبط
+
+
                         SelectedAttributes = v.ProductVariantAttributeValues.Select(pva => new AttributeValueResponseDto
                         {
                             Id = pva.AttributeValueId,

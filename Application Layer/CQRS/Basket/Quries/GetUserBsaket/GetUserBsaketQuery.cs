@@ -45,9 +45,9 @@ namespace Application_Layer.CQRS.Basket.Quries.GetUserBsaket
                     ProductName = i.ProductName,
                     Price = i.Price,
                     Quantity = i.Quantity,
-                    ProductVariantid=i.ProductVariantid,
-                    ProductVariant =i.ProductVariant,
-                    PictureUrl =i.PictureUrl
+                    VariantImageUrl= i.VariantImageUrl,
+                    ProductVariantid =i.ProductVariantid,
+                    ProductVariantValues =i.ProductVariantValues,
                 }).ToList()
             };
 

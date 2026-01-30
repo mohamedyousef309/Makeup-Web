@@ -51,7 +51,7 @@ namespace Makeup_Web.Controllers
             }
 
             var userIdFromClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var result = await mediator.Send(new CreateOrUpdateBasketOrchestrator(userId, Modle.ProductId,Modle.ProductVariantId,Modle.ProductVariant,Modle.ProductName,Modle.ProductPrice,Modle.Quantity));
+            var result = await mediator.Send(new CreateOrUpdateBasketOrchestrator(userId, Modle.ProductId,Modle.ProductVariantId,Modle.VariantImageUrl??"",Modle.ProductVariantValues,Modle.ProductName,Modle.ProductPrice,Modle.Quantity));
 
             if (!result.IsSuccess)
             {

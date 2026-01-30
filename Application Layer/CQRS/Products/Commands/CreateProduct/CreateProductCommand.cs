@@ -1,4 +1,5 @@
-﻿using Domain_Layer.DTOs.ProductDtos;
+﻿using Application_Layer.Services;
+using Domain_Layer.DTOs.ProductDtos;
 using Domain_Layer.DTOs.ProductVariantDtos;
 using Domain_Layer.Entites;
 using Domain_Layer.Interfaces.Abstraction;
@@ -6,6 +7,7 @@ using Domain_Layer.Interfaces.Repositryinterfaces;
 using Domain_Layer.Interfaces.ServiceInterfaces;
 using Domain_Layer.Respones;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,27 +21,53 @@ namespace Application_Layer.CQRS.Products.Commands.CreateProduct
     public class CreateProductHandler: IRequestHandler<CreateProductCommand, RequestRespones<ProductDto>>
     {
         private readonly IGenaricRepository<Product> _productRepo;
+        private readonly IAttachmentService attachmentService;
 
-        public CreateProductHandler(IGenaricRepository<Product> productRepo)
+        public CreateProductHandler(IGenaricRepository<Product> productRepo,IAttachmentService attachmentService)
         {
             _productRepo = productRepo;
+            this.attachmentService = attachmentService;
         }
 
         public async Task<RequestRespones<ProductDto>> Handle(CreateProductCommand request,CancellationToken cancellationToken)
         {
-            
-            
+            string? imageUrl = null;
+            var imageFile = request.CreateProductDto.Productpecture;
 
-                var product = new Product
+            if (imageFile != null)
+            {
+                var originalFileName = Path.GetFileName(imageFile.FileName);
+
+                var existingPath = await _productRepo.GetAll()
+                    .Where(p => p.ImageUrl != null && p.ImageUrl.EndsWith("_" + originalFileName))
+                    .Select(p => p.ImageUrl)
+                    .FirstOrDefaultAsync(cancellationToken);
+
+                if (existingPath != null)
                 {
-                    Name = request.CreateProductDto.Name,
-                    Description = request.CreateProductDto.Description,
-                    //Price = request.CreateProductDto.Price,
-                    //Stock = request.CreateProductDto.Stock,
-                    CategoryId = request.CreateProductDto.CategoryId,
-                    IsActive = true,
+                    var fullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", existingPath.TrimStart('/'));
+                    if (File.Exists(fullPath))
+                    {
+                        imageUrl = existingPath; 
+                    }
+                }
+
+                if (imageUrl == null)
+                {
+                    imageUrl = attachmentService.UploadImage(imageFile, "Images/ProductImages");
+                }
+            }
+
+
+            var product = new Product
+            {
+               Name = request.CreateProductDto.Name,
+               Description = request.CreateProductDto.Description,
+               CategoryId = request.CreateProductDto.CategoryId,
+               ImageUrl= imageUrl,
+               IsActive = true,
                     
-                };
+            };
 
                 await _productRepo.addAsync(product);
 
@@ -53,11 +81,8 @@ namespace Application_Layer.CQRS.Products.Commands.CreateProduct
                 Id = product.Id, 
                 Name = product.Name,
                 Description = product.Description,
-                //Price = product.Price,
-                //Stock = product.Stock,
                 IsActive = product.IsActive,
-                //CategoryId = product.CategoryId,
-            
+
                 Variants = new List<ProductVariantDto>()
             };
 

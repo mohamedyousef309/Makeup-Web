@@ -13,7 +13,9 @@ namespace Domain_Layer.ViewModels.Basket
         public int ProductVariantId { get; set; }
 
         [Required(ErrorMessage = "ProductVariant is required.")]
-        public string ProductVariant { get; set; }
+        public IEnumerable<string> ProductVariantValues { get; set; }
+
+        public string? VariantImageUrl { get; set; }
 
         [Required(ErrorMessage = "Quantity is required.")]
         [Range(1, 100, ErrorMessage = "Quantity must be between 1 and 100.")]

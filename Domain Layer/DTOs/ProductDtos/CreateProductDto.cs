@@ -1,4 +1,5 @@
 ﻿using Domain_Layer.DTOs.ProductVariantDtos;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +17,10 @@ namespace Domain_Layer.DTOs.ProductDtos
         public int Stock { get; set; }
         public int CategoryId { get; set; }
 
-        
+        public IFormFile? Productpecture { get; set; }
+
+
+
     }
 
 }

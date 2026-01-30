@@ -16,6 +16,8 @@ namespace Domain_Layer.DTOs.ProductVariantDtos
 
         public decimal Price { get; set; }
 
+        public string? VariantImage { get; set; }
+
         public IEnumerable<AttributeValueResponseDto> SelectedAttributes { get; set; }=new HashSet<AttributeValueResponseDto>();
     }
 
