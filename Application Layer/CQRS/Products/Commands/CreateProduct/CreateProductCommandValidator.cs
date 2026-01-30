@@ -1,6 +1,8 @@
 ﻿using Application_Layer.CQRS.Products.Commands.CreateProduct;
+using Domain_Layer.DTOs.ProductDtos;
 using Domain_Layer.DTOs.ProductVariantDtos;
 using FluentValidation;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,30 +13,39 @@ namespace Application_Layer.CQRS.Products.Commands
 {
 
 
-    public class CreateProductCommandValidator : AbstractValidator<CreateProductCommand>
+    public class CreateProductDtoValidator : AbstractValidator<CreateProductDto>
     {
-        public CreateProductCommandValidator()
+        public CreateProductDtoValidator()
         {
-            // Validate product main fields
-            RuleFor(x => x.CreateProductDto.Name)
-                .NotEmpty().WithMessage("Product name is required.")
-                .MaximumLength(100).WithMessage("Product name must not exceed 100 characters.");
+            RuleFor(x => x.Name)
+                .NotEmpty()
+                .WithMessage("Product name is required.")
+                .MaximumLength(100)
+                .WithMessage("Product name must not exceed 100 characters.");
 
-            RuleFor(x => x.CreateProductDto.Description)
-                .MaximumLength(500).WithMessage("Description must not exceed 500 characters.");
+            RuleFor(x => x.Description)
+                .MaximumLength(500)
+                .When(x => !string.IsNullOrWhiteSpace(x.Description))
+                .WithMessage("Description must not exceed 500 characters.");
 
-            //RuleFor(x => x.CreateProductDto.Price)
-            //    .GreaterThan(0).WithMessage("Price must be greater than zero.");
+            RuleFor(x => x.CategoryId)
+                .GreaterThan(0)
+                .WithMessage("Invalid CategoryId.");
 
-            RuleFor(x => x.CreateProductDto.Stock)
-                .GreaterThanOrEqualTo(0).WithMessage("Stock cannot be negative.");
+            RuleFor(x => x.Productpecture)
+                .Must(BeValidImage)
+                .When(x => x.Productpecture != null)
+                .WithMessage("Invalid image file.");
+        }
 
-            //RuleFor(x => x.CreateProductDto.CategoryId)
-            //    .GreaterThan(0).WithMessage("CategoryId must be greater than zero.");
-
-           
+        private bool BeValidImage(IFormFile file)
+        {
+            var allowedTypes = new[] { "image/jpeg", "image/png", "image/webp" };
+            return allowedTypes.Contains(file.ContentType)
+                   && file.Length > 0
+                   && file.Length <= 5 * 1024 * 1024; // 5MB
         }
     }
-   
+
 }
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Domain_Layer.DTOs.ProductVariantDtos;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Domain_Layer.DTOs.ProductDtos
 {
-    public class ProductDto
+    public class ProductWithVariantsDto
     {
         public int Id { get; set; }
         public string Name { get; set; } = default!;
@@ -15,5 +16,6 @@ namespace Domain_Layer.DTOs.ProductDtos
         public string ImageUrl { get; set; }
 
         public int? CategoryId { get; set; }
+        public List<ProductVariantDto> Variants { get; set; } = new();
     }
 }

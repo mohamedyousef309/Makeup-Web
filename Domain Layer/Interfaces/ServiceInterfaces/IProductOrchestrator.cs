@@ -10,10 +10,10 @@ namespace Domain_Layer.Interfaces.ServiceInterfaces
 {
     public interface IProductOrchestrator
     {
-        Task<RequestRespones<ProductDto>> CreateProduct(CreateProductDto dto);
-        Task<RequestRespones<ProductDto>> UpdateProduct(UpdateProductDto dto);
+        Task<RequestRespones<ProductWithVariantsDto>> CreateProduct(CreateProductDto dto);
+        Task<RequestRespones<ProductWithVariantsDto>> UpdateProduct(UpdateProductDto dto);
         Task<RequestRespones<bool>> DeleteProduct(int id);
-        Task<RequestRespones<List<ProductDto>>> GetAllProducts();
-        Task<RequestRespones<ProductDto>> GetProductById(int id);
+        Task<RequestRespones<List<ProductWithVariantsDto>>> GetAllProducts();
+        Task<RequestRespones<ProductWithVariantsDto>> GetProductById(int id);
     }
 }

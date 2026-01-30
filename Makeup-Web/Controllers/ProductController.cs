@@ -6,6 +6,7 @@ using Application_Layer.CQRS.Products.Commands.CreateProduct;
 using Application_Layer.CQRS.Products.Commands.Orchestrators.AddProductWithVariants;
 using Application_Layer.CQRS.Products.Commands.UpdateProduct;
 using Application_Layer.CQRS.Products.Queries;
+using Application_Layer.CQRS.Products.Queries.GetProductByid;
 using Application_Layer.CQRS.Products.Queries.GetProductsByCategory; // Added Namespace
 using Application_Layer.CQRS.Products.Queries.GetProductsByIds;
 using Domain_Layer.DTOs;
@@ -64,7 +65,7 @@ namespace Makeup_Web.Controllers
             {
                 TempData["ErrorMessage"] = result.Message;
                 // You can return an empty list or redirect depending on your UI preference
-                return View("GetAllProducts", new PaginatedListDto<ProductDto> { Items = new List<ProductDto>() });
+                return View("GetAllProducts", new PaginatedListDto<ProductWithVariantsDto> { Items = new List<ProductWithVariantsDto>() });
             }
 
             return View(result.Data);
@@ -73,7 +74,7 @@ namespace Makeup_Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Details(int id)
         {
-            var result = await _mediator.Send(new GetProductByIdQuery(id));
+            var result = await _mediator.Send(new GetProductWithVarintsByIdQuery(id));
             if (!result.IsSuccess) return NotFound();
             return View(result.Data);
         }
@@ -124,7 +125,8 @@ namespace Makeup_Web.Controllers
             {
                 Name = model.Name,
                 Description = model.Description,
-                CategoryId = model.CategoryId
+                CategoryId = model.CategoryId,
+                Productpecture= model.Productpecture
             };
 
             var result = await _mediator.Send(new AddProductWithVariantsOrchstrator(
@@ -141,10 +143,10 @@ namespace Makeup_Web.Controllers
 
 
         [HttpGet]
-        [HasPermission("Products.Edit")]
+        //[HasPermission("Products.Edit")]
         public async Task<IActionResult> Edit(int id)
         {
-            var result = await _mediator.Send(new GetProductByIdQuery(id));
+            var result = await _mediator.Send(new GetProductByidQuery(id));
             if (!result.IsSuccess) return NotFound();
 
             var productDto = result.Data;
@@ -153,8 +155,6 @@ namespace Makeup_Web.Controllers
                 Id = productDto.Id,
                 Name = productDto.Name,
                 Description = productDto.Description,
-                //CategoryId = productDto.CategoryId,
-                //IsActive = productDto.IsActive
             };
 
             var categoriesResult = await _mediator.Send(new GetCategoryLookupQuery());
@@ -172,7 +172,7 @@ namespace Makeup_Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [HasPermission("Products.Edit")]
+        //[HasPermission("Products.Edit")]
         public async Task<IActionResult> Edit(UpdateProductViewModel modle)
         {
             if (!ModelState.IsValid)

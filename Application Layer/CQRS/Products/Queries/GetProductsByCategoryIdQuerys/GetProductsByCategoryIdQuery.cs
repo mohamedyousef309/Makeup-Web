@@ -18,9 +18,9 @@ namespace Application_Layer.CQRS.Products.Queries.GetProductsByCategory
         string? SortBy = "id",
         string? SortDir = "desc",
         string? Search = null
-    ) : IRequest<RequestRespones<PaginatedListDto<ProductDto>>>;
+    ) : IRequest<RequestRespones<PaginatedListDto<ProductWithVariantsDto>>>;
 
-    public class GetProductsByCategoryIdHandler : BaseQueryHandler, IRequestHandler<GetProductsByCategoryIdQuery, RequestRespones<PaginatedListDto<ProductDto>>>
+    public class GetProductsByCategoryIdHandler : BaseQueryHandler, IRequestHandler<GetProductsByCategoryIdQuery, RequestRespones<PaginatedListDto<ProductWithVariantsDto>>>
     {
         private readonly IGenaricRepository<Product> _productRepo;
 
@@ -29,7 +29,7 @@ namespace Application_Layer.CQRS.Products.Queries.GetProductsByCategory
             _productRepo = productRepo;
         }
 
-        public async Task<RequestRespones<PaginatedListDto<ProductDto>>> Handle(GetProductsByCategoryIdQuery request, CancellationToken cancellationToken)
+        public async Task<RequestRespones<PaginatedListDto<ProductWithVariantsDto>>> Handle(GetProductsByCategoryIdQuery request, CancellationToken cancellationToken)
         {
             
             var query = _productRepo.GetByCriteriaQueryable(p => p.CategoryId == request.CategoryId && p.IsActive);
@@ -56,7 +56,7 @@ namespace Application_Layer.CQRS.Products.Queries.GetProductsByCategory
             
             query = ApplayPagination(query, request.PageIndex, request.PageSize);
  
-            var productsList = await query.Select(p => new ProductDto
+            var productsList = await query.Select(p => new ProductWithVariantsDto
             {
                 Id = p.Id,
                 Name = p.Name ?? "No Name",
@@ -75,7 +75,7 @@ namespace Application_Layer.CQRS.Products.Queries.GetProductsByCategory
             }).ToListAsync(cancellationToken);
 
             
-            var result = new PaginatedListDto<ProductDto>
+            var result = new PaginatedListDto<ProductWithVariantsDto>
             {
                 Items = productsList,
                 PageNumber = request.PageIndex,
@@ -83,7 +83,7 @@ namespace Application_Layer.CQRS.Products.Queries.GetProductsByCategory
                 TotalCount = totalCount
             };
 
-            return RequestRespones<PaginatedListDto<ProductDto>>.Success(result, 200, "Retrieved successfully.");
+            return RequestRespones<PaginatedListDto<ProductWithVariantsDto>>.Success(result, 200, "Retrieved successfully.");
         }
     }
 }

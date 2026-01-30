@@ -16,9 +16,9 @@ using System.Threading.Tasks;
 
 namespace Application_Layer.CQRS.Products.Commands.CreateProduct
 {
-    public record CreateProductCommand(CreateProductDto CreateProductDto): ICommand<RequestRespones<ProductDto>>;
+    public record CreateProductCommand(CreateProductDto CreateProductDto): ICommand<RequestRespones<ProductWithVariantsDto>>;
    
-    public class CreateProductHandler: IRequestHandler<CreateProductCommand, RequestRespones<ProductDto>>
+    public class CreateProductHandler: IRequestHandler<CreateProductCommand, RequestRespones<ProductWithVariantsDto>>
     {
         private readonly IGenaricRepository<Product> _productRepo;
         private readonly IAttachmentService attachmentService;
@@ -29,7 +29,7 @@ namespace Application_Layer.CQRS.Products.Commands.CreateProduct
             this.attachmentService = attachmentService;
         }
 
-        public async Task<RequestRespones<ProductDto>> Handle(CreateProductCommand request,CancellationToken cancellationToken)
+        public async Task<RequestRespones<ProductWithVariantsDto>> Handle(CreateProductCommand request,CancellationToken cancellationToken)
         {
             string? imageUrl = null;
             var imageFile = request.CreateProductDto.Productpecture;
@@ -76,7 +76,7 @@ namespace Application_Layer.CQRS.Products.Commands.CreateProduct
                 await _productRepo.SaveChanges();
 
 
-            var resultDto = new ProductDto
+            var resultDto = new ProductWithVariantsDto
             {
                 Id = product.Id, 
                 Name = product.Name,
@@ -86,7 +86,7 @@ namespace Application_Layer.CQRS.Products.Commands.CreateProduct
                 Variants = new List<ProductVariantDto>()
             };
 
-            return RequestRespones<ProductDto>
+            return RequestRespones<ProductWithVariantsDto>
                 .Success(resultDto, Message: "Product created successfully");
 
 

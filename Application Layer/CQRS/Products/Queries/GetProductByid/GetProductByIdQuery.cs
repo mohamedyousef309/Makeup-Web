@@ -1,91 +1,47 @@
-﻿using Domain_Layer.DTOs.Attribute;
-using Domain_Layer.DTOs.ProductDtos;
-using Domain_Layer.DTOs.ProductVariantDtos;
+﻿using Domain_Layer.DTOs.ProductDtos;
 using Domain_Layer.Entites;
 using Domain_Layer.Interfaces.Repositryinterfaces;
 using Domain_Layer.Respones;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
+using System.Text;
 using System.Threading.Tasks;
 
-namespace Application_Layer.CQRS.Products.Queries
+namespace Application_Layer.CQRS.Products.Queries.GetProductByid
 {
-   
-    public record GetProductByIdQuery(int Id) : IRequest<RequestRespones<ProductDetailsDto>>;
+    public record GetProductByidQuery(int Productid): IRequest<RequestRespones<ProductDto>>;
 
-    public class GetProductByIdHandler : IRequestHandler<GetProductByIdQuery, RequestRespones<ProductDetailsDto>>
+    public class GetProductByidQueryHandler : IRequestHandler<GetProductByidQuery, RequestRespones<ProductDto>>
     {
-        private readonly IGenaricRepository<Product> _productRepo;
+        private readonly IGenaricRepository<Product> genaricRepository;
 
-        public GetProductByIdHandler(IGenaricRepository<Product> productRepo)
+        public GetProductByidQueryHandler(IGenaricRepository<Domain_Layer.Entites.Product> genaricRepository)
         {
-            _productRepo = productRepo;
+            this.genaricRepository = genaricRepository;
         }
-
-        public async Task<RequestRespones<ProductDetailsDto>> Handle(GetProductByIdQuery request, CancellationToken cancellationToken)
+        public async Task<RequestRespones<ProductDto>> Handle(GetProductByidQuery request, CancellationToken cancellationToken)
         {
-            try
-            {
-               
-                var product = await _productRepo.GetByCriteriaQueryable(p => p.Id == request.Id).Select(p => new ProductDetailsDto
+            var product = await genaricRepository.GetByCriteriaQueryable(x=>x.Id==request.Productid)
+                .Select(p=> new ProductDto
                 {
                     Id = p.Id,
                     Name = p.Name,
                     Description = p.Description,
-                    ImageUrl = p.ImageUrl,
+                    CategoryId = p.CategoryId,
+                }).FirstOrDefaultAsync(cancellationToken);
 
-                    AllOptions = p.Variants.SelectMany(v => v.ProductVariantAttributeValues)
-                    .Select(va => va.AttributeValue).
-                    GroupBy(av => av.Attribute.Name)
-                    .Select(g => new AttributeGroupDto
-                    {
-                        Name = g.Key,
-                        Values = g.Select(v => new AttributeValueSelectionDto
-                        {
-                            Id = v.Id,
-                            Value = v.Value
-                        })
-                    .Distinct() 
-                    .ToList()
-                    }).ToList(),
-                    Variants = p.Variants.Select(v => new ProductVariantDto
-                    {
-                        Id = v.Id,
-                        ProductId = v.ProductId,
-                        Price = v.Price,
-                        Stock = v.Stock,
-                        VariantImage= v.ImageUrl,
-
-
-
-                        SelectedAttributes = v.ProductVariantAttributeValues.Select(pva => new AttributeValueResponseDto
-                        {
-                            Id = pva.AttributeValueId,
-                            AttributeName = pva.AttributeValue.Attribute.Name,
-                            Value = pva.AttributeValue.Value
-                        }).ToList()
-                    }).ToList()
-                }).FirstOrDefaultAsync(); // تجميع باسم الخاصية (Color, Size)
-
-
-
-
-
-
-
-
-
-                if (product == null)
-                    return RequestRespones<ProductDetailsDto>.Fail($"Product with Id {request.Id} not found.", 404);
-
-                return RequestRespones<ProductDetailsDto>.Success(product, 200, "Product retrieved successfully.");
-            }
-            catch (System.Exception ex)
+            if (product==null)
             {
-                return RequestRespones<ProductDetailsDto>.Fail($"Error: {ex.Message}", 500);
+                return RequestRespones<ProductDto>.Fail("Product Not Found", 404);
             }
+
+            return RequestRespones<ProductDto>.Success(product);
+
+
         }
+
     }
 }

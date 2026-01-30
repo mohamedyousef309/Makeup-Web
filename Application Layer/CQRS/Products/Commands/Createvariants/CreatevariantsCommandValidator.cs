@@ -20,9 +20,8 @@ namespace Application_Layer.CQRS.Products.Commands.Createvariants
             .WithMessage("Invalid Product Id");
 
             RuleFor(x => x.UpdateProductVariantDtos)
-                .NotNull()
-                .NotEmpty()
-                .WithMessage("At least one product variant is required");
+                .NotNull();
+
 
             RuleForEach(x => x.UpdateProductVariantDtos)
                 .SetValidator(new CreateProductVariantDtoValidator());
