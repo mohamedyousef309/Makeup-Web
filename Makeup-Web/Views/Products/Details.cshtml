@@ -223,6 +223,40 @@
                 transform: none !important;
             }
 
+        /* Variant Options Styling */
+        .variant-option {
+            min-width: 180px;
+            text-align: center;
+            padding: 15px;
+        }
+
+        .variant-option .option-name {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            color: var(--text-light);
+        }
+
+        .variant-option .option-details {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+
+        .variant-option .option-price {
+            color: var(--accent-gold);
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        /* Highlight selected variant */
+        .variant-option.selected {
+            background: rgba(214, 138, 138, 0.2) !important;
+            border-color: var(--primary-pink) !important;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(214, 138, 138, 0.2);
+        }
+
         /* Stock Info */
         .stock-info {
             display: flex;
@@ -308,36 +342,49 @@
                 color: var(--primary-pink);
             }
 
-        /* Variants Summary */
-        .variants-summary {
+        /* Selected Options Summary */
+        .selected-options-summary {
             margin-top: 40px;
-            padding-top: 30px;
-            border-top: 1px solid #252525;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            border: 1px solid #252525;
+        }
+
+        .summary-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
         }
 
         .summary-title {
             font-size: 1.3rem;
             font-weight: 600;
             color: var(--text-light);
-            margin-bottom: 20px;
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
-            .summary-title i {
-                color: var(--primary-pink);
-            }
+        .summary-title i {
+            color: var(--primary-pink);
+        }
+
+        .selected-variant-details {
+            margin-top: 15px;
+        }
 
         .selected-variant {
             display: flex;
             align-items: center;
-            gap: 15px;
-            margin-bottom: 15px;
+            justify-content: space-between;
+            margin-bottom: 10px;
             padding: 15px;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
             border: 1px solid #252525;
+            transition: all 0.3s ease;
         }
 
         .variant-attributes {
@@ -362,13 +409,75 @@
             color: var(--accent-gold);
         }
 
-        /* Selected Options Summary */
-        .selected-options-summary {
+        /* Available Variants List */
+        .variants-summary {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid #252525;
+        }
+
+        .variants-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
             margin-top: 20px;
+        }
+
+        .variant-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             padding: 15px;
             background: rgba(255, 255, 255, 0.03);
-            border-radius: 10px;
             border: 1px solid #252525;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+            .variant-item:hover {
+                border-color: var(--primary-pink);
+                transform: translateX(5px);
+                background: rgba(214, 138, 138, 0.05);
+            }
+
+            .variant-item.selected {
+                border-color: var(--primary-pink);
+                background: rgba(214, 138, 138, 0.1);
+            }
+
+        .variant-item-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .variant-item-name {
+            font-weight: 600;
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+
+        .variant-item-attributes {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .variant-item-attribute {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-muted);
+            padding: 4px 8px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+        }
+
+        .variant-item-price {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--accent-gold);
+            min-width: 100px;
+            text-align: right;
         }
 
         /* Empty State */
@@ -467,6 +576,10 @@
                 min-width: 70px;
             }
 
+            .variant-option {
+                min-width: 150px;
+            }
+
             .actions-section {
                 flex-direction: column;
             }
@@ -474,6 +587,17 @@
             .btn-wishlist {
                 width: 100%;
                 height: 50px;
+            }
+
+            .variant-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .variant-item-price {
+                text-align: left;
+                min-width: auto;
             }
         }
 
@@ -612,23 +736,66 @@
                             </div>
                         </div>
                     }
+
+                    <!-- Available Variants as Options -->
+                    @if (Model.Variants != null && Model.Variants.Any())
+                    {
+                        <div class="option-group animate-fade">
+                            <div class="option-title">
+                                <i class="bi bi-box"></i>
+                                Choose Directly
+                            </div>
+                            <div class="option-values">
+                                @foreach (var variant in Model.Variants)
+                                {
+                                    <div class="option-value variant-option" 
+                                         data-variant-id="@variant.Id"
+                                         data-variant-name="@variant.VariantName"
+                                         data-variant-image="@variant.VariantImage"
+                                         data-variant-price="@variant.Price"
+                                         data-variant-stock="@variant.Stock"
+                                         onclick="selectVariantDirect('@variant.Id', '@variant.VariantName', '@variant.VariantImage', @variant.Price, @variant.Stock, this)">
+                                        <div style="text-align: left;">
+                                            <strong>@variant.VariantName</strong><br>
+                                            @if (variant.SelectedAttributes != null && variant.SelectedAttributes.Any())
+                                            {
+                                                @foreach (var attr in variant.SelectedAttributes)
+                                                {
+                                                    <small>@attr.AttributeName: @attr.Value</small><br>
+                                                }
+                                            }
+                                            <span style="color: var(--accent-gold); font-weight: bold;">@variant.Price.ToString("C")</span>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
                 </div>
 
                 <!-- Selected Options Summary -->
                 <div class="selected-options-summary animate-fade" id="selectedOptionsSummary" style="display: none;">
-                    <div class="option-title">
-                        <i class="bi bi-check-circle"></i>
-                        Selected Options
+                    <div class="summary-header">
+                        <div class="summary-title">
+                            <i class="bi bi-check-circle"></i>
+                            Selected Options
+                        </div>
+                        <div id="stockStatus" class="stock-text"></div>
                     </div>
+                    
                     <div id="selectedOptionsList" class="variant-attributes" style="margin-top: 10px;">
                         <!-- سيتم ملؤها بالجافاسكريبت -->
                     </div>
-                </div>
-
-                <!-- Stock Info -->
-                <div class="stock-info animate-fade" id="stockInfo" style="display: none;">
-                    <div class="stock-indicator" id="stockIndicator"></div>
-                    <div class="stock-text" id="stockText"></div>
+                    
+                    <!-- Selected Variant Details -->
+                    <div class="selected-variant-details" id="selectedVariantDetails" style="display: none;">
+                        <div class="selected-variant">
+                            <div class="variant-attributes">
+                                <span class="variant-item-name" id="selectedVariantName"></span>
+                            </div>
+                            <div class="variant-price" id="selectedVariantPrice"></div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Actions -->
@@ -651,33 +818,41 @@
                 </div>
             }
 
-            <!-- Available Variants Summary -->
+            <!-- Available Variants Summary (Optional - Keep as backup) -->
             @if (Model.Variants != null && Model.Variants.Any())
             {
                 <div class="variants-summary animate-fade">
                     <h3 class="summary-title">
                         <i class="bi bi-box"></i>
-                        Available Variants
+                        Available Variants List
                     </h3>
-                    @foreach (var variant in Model.Variants)
-                    {
-                        <div class="selected-variant">
-                            <div class="variant-attributes">
-                                @if (variant.SelectedAttributes != null && variant.SelectedAttributes.Any())
-                                {
-                                    foreach (var attr in variant.SelectedAttributes)
+                    <div class="variants-list">
+                        @foreach (var variant in Model.Variants)
+                        {
+                            <div class="variant-item" 
+                                 data-variant-id="@variant.Id"
+                                 data-variant-image="@variant.VariantImage"
+                                 onclick="selectVariantFromList(@Json.Serialize(variant))">
+                                <div class="variant-item-info">
+                                    <div class="variant-item-name">@variant.VariantName</div>
+                                    @if (variant.SelectedAttributes != null && variant.SelectedAttributes.Any())
                                     {
-                                        <span class="attribute-badge">
-                                            @attr.AttributeName: @attr.Value
-                                        </span>
+                                        <div class="variant-item-attributes">
+                                            @foreach (var attr in variant.SelectedAttributes)
+                                            {
+                                                <span class="variant-item-attribute">
+                                                    @attr.AttributeName: @attr.Value
+                                                </span>
+                                            }
+                                        </div>
                                     }
-                                }
+                                </div>
+                                <div class="variant-item-price">
+                                    @variant.Price.ToString("C")
+                                </div>
                             </div>
-                            <div class="variant-price">
-                                @variant.Price.ToString("C")
-                            </div>
-                        </div>
-                    }
+                        }
+                    </div>
                 </div>
             }
         </div>
@@ -743,6 +918,12 @@
                     // Deselect
                     optionValue.classList.remove('selected');
                     delete window.selectedOptions[attributeName];
+                    
+                    // Also deselect any direct variant selection
+                    document.querySelectorAll('.variant-option.selected').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    window.selectedVariant = null;
                 } else {
                     // Remove selection from other values in same attribute
                     const siblings = optionValue.parentElement.querySelectorAll('.option-value');
@@ -756,9 +937,139 @@
                         value: value,
                         valueId: valueId
                     };
+                    
+                    // Deselect any direct variant selection
+                    document.querySelectorAll('.variant-option.selected').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    window.selectedVariant = null;
                 }
 
                 // Update UI based on selection
+                updateVariantInfo();
+                updateSelectedOptionsSummary();
+            };
+
+            // Function to select variant directly from Available Variants
+            window.selectVariantDirect = function(variantId, variantName, variantImage, variantPrice, variantStock, element) {
+                // Remove selection from all variant options
+                document.querySelectorAll('.variant-option.selected').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                
+                // Select the clicked variant
+                element.classList.add('selected');
+                
+                // Clear individual option selections
+                window.selectedOptions = {};
+                document.querySelectorAll('.option-value.selected').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                
+                // Clear variant list selection
+                document.querySelectorAll('.variant-item.selected').forEach(item => {
+                    item.classList.remove('selected');
+                });
+                
+                // Set the selected variant
+                window.selectedVariant = {
+                    id: variantId,
+                    variantName: variantName,
+                    variantImage: variantImage,
+                    price: variantPrice,
+                    stock: variantStock,
+                    selectedAttributes: []
+                };
+                
+                // Update UI
+                updateVariantInfo();
+                updateSelectedOptionsSummary();
+                
+                // Update price display
+                const priceElement = document.getElementById('selectedPrice');
+                priceElement.textContent = '$' + variantPrice.toFixed(2);
+                
+                // Update form fields
+                document.getElementById('formProductPrice').value = variantPrice;
+                document.getElementById('formProductVariantId').value = variantId;
+                document.getElementById('formVariantImageUrl').value = variantImage;
+                
+                // Update image
+                if (variantImage) {
+                    switchImage('variant', variantImage);
+                } else {
+                    switchImage('main');
+                }
+                
+                // Enable/disable add to cart button
+                const addToCartBtn = document.getElementById('addToCartBtn');
+                if (variantStock > 0) {
+                    addToCartBtn.disabled = false;
+                } else {
+                    addToCartBtn.disabled = true;
+                }
+                
+                // Update stock status
+                const stockStatus = document.getElementById('stockStatus');
+                if (stockStatus) {
+                    if (variantStock > 0) {
+                        stockStatus.innerHTML = `<i class="bi bi-check-circle-fill text-success"></i> In Stock (${variantStock} available)`;
+                    } else {
+                        stockStatus.innerHTML = `<i class="bi bi-x-circle-fill text-danger"></i> Out of Stock`;
+                    }
+                }
+                
+                // Update selected variant name and price
+                const selectedVariantName = document.getElementById('selectedVariantName');
+                const selectedVariantPrice = document.getElementById('selectedVariantPrice');
+                if (selectedVariantName && selectedVariantPrice) {
+                    selectedVariantName.textContent = variantName;
+                    selectedVariantPrice.textContent = '$' + variantPrice.toFixed(2);
+                }
+            };
+
+            // Function to select variant from the list
+            window.selectVariantFromList = function(variant) {
+                // Clear previous selections
+                window.selectedOptions = {};
+                document.querySelectorAll('.option-value.selected').forEach(option => {
+                    option.classList.remove('selected');
+                });
+
+                // Clear variant-option selections
+                document.querySelectorAll('.variant-option.selected').forEach(option => {
+                    option.classList.remove('selected');
+                });
+
+                // Select the clicked variant
+                document.querySelectorAll('.variant-item.selected').forEach(item => {
+                    item.classList.remove('selected');
+                });
+                
+                const variantElement = document.querySelector(`[data-variant-id="${variant.id}"]`);
+                if (variantElement) {
+                    variantElement.classList.add('selected');
+                }
+
+                // Set selected variant
+                window.selectedVariant = variant;
+
+                // Select all options for this variant
+                if (variant.selectedAttributes && variant.selectedAttributes.length > 0) {
+                    variant.selectedAttributes.forEach(attr => {
+                        // Find and select the corresponding option
+                        const optionElement = document.querySelector(`.option-value[data-attribute="${attr.attributeName}"][data-value="${attr.value}"]`);
+                        if (optionElement) {
+                            optionElement.classList.add('selected');
+                            window.selectedOptions[attr.attributeName] = {
+                                value: attr.value,
+                                valueId: attr.id
+                            };
+                        }
+                    });
+                }
+
+                // Update UI
                 updateVariantInfo();
                 updateSelectedOptionsSummary();
             };
@@ -767,15 +1078,53 @@
             function updateSelectedOptionsSummary() {
                 const summary = document.getElementById('selectedOptionsSummary');
                 const list = document.getElementById('selectedOptionsList');
+                const stockStatus = document.getElementById('stockStatus');
+                const selectedVariantDetails = document.getElementById('selectedVariantDetails');
+                const selectedVariantName = document.getElementById('selectedVariantName');
+                const selectedVariantPrice = document.getElementById('selectedVariantPrice');
                 
-                if (Object.keys(window.selectedOptions).length > 0) {
+                if (Object.keys(window.selectedOptions).length > 0 || window.selectedVariant) {
                     summary.style.display = 'block';
                     
-                    let html = '';
-                    for (const [attributeName, option] of Object.entries(window.selectedOptions)) {
-                        html += `<span class="attribute-badge">${attributeName}: ${option.value}</span>`;
+                    // If we have a direct variant selected
+                    if (window.selectedVariant && Object.keys(window.selectedOptions).length === 0) {
+                        // Display variant name
+                        list.innerHTML = `<span class="attribute-badge">${window.selectedVariant.variantName}</span>`;
+                        selectedVariantDetails.style.display = 'block';
+                        selectedVariantName.textContent = window.selectedVariant.variantName;
+                        selectedVariantPrice.textContent = '$' + window.selectedVariant.price.toFixed(2);
+                        
+                        // Update stock status
+                        if (window.selectedVariant.stock > 0) {
+                            stockStatus.innerHTML = `<i class="bi bi-check-circle-fill text-success"></i> In Stock (${window.selectedVariant.stock} available)`;
+                        } else {
+                            stockStatus.innerHTML = `<i class="bi bi-x-circle-fill text-danger"></i> Out of Stock`;
+                        }
+                    } else if (Object.keys(window.selectedOptions).length > 0) {
+                        // Display selected options
+                        let html = '';
+                        for (const [attributeName, option] of Object.entries(window.selectedOptions)) {
+                            html += `<span class="attribute-badge">${attributeName}: ${option.value}</span>`;
+                        }
+                        list.innerHTML = html;
+                        
+                        // If variant is selected, show its details
+                        if (window.selectedVariant) {
+                            selectedVariantDetails.style.display = 'block';
+                            selectedVariantName.textContent = window.selectedVariant.variantName;
+                            selectedVariantPrice.textContent = '$' + window.selectedVariant.price.toFixed(2);
+                            
+                            // Update stock status
+                            if (window.selectedVariant.stock > 0) {
+                                stockStatus.innerHTML = `<i class="bi bi-check-circle-fill text-success"></i> In Stock (${window.selectedVariant.stock} available)`;
+                            } else {
+                                stockStatus.innerHTML = `<i class="bi bi-x-circle-fill text-danger"></i> Out of Stock`;
+                            }
+                        } else {
+                            selectedVariantDetails.style.display = 'none';
+                            stockStatus.innerHTML = `<i class="bi bi-info-circle"></i> Please complete all selections`;
+                        }
                     }
-                    list.innerHTML = html;
                 } else {
                     summary.style.display = 'none';
                 }
@@ -905,6 +1254,8 @@
                         if (window.selectedVariant && window.selectedVariant.selectedAttributes) {
                             const attributes = window.selectedVariant.selectedAttributes.map(attr => attr.value).join(', ');
                             variantImage.alt = '@Model.Name - ' + attributes;
+                        } else if (window.selectedVariant) {
+                            variantImage.alt = window.selectedVariant.variantName;
                         }
                         
                         // Once image loads, show it
@@ -956,7 +1307,30 @@
 
             // Function to update variant information
             window.updateVariantInfo = function () {
-                const allOptionsSelected = Object.keys(window.selectedOptions).length === @Model.AllOptions.Count();
+                // If we have a direct variant selected, use it
+                if (window.selectedVariant && Object.keys(window.selectedOptions).length === 0) {
+                    // Update price
+                    const priceElement = document.getElementById('selectedPrice');
+                    priceElement.textContent = '$' + window.selectedVariant.price.toFixed(2);
+                    
+                    // Update form fields
+                    document.getElementById('formProductPrice').value = window.selectedVariant.price;
+                    document.getElementById('formProductVariantId').value = window.selectedVariant.id;
+                    document.getElementById('formVariantImageUrl').value = window.selectedVariant.variantImage;
+                    
+                    // Enable/disable add to cart button
+                    const addToCartBtn = document.getElementById('addToCartBtn');
+                    if (window.selectedVariant.stock > 0) {
+                        addToCartBtn.disabled = false;
+                    } else {
+                        addToCartBtn.disabled = true;
+                    }
+                    
+                    return;
+                }
+                
+                // Otherwise, use the individual options logic
+                const allOptionsSelected = Object.keys(window.selectedOptions).length === @(Model.AllOptions?.Count() ?? 0);
                 
                 if (allOptionsSelected) {
                     window.selectedVariant = findMatchingVariant();
@@ -980,27 +1354,16 @@
                             switchImage('main');
                         }
                         
-                        // Update stock info
-                        const stockInfo = document.getElementById('stockInfo');
-                        const stockIndicator = document.getElementById('stockIndicator');
-                        const stockText = document.getElementById('stockText');
+                        // Enable add to cart button
                         const addToCartBtn = document.getElementById('addToCartBtn');
-                        
-                        stockInfo.style.display = 'flex';
-                        
                         if (window.selectedVariant.stock > 0) {
-                            stockIndicator.className = 'stock-indicator';
-                            stockText.textContent = `In Stock (${window.selectedVariant.stock} available)`;
                             addToCartBtn.disabled = false;
                         } else {
-                            stockIndicator.className = 'stock-indicator out-of-stock';
-                            stockText.textContent = 'Out of Stock';
                             addToCartBtn.disabled = true;
                         }
                     } else {
                         // No matching variant found
                         document.getElementById('selectedPrice').textContent = 'Not Available';
-                        document.getElementById('stockInfo').style.display = 'none';
                         document.getElementById('addToCartBtn').disabled = true;
                         
                         // Reset form fields
@@ -1014,7 +1377,6 @@
                 } else {
                     // Not all options selected
                     document.getElementById('selectedPrice').textContent = 'Select options to see price';
-                    document.getElementById('stockInfo').style.display = 'none';
                     document.getElementById('addToCartBtn').disabled = true;
                     
                     // Reset form fields
@@ -1023,16 +1385,19 @@
                     document.getElementById('formVariantImageUrl').value = '';
                     
                     // Reset to main product image if no options selected
-                    if (Object.keys(window.selectedOptions).length === 0) {
+                    if (Object.keys(window.selectedOptions).length === 0 && !window.selectedVariant) {
                         switchImage('main');
                     }
                 }
+                
+                // Update selected options summary
+                updateSelectedOptionsSummary();
             };
 
-            // Function to add to cart - UPDATED
+            // Function to add to cart
             window.addToCart = function () {
                 if (!window.selectedVariant) {
-                    showAlert('Please select all options first', 'info');
+                    showAlert('Please select a variant first', 'info');
                     return;
                 }
 
@@ -1053,14 +1418,27 @@
 
                 // Add selected variant values to form
                 const selectedValues = [];
-                for (const [attributeName, option] of Object.entries(window.selectedOptions)) {
-                    selectedValues.push(option.value);
+                
+                // If we have selected options individually
+                if (Object.keys(window.selectedOptions).length > 0) {
+                    for (const [attributeName, option] of Object.entries(window.selectedOptions)) {
+                        selectedValues.push(option.value);
+                        
+                        // Create hidden input for each selected value
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = 'ProductVariantValues';
+                        input.value = option.value;
+                        variantValuesContainer.appendChild(input);
+                    }
+                } else if (window.selectedVariant && window.selectedVariant.variantName) {
+                    // If we selected variant directly, use variant name
+                    selectedValues.push(window.selectedVariant.variantName);
                     
-                    // Create hidden input for each selected value
                     const input = document.createElement('input');
                     input.type = 'hidden';
                     input.name = 'ProductVariantValues';
-                    input.value = option.value;
+                    input.value = window.selectedVariant.variantName;
                     variantValuesContainer.appendChild(input);
                 }
 

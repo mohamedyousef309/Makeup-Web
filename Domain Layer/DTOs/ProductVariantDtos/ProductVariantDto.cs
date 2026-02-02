@@ -11,6 +11,7 @@ namespace Domain_Layer.DTOs.ProductVariantDtos
     {
       public int Id { get; set; }
 
+        public string VariantName { get; set; }
         public int ProductId { get; set; }
         public int Stock { get; set; }
 
