@@ -81,8 +81,7 @@ namespace Makeup_Web.Controllers
         {
             if (!ModelState.IsValid)
             {
-                var validationErrors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
-                TempData["ErrorMessage"] = string.Join("<br/>", validationErrors);
+                 
                 return View(Modle);
             }
 
@@ -98,48 +97,53 @@ namespace Makeup_Web.Controllers
             return RedirectToAction("GetAllAttributes");
         }
 
-      
+
 
         [HttpPost]
         public async Task<IActionResult> UpdateAttribute([FromBody] UpdateAttributeViewModel model)
         {
-            
+
             var result = await mediator.Send(new updateAttributeCommand(new UpdateAttributeDto { Id = model.Id, AttributeName = model.AttributeName }));
-            if (result.IsSuccess) return Ok(result);
-            return BadRequest(result.Message);
+            if (result.IsSuccess) return Json(new { success = true, message = result.Message });
+
+            return Json(new { success = false, message = result.Message });
         }
 
         [HttpDelete]
         public async Task<IActionResult> DeleteAttribute(int id)
         {
             var result = await mediator.Send(new deleteAttributeCommand(id));
-            if (result.IsSuccess) return Ok(result);
-            return BadRequest(result.Message);
+            if (result.IsSuccess) return Json(new { success = true, message = result.Message });
+
+            return Json(new { success = false, message = result.Message });
         }
 
         [HttpPost]
         public async Task<IActionResult> AddValuesToAttribute([FromBody] AddValuesToAttributeViewModel model)
         {
-            
+
             var result = await mediator.Send(new AddValuesToAttributeCommand(new AddValuesToAttributeDto { AttributeId = model.AttributeId, Values = model.NewValues }));
-            if (result.IsSuccess) return Ok(result);
-            return BadRequest(result.Message);
+            if (result.IsSuccess) return Json(new { success = true, message = result.Message });
+
+            return Json(new { success = false, message = result.Message });
         }
 
         [HttpPut]
         public async Task<IActionResult> UpdateAttributeValue([FromBody] UpdateAttributeValueViewModel model)
         {
             var result = await mediator.Send(new UpdateAttributeValueCommand(new UpdateAttributeValueDto { Id = model.Id, AttributeId = model.AttributeId, Value = model.Value }));
-            if (result.IsSuccess) return Ok(result);
-            return BadRequest(result.Message);
+            if (result.IsSuccess) return Json(new { success = true, message = result.Message });
+
+            return Json(new { success = false, message = result.Message });
         }
 
         [HttpDelete]
         public async Task<IActionResult> DeleteAttributeValue(int id)
         {
             var result = await mediator.Send(new DeleteAttributeValueCommand(id));
-            if (result.IsSuccess) return Ok(result);
-            return BadRequest(result.Message);
+            if (result.IsSuccess) return Json(new { success = true, message = result.Message });
+
+            return Json(new { success = false, message = result.Message });
         }
     }
 }
