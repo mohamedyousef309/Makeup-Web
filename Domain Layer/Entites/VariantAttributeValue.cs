@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Domain_Layer.Entites
 {
-    public class VariantAttributeValue
+    public class VariantAttributeValue : BaseEntity
     {
         public int ProductVariantId { get; set; }
         public ProductVariant ProductVariant { get; set; }

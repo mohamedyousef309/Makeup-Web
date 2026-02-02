@@ -12,42 +12,64 @@ using System.Threading.Tasks;
 
 namespace Application_Layer.CQRS.Products.Commands.UpdateVariants
 {
-    public record UpdateProductVariantCommand(int Id, string VariantName, string VariantValue, decimal Price) :ICommand<RequestRespones<bool>>;
+    public record UpdateProductVariantCommand(
+    int Id,
+    decimal Price,
+    int Stock,
+    List<int> SelectedAttributeValueIds 
+) : ICommand<RequestRespones<bool>>;
 
     public class UpdateProductVariantCommandHandler
-        : IRequestHandler<UpdateProductVariantCommand, RequestRespones<bool>>
+    : IRequestHandler<UpdateProductVariantCommand, RequestRespones<bool>>
     {
         private readonly IGenaricRepository<ProductVariant> _variantRepo;
+        
+        private readonly IGenaricRepository<VariantAttributeValue> _variantAttrRepo;
 
         public UpdateProductVariantCommandHandler(
-            IGenaricRepository<ProductVariant> variantRepo)
+            IGenaricRepository<ProductVariant> variantRepo,
+            IGenaricRepository<VariantAttributeValue> variantAttrRepo)
         {
             _variantRepo = variantRepo;
+            _variantAttrRepo = variantAttrRepo;
         }
 
         public async Task<RequestRespones<bool>> Handle(
             UpdateProductVariantCommand request,
             CancellationToken cancellationToken)
         {
-            var Variant = await _variantRepo.GetByCriteriaQueryable(x=>x.Id==request.Id)
+            
+            var variant = await _variantRepo.GetByCriteriaQueryable(x => x.Id == request.Id)
+                .Include(v => v.ProductVariantAttributeValues)
                 .FirstOrDefaultAsync(cancellationToken);
 
-            if (Variant == null) 
-            {
+            if (variant == null)
                 return RequestRespones<bool>.Fail("There is no Variant with this id", 404);
+
+           
+            variant.Price = request.Price;
+           
+            if (variant.ProductVariantAttributeValues.Any())
+            {
+                _variantAttrRepo.DeleteRange(variant.ProductVariantAttributeValues);
             }
 
-            //Variant.VariantValue=request.VariantValue;
-            Variant.Price=request.Price;
-            //Variant.VariantName=request.VariantName;
+            
+            if (request.SelectedAttributeValueIds != null && request.SelectedAttributeValueIds.Any())
+            {
+                var newRelations = request.SelectedAttributeValueIds.Select(valId => new VariantAttributeValue
+                {
+                    ProductVariantId = variant.Id,
+                    AttributeValueId = valId
+                }).ToList();
 
-            //_variantRepo.SaveInclude(Variant,nameof(Variant.VariantName),nameof(Variant.VariantValue),nameof(Variant.Price));
+                await _variantAttrRepo.AddRangeAsync(newRelations);
+            }
 
+           
             await _variantRepo.SaveChanges();
 
-            return RequestRespones<bool>.Success(true);
-
-
+            return RequestRespones<bool>.Success(true, 200, "Variant and its attributes updated successfully");
         }
     }
 }

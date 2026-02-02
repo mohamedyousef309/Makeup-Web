@@ -1,6 +1,6 @@
 ﻿using Application_Layer.CQRS.Products.Commands.Createvariants;
 using Application_Layer.CQRS.Products.Commands.UpdateVariants;
-using Application_Layer.CQRS.Products.Commands.UpdateVariantStock; // تأكد من إضافة هذا الـ Namespace
+using Application_Layer.CQRS.Products.Commands.UpdateVariantStock;
 using Application_Layer.CQRS.Products.Queries;
 using Application_Layer.CQRS.Products.Queries.GetProductVariantsByProductid;
 using Application_Layer.CQRS.Products.UpdateProductVariantStock;
@@ -11,9 +11,6 @@ using Domain_Layer.ViewModels.ProductsViewModels.ProductsVariantViewModel;
 using Domain_Layer.ViewModels.ProductsViewModels.UpdateProductsVariantViewModel;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
-//using static Microsoft.CodeAnalysis.CSharp.SyntaxTokenParser;
-
 
 namespace Makeup_Web.Controllers
 {
@@ -31,9 +28,6 @@ namespace Makeup_Web.Controllers
             return View();
         }
 
-      
-       
-
         public async Task<IActionResult> GetAllVariants(int productId, int pageIndex = 1, int pageSize = 10, string? sortBy = "id", string? sortDir = "asc", string? search = null)
         {
             var result = await _mediator.Send(new GetAllProductVariantsQuery(productId, pageSize, pageIndex, sortBy, sortDir, search));
@@ -49,8 +43,6 @@ namespace Makeup_Web.Controllers
                 Items = result.Data.Items.Select(v => new ProductVariantViewModel
                 {
                     Id = v.Id,
-                    //VariantName = v.VariantName,
-                    //VariantValue = v.VariantValue,
                     Stock = v.Stock
                 }).ToList(),
                 PageNumber = result.Data.PageNumber,
@@ -75,36 +67,11 @@ namespace Makeup_Web.Controllers
             var model = new ProductVariantViewModel
             {
                 Id = dto.Id,
-                //VariantName = dto.VariantName,
-                //VariantValue = dto.VariantValue,
                 Stock = dto.Stock
             };
 
             return View(model);
         }
-
-        //[HttpPost]
-
-        //public async Task<IActionResult> CreatVariant(CreateProductVariantViewModel model)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        // إذا كان هناك أخطاء في النموذج، إرجاعه مع الأخطاء
-        //        return View(model);
-        //    }
-        //    var result = await _mediator.Send(new CreateProductVariantCommand(
-        //        model.ProductId,
-        //        model.VariantName,
-        //        model.VariantValue,
-        //        model.Price,
-        //        model.Stock));
-        //    if (!result.IsSuccess)
-        //    {
-        //        TempData["ErrorMessage"] = result.Message;
-        //        return View(model);
-        //    }
-        //    return RedirectToAction("Details", "Products", new { id = model.ProductId });
-        //}
 
         [HttpGet]
         public async Task<IActionResult> UpdateVariant(int VariantId)
@@ -113,17 +80,22 @@ namespace Makeup_Web.Controllers
             if (!result.IsSuccess)
             {
                 TempData["ErrorMessage"] = result.Message;
-                return View();
+                return RedirectToAction("Index");
             }
+
             var dto = result.Data;
+
             var model = new UpdateProductVariantViewModel
             {
                 Id = dto.Id,
                 ProductId = dto.ProductId,
-                //VariantName = dto.VariantName,
-                //VariantValue = dto.VariantValue,
                 Price = dto.Price,
+                Stock = dto.Stock,
+                ImageUrl = dto.VariantImage,
+                // استخراج الـ IDs من قائمة الـ SelectedAttributes الموجودة في الـ DTO بتاعك
+                SelectedAttributeValueIds = dto.SelectedAttributes.Select(a => a.Id).ToList()
             };
+
             return View(model);
         }
 
@@ -132,15 +104,16 @@ namespace Makeup_Web.Controllers
         {
             if (!ModelState.IsValid)
             {
-                // إذا كان هناك أخطاء في النموذج، إرجاعه مع الأخطاء
                 return View(model);
             }
 
+            // إرسال الـ Command مع قائمة الـ IDs المختارة (سواء تبديل أو إضافة)
             var result = await _mediator.Send(new UpdateProductVariantCommand(
                 model.Id,
-                model.VariantName,
-                model.VariantValue,
-                model.Price));
+                model.Price,
+                model.Stock,
+                model.SelectedAttributeValueIds
+            ));
 
             if (!result.IsSuccess)
             {
@@ -149,11 +122,9 @@ namespace Makeup_Web.Controllers
             }
 
             return RedirectToAction("Details", "Products", new { id = model.ProductId });
-
         }
 
         [HttpPost]
-
         public async Task<IActionResult> UpdateVariantsStock([FromBody] UpdateProdcutVariantStockViewModle Modle)
         {
             if (!ModelState.IsValid)
@@ -170,8 +141,6 @@ namespace Makeup_Web.Controllers
                 return Json(new { success = true, message = result.Message });
 
             return Json(new { success = false, message = result.Message });
-
-
         }
 
         public async Task<IActionResult> EditVariant(int productid)
