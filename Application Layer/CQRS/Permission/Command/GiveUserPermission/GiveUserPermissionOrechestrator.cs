@@ -1,5 +1,6 @@
 ﻿using Application_Layer.CQRS.Permission.Queries.GetPermssionsByIds;
 using Application_Layer.CQRS.User.Quries.GetUserbyid;
+using Application_Layer.CQRS.User.Quries.GetUserEmailbyUserid;
 using Domain_Layer.Interfaces.Abstraction;
 using Domain_Layer.Respones;
 using MediatR;
@@ -22,7 +23,7 @@ namespace Application_Layer.CQRS.Permission.Command.GiveUserPermission
         }
         public async Task<RequestRespones<bool>> Handle(GiveUserPermissionOrechestrator request, CancellationToken cancellationToken)
         {
-            var UserResult= await mediator.Send(new GetUserByidQuery(request.userid),cancellationToken);
+            var UserResult= await mediator.Send(new GetUserEmailbyUseridQuery(request.userid),cancellationToken);
 
             if (!UserResult.IsSuccess||UserResult.Data==null)
             {

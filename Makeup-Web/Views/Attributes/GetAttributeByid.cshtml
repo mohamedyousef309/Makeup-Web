@@ -345,15 +345,110 @@
             color: #8ab4f8;
         }
 
-        /* Badge */
-        .id-badge {
-            background: rgba(197, 160, 89, 0.2);
-            color: var(--accent-gold);
-            padding: 3px 10px;
-            border-radius: 6px;
-            font-size: 0.85rem;
+        .alert-danger {
+            background: rgba(255, 77, 77, 0.2);
+            border: 1px solid var(--danger-red);
+            color: #ff6b6b;
+        }
+
+        /* Modal Styles */
+        .modal-content {
+            background: var(--card-bg);
+            border: 1px solid #252525;
+            border-radius: 16px;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid #252525;
+            padding: 20px 30px;
+        }
+
+        .modal-title {
+            color: var(--text-light);
             font-weight: 600;
-            margin-left: 10px;
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .modal-footer {
+            border-top: 1px solid #252525;
+            padding: 20px 30px;
+        }
+
+        .form-label {
+            color: var(--text-light);
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            background: var(--input-bg);
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: var(--text-light);
+            padding: 10px 15px;
+        }
+
+            .form-control:focus {
+                border-color: var(--primary-pink);
+                box-shadow: 0 0 0 0.25rem rgba(214, 138, 138, 0.25);
+                background: var(--input-bg);
+                color: var(--text-light);
+            }
+
+        .form-control-plaintext {
+            background: transparent;
+            border: none;
+            color: var(--text-light);
+            padding: 10px 0;
+        }
+
+        /* Delete Animation */
+        @@keyframes fadeOut {
+            from
+
+        {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        to {
+            opacity: 0;
+            transform: translateX(-100%);
+        }
+
+        }
+
+        .fade-out {
+            animation: fadeOut 0.5s ease forwards;
+        }
+
+        /* Toast Notification */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1055;
+            min-width: 300px;
+        }
+
+        .toast {
+            background: var(--card-bg);
+            border: 1px solid #252525;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .toast-header {
+            background: rgba(214, 138, 138, 0.1);
+            border-bottom: 1px solid #252525;
+            color: var(--text-light);
+        }
+
+        .toast-body {
+            color: var(--text-light);
         }
 
         /* Animations */
@@ -411,7 +506,7 @@
             <div class="row align-items-center">
                 <div class="col-md-8">
                     <h1 class="page-title">Attribute Details</h1>
-                    <p class="page-subtitle">View attribute information and its values</p>
+                    <p class="page-subtitle">View attribute information and manage its values</p>
                 </div>
                 <div class="col-md-4 text-end">
                     <a asp-controller="Attributes" asp-action="GetAllAttributes" class="btn-secondary">
@@ -423,6 +518,9 @@
     </div>
 
     <div class="container">
+        <!-- Toast Container -->
+        <div class="toast-container"></div>
+
         <!-- Success Alert -->
         @if (TempData["SuccessMessage"] != null)
         {
@@ -449,21 +547,9 @@
             <div class="stats-container">
                 <div class="stat-card animate-up" style="animation-delay: 0.2s">
                     <div class="stat-icon">
-                        <i class="bi bi-tag"></i>
-                    </div>
-                    <div class="stat-number">
-                        @Model.Attributeid
-                    </div>
-                    <div class="stat-label">
-                        Attribute ID
-                    </div>
-                </div>
-
-                <div class="stat-card animate-up" style="animation-delay: 0.3s">
-                    <div class="stat-icon">
                         <i class="bi bi-list-check"></i>
                     </div>
-                    <div class="stat-number">
+                    <div class="stat-number" id="values-count">
                         @Model.Attributes.Count()
                     </div>
                     <div class="stat-label">
@@ -471,7 +557,7 @@
                     </div>
                 </div>
 
-                <div class="stat-card animate-up" style="animation-delay: 0.4s">
+                <div class="stat-card animate-up" style="animation-delay: 0.3s">
                     <div class="stat-icon">
                         <i class="bi bi-calendar"></i>
                     </div>
@@ -480,6 +566,18 @@
                     </div>
                     <div class="stat-label">
                         Viewed Today
+                    </div>
+                </div>
+
+                <div class="stat-card animate-up" style="animation-delay: 0.4s">
+                    <div class="stat-icon">
+                        <i class="bi bi-gear"></i>
+                    </div>
+                    <div class="stat-number">
+                        Active
+                    </div>
+                    <div class="stat-label">
+                        Status
                     </div>
                 </div>
             </div>
@@ -495,7 +593,6 @@
                     <div class="info-label">Attribute Name</div>
                     <div class="info-value">
                         @Model.Name
-                        <span class="id-badge">ID: @Model.Attributeid</span>
                     </div>
                 </div>
             </div>
@@ -507,9 +604,18 @@
                         <i class="bi bi-list-ul"></i>
                         Attribute Values
                     </h3>
-                    <span class="text-muted">
-                        @Model.Attributes.Count() value(s) found
-                    </span>
+                    <div>
+                        <span class="text-muted me-3">
+                            <span id="values-count-text">@Model.Attributes.Count()</span> value(s) found
+                        </span>
+                        <button type="button"
+                                class="btn-primary btn-sm"
+                                data-bs-toggle="modal"
+                                data-bs-target="#addValuesModal">
+                            <i class="bi bi-plus-circle"></i>
+                            Add Values
+                        </button>
+                    </div>
                 </div>
 
                 @if (Model.Attributes != null && Model.Attributes.Any())
@@ -520,17 +626,16 @@
                                 <tr>
                                     <th>#</th>
                                     <th>Value</th>
-                                    <th>Value ID</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="values-table-body">
                                 @{
                                     int counter = 1;
                                 }
                                 @foreach (var attributeValue in Model.Attributes)
                                 {
-                                    <tr>
+                                    <tr id="value-row-@attributeValue.AttributeId" data-value-id="@attributeValue.AttributeId" data-value="@attributeValue.Value">
                                         <td>@counter</td>
                                         <td>
                                             <span class="value-badge">
@@ -538,18 +643,16 @@
                                             </span>
                                         </td>
                                         <td>
-                                            <span class="text-muted">
-                                                @attributeValue.AttributeId
-                                            </span>
-                                        </td>
-                                        <td>
                                             <div class="d-flex gap-2">
-                                                <button class="btn btn-sm btn-outline-primary"
-                                                        onclick="editValue(@attributeValue.AttributeId, '@attributeValue.Value')">
+                                                <button class="btn btn-sm btn-outline-primary edit-value-btn"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#editValueModal"
+                                                        data-id="@attributeValue.AttributeId"
+                                                        data-value="@attributeValue.Value">
                                                     <i class="bi bi-pencil"></i>
                                                 </button>
-                                                <button class="btn btn-sm btn-outline-danger"
-                                                        onclick="deleteValue(@attributeValue.AttributeId)">
+                                                <button class="btn btn-sm btn-outline-danger delete-value-btn"
+                                                        data-id="@attributeValue.AttributeId">
                                                     <i class="bi bi-trash"></i>
                                                 </button>
                                             </div>
@@ -566,14 +669,7 @@
                     <div class="empty-state animate-up" style="animation-delay: 0.3s">
                         <i class="bi bi-inboxes"></i>
                         <h4>No Values Found</h4>
-                        <p>This attribute doesn't have any values assigned yet. You can add values using the edit button below.</p>
-                        <a asp-controller="Attributes"
-                           asp-action="EditAttribute"
-                           asp-route-id="@Model.Attributeid"
-                           class="btn-primary">
-                            <i class="bi bi-plus-circle"></i>
-                            Add Values
-                        </a>
+                        <p>This attribute doesn't have any values assigned yet. Add values using the button above.</p>
                     </div>
                 }
             </div>
@@ -606,92 +702,338 @@
     </div>
 </div>
 
+<!-- Add Values Modal -->
+<div class="modal fade" id="addValuesModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Values</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Attribute</label>
+                    <input type="text" class="form-control-plaintext" value="@Model.Name" readonly />
+                    <input type="hidden" id="attributeId" value="@Model.Attributeid" />
+                </div>
+                <div class="mb-3">
+                    <label for="newValues" class="form-label">Values (one per line)</label>
+                    <textarea class="form-control" id="newValues" rows="5"
+                              placeholder="Enter each value on a new line&#10;Example:&#10;Small&#10;Medium&#10;Large"></textarea>
+                    <div class="form-text">Enter multiple values, each on a new line.</div>
+                </div>
+                <div id="addValuesErrors" class="text-danger small mt-2"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn-primary" onclick="addValues()">Add Values</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Value Modal -->
+<div class="modal fade" id="editValueModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Value</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editValueId" />
+                <input type="hidden" id="editAttributeId" value="@Model.Attributeid" />
+                <div class="mb-3">
+                    <label for="editValueText" class="form-label">Value</label>
+                    <input type="text" class="form-control" id="editValueText" />
+                </div>
+                <div id="editValueErrors" class="text-danger small mt-2"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn-primary" onclick="updateValue()">Update Value</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Function to edit value
-            window.editValue = function (valueId, currentValue) {
-                const newValue = prompt('Edit value:', currentValue);
-                if (newValue && newValue.trim() !== '') {
-                    // Here you would typically make an API call to update the value
-                    console.log(`Editing value ${valueId} to: ${newValue}`);
-                    // For now, show a success message
-                    showAlert('success', 'Value updated successfully!');
-                }
-            };
-
-            // Function to delete value
-            window.deleteValue = function (valueId) {
-                if (confirm('Are you sure you want to delete this value?')) {
-                    // Here you would typically make an API call to delete the value
-                    console.log(`Deleting value: ${valueId}`);
-                    // For now, show a success message
-                    showAlert('success', 'Value deleted successfully!');
-                }
-            };
-
-            // Function to confirm attribute deletion
-            window.confirmDelete = function (attributeId) {
-                if (confirm('Are you sure you want to delete this attribute? This action cannot be undone.')) {
-                    // Here you would typically redirect to delete action
-                    console.log(`Deleting attribute: ${attributeId}`);
-                    // For example: window.location.href = `/Attributes/DeleteAttribute/${attributeId}`;
-                    showAlert('danger', 'Attribute deletion requested. Redirecting...');
-
-                    // Simulate redirect
-                    setTimeout(() => {
-                        showAlert('info', 'This would redirect to delete page in a real application.');
-                    }, 1500);
-                }
-            };
-
-            // Function to show alerts
-            function showAlert(type, message) {
-                // Remove existing alerts
-                const existingAlerts = document.querySelectorAll('.alert');
-                existingAlerts.forEach(alert => alert.remove());
-
-                // Create alert element
-                const alertDiv = document.createElement('div');
-                alertDiv.className = `alert alert-${type} alert-dismissible fade show animate-up`;
-                alertDiv.innerHTML = `
-                    <i class="bi ${type === 'success' ? 'bi-check-circle' : type === 'danger' ? 'bi-exclamation-triangle' : 'bi-info-circle'} me-2"></i>
-                    ${message}
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-                `;
-
-                // Insert alert
-                const container = document.querySelector('.container');
-                const detailsContainer = document.querySelector('.details-container');
-                if (container && detailsContainer) {
-                    container.insertBefore(alertDiv, detailsContainer);
-
-                    // Auto-remove after 5 seconds
-                    setTimeout(() => {
-                        if (alertDiv.parentNode) {
-                            alertDiv.remove();
-                        }
-                    }, 5000);
-                }
-            }
-
             // Initialize tooltips
             const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            tooltipTriggerList.map(function (tooltipTriggerEl) {
+            const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
                 return new bootstrap.Tooltip(tooltipTriggerEl);
             });
 
-            // Copy attribute ID to clipboard
-            document.querySelector('.id-badge').addEventListener('click', function () {
-                const attributeId = @Model.Attributeid;
-                navigator.clipboard.writeText(attributeId.toString()).then(() => {
-                    const originalText = this.textContent;
-                    this.textContent = 'Copied!';
-                    setTimeout(() => {
-                        this.textContent = originalText;
-                    }, 2000);
+            // Setup edit buttons
+            document.querySelectorAll('.edit-value-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    const value = this.getAttribute('data-value');
+                    document.getElementById('editValueId').value = id;
+                    document.getElementById('editValueText').value = value;
+                    document.getElementById('editValueErrors').textContent = '';
                 });
             });
+
+            // Setup delete buttons
+            document.querySelectorAll('.delete-value-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    deleteValue(id);
+                });
+            });
+        });
+
+        // Toast notification function
+        function showToast(type, message) {
+            const toastContainer = document.querySelector('.toast-container');
+            const toastId = 'toast-' + Date.now();
+
+            const toastHtml = `
+                <div id="${toastId}" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="toast-header">
+                        <i class="bi ${type === 'success' ? 'bi-check-circle text-success' : type === 'error' ? 'bi-exclamation-triangle text-danger' : 'bi-info-circle text-info'} me-2"></i>
+                        <strong class="me-auto">${type === 'success' ? 'Success' : type === 'error' ? 'Error' : 'Info'}</strong>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body">
+                        ${message}
+                    </div>
+                </div>
+            `;
+
+            toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+            const toast = new bootstrap.Toast(document.getElementById(toastId));
+            toast.show();
+
+            // Remove toast after hiding
+            document.getElementById(toastId).addEventListener('hidden.bs.toast', function () {
+                this.remove();
+            });
+        }
+
+        // Add values function
+        async function addValues() {
+            const attributeId = document.getElementById('attributeId').value;
+            const newValuesText = document.getElementById('newValues').value;
+            const errorDiv = document.getElementById('addValuesErrors');
+
+            // Validate input
+            if (!newValuesText.trim()) {
+                errorDiv.textContent = 'Please enter at least one value.';
+                return;
+            }
+
+            // Split by new lines and filter empty lines
+            const newValues = newValuesText.split('\n')
+                .map(v => v.trim())
+                .filter(v => v !== '');
+
+            if (newValues.length === 0) {
+                errorDiv.textContent = 'Please enter valid values.';
+                return;
+            }
+
+            try {
+                const response = await fetch('/Attributes/AddValuesToAttribute', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    },
+                    body: JSON.stringify({
+                        AttributeId: parseInt(attributeId),
+                        AttributeName: '@Model.Name',
+                        NewValues: newValues
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast('success', result.message);
+
+                    // Close modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('addValuesModal'));
+                    modal.hide();
+
+                    // Clear form
+                    document.getElementById('newValues').value = '';
+                    errorDiv.textContent = '';
+
+                    // Reload page after delay
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    errorDiv.textContent = result.message;
+                    showToast('error', result.message);
+                }
+            } catch (error) {
+                errorDiv.textContent = 'An error occurred. Please try again.';
+                showToast('error', 'An error occurred. Please try again.');
+            }
+        }
+
+        // Update value function
+        async function updateValue() {
+            const id = document.getElementById('editValueId').value;
+            const attributeId = document.getElementById('editAttributeId').value;
+            const value = document.getElementById('editValueText').value;
+            const errorDiv = document.getElementById('editValueErrors');
+
+            // Validate input
+            if (!value.trim()) {
+                errorDiv.textContent = 'Please enter a value.';
+                return;
+            }
+
+            try {
+                const response = await fetch('/Attributes/UpdateAttributeValue', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    },
+                    body: JSON.stringify({
+                        Id: parseInt(id),
+                        AttributeId: parseInt(attributeId),
+                        Value: value
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast('success', result.message);
+
+                    // Close modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('editValueModal'));
+                    modal.hide();
+
+                    // Update the row in the table
+                    const row = document.getElementById(`value-row-${id}`);
+                    if (row) {
+                        // Animate update
+                        row.querySelector('.value-badge').textContent = value;
+                        row.setAttribute('data-value', value);
+                        row.querySelector('.edit-value-btn').setAttribute('data-value', value);
+                    }
+
+                    // Reload page after delay
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    errorDiv.textContent = result.message;
+                    showToast('error', result.message);
+                }
+            } catch (error) {
+                errorDiv.textContent = 'An error occurred. Please try again.';
+                showToast('error', 'An error occurred. Please try again.');
+            }
+        }
+
+        // Delete value function with animation
+        async function deleteValue(id) {
+            if (!confirm('Are you sure you want to delete this value?')) {
+                return;
+            }
+
+            const row = document.getElementById(`value-row-${id}`);
+            if (row) {
+                // Add fade-out animation
+                row.classList.add('fade-out');
+
+                // Wait for animation to complete
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+
+            try {
+                const response = await fetch(`/Attributes/DeleteAttributeValue/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    }
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast('success', result.message);
+
+                    // Remove row from table
+                    if (row) {
+                        row.remove();
+                    }
+
+                    // Update counters
+                    updateCounters();
+
+                    // Check if table is empty
+                    const tbody = document.getElementById('values-table-body');
+                    if (!tbody || tbody.children.length === 0) {
+                        // Reload to show empty state
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
+                    }
+                } else {
+                    showToast('error', result.message);
+                    // Restore row if error
+                    if (row) {
+                        row.classList.remove('fade-out');
+                    }
+                }
+            } catch (error) {
+                showToast('error', 'An error occurred. Please try again.');
+                // Restore row if error
+                if (row) {
+                    row.classList.remove('fade-out');
+                }
+            }
+        }
+
+        // Update counters after delete
+        function updateCounters() {
+            const tbody = document.getElementById('values-table-body');
+            const count = tbody ? tbody.children.length : 0;
+
+            document.getElementById('values-count').textContent = count;
+            document.getElementById('values-count-text').textContent = count;
+
+            // Update row numbers
+            if (tbody) {
+                const rows = tbody.querySelectorAll('tr');
+                rows.forEach((row, index) => {
+                    row.querySelector('td:first-child').textContent = index + 1;
+                });
+            }
+        }
+
+        // Confirm attribute deletion
+        function confirmDelete(attributeId) {
+            if (confirm('Are you sure you want to delete this attribute? This action cannot be undone.')) {
+                // Add loading state
+                const btn = document.querySelector('.btn-danger');
+                const originalHtml = btn.innerHTML;
+                btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Deleting...';
+                btn.disabled = true;
+
+                // Redirect to delete action
+                window.location.href = `/Attributes/DeleteAttribute/${attributeId}`;
+            }
+        }
+
+        // Clear modal errors when modal is hidden
+        document.getElementById('addValuesModal').addEventListener('hidden.bs.modal', function() {
+            document.getElementById('addValuesErrors').textContent = '';
+        });
+
+        document.getElementById('editValueModal').addEventListener('hidden.bs.modal', function() {
+            document.getElementById('editValueErrors').textContent = '';
         });
     </script>
 }

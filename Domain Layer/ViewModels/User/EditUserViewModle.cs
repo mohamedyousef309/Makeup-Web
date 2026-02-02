@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Domain_Layer.ViewModels.Permissions;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -31,6 +32,8 @@ namespace Domain_Layer.ViewModels.User
         [RegularExpression(@"^01[0125][0-9]{8}$", ErrorMessage = "Please enter a valid Egyptian phone number")]
         [Display(Name = "Phone Number")]
         public string PhoneNumber { get; set; }
+
+        public List<UserPermissionViewModel> UserPermissions { get; set; } = new List<UserPermissionViewModel>();
     }
 
 }

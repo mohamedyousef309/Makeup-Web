@@ -120,8 +120,7 @@ namespace Makeup_Web.Controllers
             {
                 Id = dto.Id,
                 ProductId = dto.ProductId,
-                //VariantName = dto.VariantName,
-                //VariantValue = dto.VariantValue,
+                
                 Price = dto.Price,
             };
             return View(model);

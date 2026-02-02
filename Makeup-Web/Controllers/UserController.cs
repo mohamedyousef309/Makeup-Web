@@ -1,9 +1,13 @@
-﻿using Application_Layer.CQRS.User.Commands.BlockUser;
+﻿using Application_Layer.CQRS.Permission.Queries.GetAllPermissions;
+using Application_Layer.CQRS.User.Commands.BlockUser;
 using Application_Layer.CQRS.User.Commands.EditUserProfile;
 using Application_Layer.CQRS.User.Commands.UnBlockUser;
 using Application_Layer.CQRS.User.Quries.GetAllUsers;
+using Application_Layer.CQRS.User.Quries.GetUserbyid;
 using Application_Layer.CQRS.User.Quries.GetUserEmailbyUserid;
 using AspNetCoreGeneratedDocument;
+using Domain_Layer.DTOs.AthanticationDtos;
+using Domain_Layer.ViewModels.Permissions;
 using Domain_Layer.ViewModels.User;
 using Humanizer;
 using MediatR;
@@ -74,7 +78,9 @@ namespace Makeup_Web.Controllers
             bool isAdmin = User.IsInRole("SuperAdmin") || User.IsInRole("Admin");
             int targetUserId = (isAdmin && userid.HasValue && userid != 0) ? userid.Value : loggedInUserId;
             
-            var GetUserResult = await mediator.Send(new GetUserEmailbyUseridQuery(targetUserId));
+            var GetUserResult = await mediator.Send(new GetUserByidQuery(targetUserId));
+
+            
 
             if (!GetUserResult.IsSuccess)
             {
@@ -88,7 +94,12 @@ namespace Makeup_Web.Controllers
                 Username = GetUserResult.Data.Username,
                 Email = GetUserResult.Data.Email,
                 UserAddress = GetUserResult.Data.UserAddress,
-                PhoneNumber = GetUserResult.Data.PhoneNumber
+                PhoneNumber = GetUserResult.Data.PhoneNumber,
+                UserPermissions= GetUserResult.Data.UserPermissions.Select(x=>new UserPermissionViewModel 
+                {
+                    PermissionId=x.PermissionId,
+                    PermissionName=x.PermissionName,
+                }).ToList()
             };
 
             return View(viewModel);
