@@ -89,6 +89,7 @@ namespace Makeup_Web.Controllers
             {
                 Id = dto.Id,
                 ProductId = dto.ProductId,
+                
                 Price = dto.Price,
                 Stock = dto.Stock,
                 ImageUrl = dto.VariantImage,

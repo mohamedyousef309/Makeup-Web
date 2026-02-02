@@ -80,6 +80,7 @@ namespace Application_Layer.CQRS.Products.Commands.Createvariants
 
                 variants.Add(new ProductVariant
                 {
+                    VariantName= item.VariantName,
                     ProductId = request.productid,
                     Price = item.Price,
                     Stock = item.Stock,

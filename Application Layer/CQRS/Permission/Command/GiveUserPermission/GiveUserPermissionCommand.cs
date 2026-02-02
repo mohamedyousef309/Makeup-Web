@@ -33,6 +33,7 @@ namespace Application_Layer.CQRS.Permission.Command.GiveUserPermission
                 }).ToList();
 
                 await genaricRepository.AddRangeAsync(userPermissionsList);
+                await genaricRepository.SaveChanges();
                 return RequestRespones<bool>.Success(true);
             }
             catch (Exception ex)

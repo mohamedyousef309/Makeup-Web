@@ -83,14 +83,14 @@ namespace Application_Layer.CQRS.Orders.Commands.CreatOrder
 
                 if (ProductVariant.Stock < item.Quantity)
                 {
-                    //throw new Exception($"Product {ProductVariant.Product.Name}-{ProductVariant.VariantName} Out Of Stock: {ProductVariant.Stock}");
+                    throw new Exception($"Product {ProductVariant.Product.Name}-{ProductVariant.VariantName} Out Of Stock: {ProductVariant.Stock}");
                 }
 
                 bool isFinished = ProductVariant.ReduceStock(item.Quantity);
 
                 if (isFinished)
                 {
-                    //events.Add(new OutOfStockEvent(ProductVariant.Id, ProductVariant.Product.Name,ProductVariant.VariantName));
+                    events.Add(new OutOfStockEvent(ProductVariant.Id, ProductVariant.Product.Name,ProductVariant.VariantName));
                 }
             }
 

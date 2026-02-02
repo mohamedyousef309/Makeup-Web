@@ -54,6 +54,7 @@ namespace Application_Layer.CQRS.Products.Queries
                     {
                         Id = v.Id,
                         ProductId = v.ProductId,
+                        VariantName = v.VariantName,
                         Price = v.Price,
                         Stock = v.Stock,
                         VariantImage= v.ImageUrl,
