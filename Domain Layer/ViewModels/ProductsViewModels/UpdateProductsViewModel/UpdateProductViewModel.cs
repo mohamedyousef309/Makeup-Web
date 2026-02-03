@@ -33,7 +33,7 @@ namespace Domain_Layer.ViewModels.ProductsViewModels.UpdateProductsViewModel
 
         public bool IsActive { get; set; } = true;
 
-        public IFormFile? Image { get; set; }
+        public IFormFile? ImageUrl { get; set; }
 
 
     }
