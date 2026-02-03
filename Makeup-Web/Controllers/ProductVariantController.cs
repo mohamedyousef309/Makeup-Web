@@ -89,7 +89,7 @@ namespace Makeup_Web.Controllers
             var model = new UpdateProductVariantViewModel
             {
                 Id = dto.Id,
-                ProductId = dto.ProductId,
+              
                 Price = dto.Price,
                 Stock = dto.Stock,
                 VariantName = dto.VariantImage ?? "",
