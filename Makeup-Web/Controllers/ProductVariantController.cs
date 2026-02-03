@@ -8,7 +8,7 @@ using Domain_Layer.DTOs;
 using Domain_Layer.DTOs.ProductVariantDtos;
 using Domain_Layer.ViewModels.ProductsViewModels;
 using Domain_Layer.ViewModels.ProductsViewModels.ProductsVariantViewModel;
-using Domain_Layer.ViewModels.ProductsViewModels.UpdateProductsVariantViewModel;
+using Domain_Layer.ViewModels.ProductsViewModels.UpdateProductsVariantViewModel; 
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -85,17 +85,16 @@ namespace Makeup_Web.Controllers
 
             var dto = result.Data;
 
+            
             var model = new UpdateProductVariantViewModel
             {
                 Id = dto.Id,
                 ProductId = dto.ProductId,
-                
                 Price = dto.Price,
                 Stock = dto.Stock,
-                ImageUrl = dto.VariantImage,
-                // استخراج الـ IDs من قائمة الـ SelectedAttributes الموجودة في الـ DTO بتاعك
-                SelectedAttributeValueIds = dto.SelectedAttributes.Select(a => a.Id).ToList()
+                VariantName = dto.VariantImage ?? "",
             };
+               
 
             return View(model);
         }
@@ -108,12 +107,14 @@ namespace Makeup_Web.Controllers
                 return View(model);
             }
 
-            // إرسال الـ Command مع قائمة الـ IDs المختارة (سواء تبديل أو إضافة)
+            
+            
             var result = await _mediator.Send(new UpdateProductVariantCommand(
                 model.Id,
                 model.Price,
+                model.VariantName,
                 model.Stock,
-                model.SelectedAttributeValueIds
+                model.ImageFile 
             ));
 
             if (!result.IsSuccess)

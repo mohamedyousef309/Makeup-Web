@@ -10,7 +10,6 @@ namespace Domain_Layer.Entites
     {
 
 
-        // FK to Product
         public int ProductId { get; set; }
         public Product Product { get; set; } = default!;
 

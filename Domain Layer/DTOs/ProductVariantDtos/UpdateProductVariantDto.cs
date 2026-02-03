@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Domain_Layer.DTOs.ProductVariantDtos
 {
-    public class UpdateProductVariantViewModel
+    public class UpdateProductVariantDto
     {
         public int Id { get; set; }
         public int ProductId { get; set; }
