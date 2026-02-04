@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Application_Layer.CQRS.Orders.Quries.GetOrderbyid
 {
-    public record GetOrderbyidQuery(int Orderid):ICommand<RequestRespones<OrderToReturnDto>>;
+    public record GetOrderbyidQuery(int Orderid): IRequest<RequestRespones<OrderToReturnDto>>;
 
     public class GetOrderbyidQueryHandler : IRequestHandler<GetOrderbyidQuery, RequestRespones<OrderToReturnDto>>
     {

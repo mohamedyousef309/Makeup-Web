@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Application_Layer.CQRS.Permission.Queries.GetPermssionsByIds
 {
-    public record GetPermssionsByIdsQuery(IEnumerable<int> Ids):ICommand<RequestRespones<IEnumerable<UserPermissionsDTo>>>;
+    public record GetPermssionsByIdsQuery(IEnumerable<int> Ids): IRequest<RequestRespones<IEnumerable<UserPermissionsDTo>>>;
 
     public class GetPermssionsByIdsQueryHandler : IRequestHandler<GetPermssionsByIdsQuery, RequestRespones<IEnumerable<UserPermissionsDTo>>>
     {

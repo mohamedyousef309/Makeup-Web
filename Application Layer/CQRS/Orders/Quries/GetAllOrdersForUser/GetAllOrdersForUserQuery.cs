@@ -16,7 +16,7 @@ namespace Application_Layer.CQRS.Orders.Quries.GetAllOrdersForUser
 {
     public record GetAllOrdersForUserQuery(int userid, int pageSize=10, int pageindex=1, string? sortby = "id"
         , string? sortdirc = "desc",
-        string? search = null) :ICommand<RequestRespones<PaginatedListDto<OrderToReturnDto>>>;
+        string? search = null) : IRequest<RequestRespones<PaginatedListDto<OrderToReturnDto>>>;
 
     public class GetAllOrdersForUserQueryHandler :BaseQueryHandler ,IRequestHandler<GetAllOrdersForUserQuery, RequestRespones<PaginatedListDto<OrderToReturnDto>>>
     {

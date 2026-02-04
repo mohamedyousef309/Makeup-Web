@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Application_Layer.CQRS.Basket.Commands.UpdateBasketProductQuntaty
 {
-    public record UpdateBasketProductQuntatyCommand(int Userid,int productid,int newQuntaty):ICommand<RequestRespones<CustomerBasketDto>>;
+    public record UpdateBasketProductQuntatyCommand(int Userid,int productid,int ProductVarantId,int newQuntaty):ICommand<RequestRespones<CustomerBasketDto>>;
 
     public class UpdateBasketProductQuntatyCommandHandler : IRequestHandler<UpdateBasketProductQuntatyCommand, RequestRespones<CustomerBasketDto>>
     {
@@ -32,7 +32,7 @@ namespace Application_Layer.CQRS.Basket.Commands.UpdateBasketProductQuntaty
                 return RequestRespones<CustomerBasketDto>.Fail("Basket not found for this user.", 404);
             }
 
-            var item = basket.Items.FirstOrDefault(x => x.ProductId == request.productid);
+            var item = basket.Items.FirstOrDefault(x => x.ProductVariantid == request.ProductVarantId);
 
             if (item == null)
             {

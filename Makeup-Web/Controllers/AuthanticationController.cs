@@ -35,6 +35,8 @@ namespace Makeup_Web.Controllers
             return View(new LoginViewModel());
         }
         [HttpPost]
+        [ValidateAntiForgeryToken]
+
         public async Task<ActionResult<EndpointRespones<AuthModleDto>>> Login(LoginViewModel model)
         {
             if (ModelState.IsValid)

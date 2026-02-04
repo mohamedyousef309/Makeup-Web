@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Application_Layer.CQRS.Products.Queries.GetProductVariantsByProductid
 {
-    public record GetProductVariantsByProductidQuery(int Productid):ICommand<RequestRespones<IEnumerable<ProductVariantDto>>>;
+    public record GetProductVariantsByProductidQuery(int Productid): IRequest<RequestRespones<IEnumerable<ProductVariantDto>>>;
 
     public class GetProductVariantsByProductidQueryHandler : IRequestHandler<GetProductVariantsByProductidQuery, RequestRespones<IEnumerable<ProductVariantDto>>>
     {

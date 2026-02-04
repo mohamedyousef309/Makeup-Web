@@ -92,7 +92,7 @@ namespace Makeup_Web.Controllers
             {
                 return BadRequest(ModelState);
             }
-            var UpdateProductQunatyResult = await mediator.Send(new UpdateBasketProductQuntatyCommand(userId, Modle.ProductId,  Modle.NewQuantity));
+            var UpdateProductQunatyResult = await mediator.Send(new UpdateBasketProductQuntatyCommand(userId, Modle.ProductId,Modle.ProductVariantId,  Modle.NewQuantity));
             if (!UpdateProductQunatyResult.IsSuccess)
             {
                 return BadRequest(new { message = UpdateProductQunatyResult.Message });

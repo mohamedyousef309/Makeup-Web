@@ -103,25 +103,27 @@
                 </div>
             </div>
             <div class="col-md-3">
-                <div class="card bg-dark border-pink">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="text-muted mb-2">Categories</h6>
-                                <h3 class="text-white mb-0">15</h3>
-                            </div>
-                            <div class="bg-pink bg-opacity-25 p-3 rounded">
-                                <i class="bi bi-tags display-6 text-pink"></i>
+                <a asp-controller="Categories" asp-action="Index" class="text-decoration-none">
+                    <div class="card bg-dark border-pink">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted mb-2">Categories</h6>
+                                    <h3 class="text-white mb-0">15</h3>
+                                </div>
+                                <div class="bg-pink bg-opacity-25 p-3 rounded">
+                                    <i class="bi bi-tags display-6 text-pink"></i>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
         </div>
 
         <!-- Admin Quick Actions -->
         <div class="row g-4 mb-4">
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="card bg-dark border-primary h-100">
                     <div class="card-header border-primary d-flex justify-content-between align-items-center">
                         <h5 class="mb-0 text-white">
@@ -138,7 +140,7 @@
                 </div>
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="card bg-dark border-success h-100">
                     <div class="card-header border-success">
                         <h5 class="mb-0 text-white">
@@ -155,7 +157,7 @@
                 </div>
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="card bg-dark border-warning h-100">
                     <div class="card-header border-warning">
                         <h5 class="mb-0 text-white">
@@ -171,17 +173,79 @@
                     </div>
                 </div>
             </div>
+
+            <div class="col-md-3">
+                <div class="card bg-dark border-info h-100">
+                    <div class="card-header border-info">
+                        <h5 class="mb-0 text-white">
+                            <i class="bi bi-tags text-info"></i> Categories Management
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted mb-3">Manage product categories, subcategories, and organization.</p>
+                        <a asp-controller="Categories" asp-action="Index"
+                           class="btn btn-outline-info w-100">
+                            <i class="bi bi-folder"></i> Manage Categories
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- Attributes Management Card -->
+        <!-- Categories Management Card -->
         <div class="row g-4 mb-4">
             <div class="col-12">
                 <div class="card bg-dark border-pink">
                     <div class="card-header border-pink d-flex justify-content-between align-items-center">
                         <h5 class="mb-0 text-white">
-                            <i class="bi bi-tags text-pink"></i> Attributes Management (Admin Only)
+                            <i class="bi bi-tags text-pink"></i> Advanced Categories Management
                         </h5>
-                        <span class="badge bg-pink">Admin Privilege</span>
+                        <span class="badge bg-pink">Organize Products</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <h4 class="text-white mb-3">Complete Categories Control</h4>
+                                <p class="text-muted mb-4">
+                                    Access the full categories management system to organize your products efficiently.
+                                    Create, edit, delete, and arrange categories and subcategories with drag-and-drop
+                                    functionality. Set category images, SEO settings, and visibility options.
+                                </p>
+                                <div class="d-flex gap-3">
+                                    <a asp-controller="Categories" asp-action="Index"
+                                       class="btn btn-pink btn-lg">
+                                        <i class="bi bi-tags"></i> Manage All Categories
+                                    </a>
+                                    <a asp-controller="Categories" asp-action="Create"
+                                       class="btn btn-outline-pink btn-lg">
+                                        <i class="bi bi-plus-circle"></i> Add New Category
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-center">
+                                <div class="bg-dark-secondary p-4 rounded">
+                                    <i class="bi bi-diagram-3 display-3 text-pink mb-3"></i>
+                                    <h6 class="text-white">Hierarchical Categories</h6>
+                                    <p class="text-muted small mt-2">
+                                        Create unlimited levels of categories and subcategories for better organization.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Attributes Management Card -->
+        <div class="row g-4 mb-4">
+            <div class="col-12">
+                <div class="card bg-dark border-info">
+                    <div class="card-header border-info d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 text-white">
+                            <i class="bi bi-sliders text-info"></i> Attributes Management
+                        </h5>
+                        <span class="badge bg-info">Product Specifications</span>
                     </div>
                     <div class="card-body">
                         <div class="row align-items-center">
@@ -189,20 +253,19 @@
                                 <h4 class="text-white mb-3">Manage Product Attributes</h4>
                                 <p class="text-muted mb-4">
                                     Access the attributes management panel to add, edit, or remove
-                                    product attributes, categories, and specifications. This feature
-                                    is exclusively available for administrators.
+                                    product attributes, specifications, colors, sizes, and other variants.
                                 </p>
                                 <a asp-controller="Attributes" asp-action="GetAllAttributes"
-                                   class="btn btn-pink btn-lg">
+                                   class="btn btn-info btn-lg">
                                     <i class="bi bi-gear"></i> Go to Attributes Management
                                 </a>
                             </div>
                             <div class="col-md-4 text-center">
                                 <div class="bg-dark-secondary p-4 rounded">
-                                    <i class="bi bi-shield-lock display-3 text-pink mb-3"></i>
-                                    <h6 class="text-white">Administrator Access</h6>
+                                    <i class="bi bi-list-check display-3 text-info mb-3"></i>
+                                    <h6 class="text-white">Product Variants</h6>
                                     <p class="text-muted small mt-2">
-                                        Only users with Administrator role can access this feature.
+                                        Create and manage product variants like sizes, colors, materials, etc.
                                     </p>
                                 </div>
                             </div>
@@ -236,6 +299,13 @@
                                     <small class="text-muted">5 hours ago</small>
                                 </div>
                                 <p class="mb-1 text-muted">Order #ORD-7894 shipped to customer</p>
+                            </div>
+                            <div class="list-group-item bg-dark border-secondary text-white">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">New category added</h6>
+                                    <small class="text-muted">Yesterday</small>
+                                </div>
+                                <p class="mb-1 text-muted">"Summer Collection" category created</p>
                             </div>
                             <div class="list-group-item bg-dark border-secondary text-white">
                                 <div class="d-flex w-100 justify-content-between">
@@ -406,5 +476,20 @@ else
         .card-header {
             background-color: rgba(255, 255, 255, 0.03);
         }
+
+        a.text-decoration-none .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--brand-pink) !important;
+        }
+
+        .btn-outline-pink {
+            color: var(--brand-pink);
+            border-color: var(--brand-pink);
+        }
+
+            .btn-outline-pink:hover {
+                background-color: var(--brand-pink);
+                color: white;
+            }
     </style>
 }

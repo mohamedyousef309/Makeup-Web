@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Application_Layer.CQRS.Attributes.Quries.GetAttributeWithValueByid
 {
-    public record GetAttributeWithValueByidQuery(int Attributeid) :ICommand<RequestRespones<AttributeWithValueDTo>>;
+    public record GetAttributeWithValueByidQuery(int Attributeid) : IRequest<RequestRespones<AttributeWithValueDTo>>;
 
     public class GetAttributeWithValueByidQueryHandler:IRequestHandler<GetAttributeWithValueByidQuery,RequestRespones<AttributeWithValueDTo>>
     {

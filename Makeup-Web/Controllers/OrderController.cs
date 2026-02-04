@@ -3,9 +3,11 @@ using Application_Layer.CQRS.Orders.Commands.CreatOrder;
 using Application_Layer.CQRS.Orders.Commands.DeleteOrder;
 using Application_Layer.CQRS.Orders.Commands.UpdateOrder;
 using Application_Layer.CQRS.Orders.Commands.UpdateOrderDetails; // الـ Namespace الجديد
+using Application_Layer.CQRS.Orders.Commands.UpdateOrderStatus;
 using Application_Layer.CQRS.Orders.Quries.GetAllOrders;
 using Application_Layer.CQRS.Orders.Quries.GetAllOrdersForUser;
 using Application_Layer.CQRS.Orders.Quries.GetOrderbyid;
+using Application_Layer.CQRS.Orders.Quries.GetOrderStatuses;
 using Domain_Layer.DTOs;
 using Domain_Layer.DTOs.OrderDTOs;
 using Domain_Layer.Entites.Order;
@@ -71,6 +73,36 @@ namespace Makeup_Web.Controllers
 
             TempData["ErrorMessage"] = result.Message;
             return RedirectToAction(nameof(GetOrderbyid), new { orderid = orderId });
+
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateOrderStatus(UpdateOrderStatusViewModle Modle) 
+        {
+            if (!ModelState.IsValid)
+            {
+                var Errors = ModelState.Where(x=>x.Value.Errors.Any())
+                    .ToDictionary(
+                        kvp => kvp.Key,
+                        kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray()
+                    );
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "Validation failed",
+                    Errors
+                });
+            }
+
+            var UpdateOrderStatusReslut= await _Mediator.Send(new UpdateOrderStatusCommand(Modle.Orderid,Modle.OrderStatus));
+
+            if (!UpdateOrderStatusReslut.IsSuccess)
+            {
+                return Json(new { succes = false,Message="Error While Updating Status" });
+            }
+
+            return Json(new { succes = true, Message = "Updated Successfuly" });
+
         }
         #endregion
 
@@ -84,7 +116,7 @@ namespace Makeup_Web.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(new { success = false, message = "بيانات غير صالحة" });
+                return BadRequest(new { success = false, message = "invalid Data" });
             }
 
             var result = await _Mediator.Send(command);
@@ -159,9 +191,23 @@ namespace Makeup_Web.Controllers
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error occurred while fetching all orders.");
-                ViewBag.ErrorMessage = "حدث خطأ داخلي، يرجى المحاولة لاحقاً.";
+                ViewBag.ErrorMessage = "Error Try againg Later.";
                 return View(new PaginatedListDto<OrderToReturnDto>());
             }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllOrderStatus() 
+        {
+            var GetStatusResult = await _Mediator.Send(new GetOrderStatusesQuery());
+
+            if (!GetStatusResult.IsSuccess)
+            {
+                return Json(new { succes = false, Message = GetStatusResult.Message });
+            }
+
+            return Json(new { succes = true, Message = GetStatusResult.Message });
+
         }
         #endregion
 

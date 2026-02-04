@@ -1,9 +1,9 @@
 ﻿@using Domain_Layer.DTOs.OrderDTOs
-@model OrderToReturnDto
+@model OrderToReturnDto?
 
 @{
-    ViewData["Title"] = $"Order Details #{Model.orderid}";
-    var totalAmount = Model.subTotal + Model.Deliverycost;
+    ViewData["Title"] = Model != null ? $"Order Details #{Model.orderid}" : "Order Details";
+    var totalAmount = Model != null ? Model.subTotal + Model.Deliverycost : 0;
 }
 
 @section Styles {
@@ -70,6 +70,18 @@
             color: #198754;
             border-color: rgba(25, 135, 84, 0.3);
             background: rgba(25, 135, 84, 0.05);
+        }
+
+        .status-cancelled {
+            color: #dc3545;
+            border-color: rgba(220, 53, 69, 0.3);
+            background: rgba(220, 53, 69, 0.05);
+        }
+
+        .status-default {
+            color: var(--text-muted);
+            border-color: rgba(176, 176, 176, 0.3);
+            background: rgba(176, 176, 176, 0.05);
         }
 
         .luxury-card {
@@ -199,119 +211,277 @@
             color: var(--text-muted);
             text-transform: uppercase;
         }
+
+        .empty-state {
+            text-align: center;
+            padding: 100px 20px;
+        }
+
+            .empty-state i {
+                font-size: 5rem;
+                color: var(--text-muted);
+                margin-bottom: 20px;
+                opacity: 0.5;
+            }
+
+            .empty-state h3 {
+                color: var(--text-main);
+                margin-bottom: 15px;
+                font-size: 1.8rem;
+            }
+
+            .empty-state p {
+                color: var(--text-muted);
+                margin-bottom: 30px;
+                max-width: 400px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+        .error-state {
+            text-align: center;
+            padding: 100px 20px;
+            background: rgba(220, 53, 69, 0.05);
+            border: 1px solid rgba(220, 53, 69, 0.3);
+            border-radius: 20px;
+            margin: 20px 0;
+        }
+
+            .error-state i {
+                font-size: 4rem;
+                color: #dc3545;
+                margin-bottom: 20px;
+            }
+
+            .error-state h3 {
+                color: var(--text-main);
+                margin-bottom: 15px;
+                font-size: 1.8rem;
+            }
+
+            .error-state p {
+                color: var(--text-muted);
+                margin-bottom: 30px;
+                max-width: 400px;
+                margin-left: auto;
+                margin-right: auto;
+            }
     </style>
 }
 
-<div class="container pb-5">
-    <div class="order-header-box">
-        <div class="row align-items-center">
-            <div class="col-md-7">
-                <a href="@Url.Action("GetUserOrders", "Order")" class="btn-back-custom">
+@if (Model == null)
+{
+    <div class="container">
+        <div class="error-state">
+            <i class="bi bi-exclamation-triangle"></i>
+            <h3>Order Not Found</h3>
+            <p>The order you are looking for could not be found. It may have been deleted or you don't have permission to view it.</p>
+            <div class="d-flex justify-content-center gap-3">
+                <a href="@Url.Action("GetUserOrders", "Order")" class="btn btn-outline-primary">
                     <i class="bi bi-arrow-left"></i> Back to Orders
                 </a>
-                <h1 class="order-id-title">Order <span>#@Model.orderid</span></h1>
-                <p class="text-muted">
-                    <i class="bi bi-calendar3 me-2"></i> Date: @Model.orderDate.ToString("MMM dd, yyyy | hh:mm tt")
-                </p>
-            </div>
-            <div class="col-md-5 text-md-end">
-                @{
-                    var statusClass = Model.status.ToLower() switch
-                    {
-                        "pending" => "status-pending",
-                        "shipped" => "status-shipped",
-                        "delivered" => "status-delivered",
-                        _ => "status-default"
-                    };
-                }
-                <div class="status-pill @statusClass">@Model.status</div>
+                <a href="@Url.Action("Index", "Home")" class="btn btn-primary">
+                    <i class="bi bi-house-door"></i> Go to Home
+                </a>
             </div>
         </div>
     </div>
-
-    <div class="row g-4">
-        <div class="col-lg-6">
-            <div class="luxury-card">
-                <div class="card-label"><i class="bi bi-person-badge"></i> Customer Information</div>
-                <div class="mb-4">
-                    <span class="info-sub">Shipping Address:</span>
-                    <strong class="info-value">@Model.Address</strong>
+}
+else if (Model.Items == null || !Model.Items.Any())
+{
+    <div class="container">
+        <div class="order-header-box">
+            <div class="row align-items-center">
+                <div class="col-md-7">
+                    <a href="@Url.Action("GetUserOrders", "Order")" class="btn-back-custom">
+                        <i class="bi bi-arrow-left"></i> Back to Orders
+                    </a>
+                    <h1 class="order-id-title">Order <span>#@Model.orderid</span></h1>
+                    <p class="text-muted">
+                        <i class="bi bi-calendar3 me-2"></i>
+                        Date: @(Model.orderDate != default(DateTimeOffset) ? Model.orderDate.ToString("MMM dd, yyyy | hh:mm tt") : "N/A")
+                    </p>
                 </div>
-                <div class="row">
-                    <div class="col-6">
-                        <span class="info-sub">Email Address:</span>
-                        <strong class="info-value">@Model.BuyerEmail</strong>
-                    </div>
-                    <div class="col-6">
-                        <span class="info-sub">Phone Number:</span>
-                        <strong class="info-value">@Model.PhoneNumber</strong>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-lg-6">
-            <div class="luxury-card">
-                <div class="card-label"><i class="bi bi-credit-card"></i> Payment Summary</div>
-                <div class="summary-row">
-                    <span class="text-muted">Subtotal:</span>
-                    <span>@Model.subTotal.ToString("N2") <small class="currency">EGP</small></span>
-                </div>
-                <div class="summary-row">
-                    <span class="text-muted">Shipping Fee:</span>
-                    <span>@Model.Deliverycost.ToString("N2") <small class="currency">EGP</small></span>
-                </div>
-                <div class="summary-row total-amount-box">
-                    <span>Grand Total:</span>
-                    <span>@totalAmount.ToString("N2") <small class="currency" style="color:var(--accent-gold)">EGP</small></span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="items-container">
-        <h3 class="items-title">Ordered Items</h3>
-        <div class="table-responsive">
-            <table class="luxury-table">
-                <thead>
-                    <tr>
-                        <th>Product</th>
-                        <th>Details</th>
-                        <th class="text-center">Price</th>
-                        <th class="text-center">Qty</th>
-                        <th class="text-end">Total</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model.Items)
-                    {
-                        <tr class="item-row">
-                            <td style="width: 120px;">
-                                <div class="item-img-wrapper">
-                                    <img src="@(string.IsNullOrEmpty(item.PictureUrl) ? "/Files/Images/default-product.jpg" : item.PictureUrl)"
-                                         alt="@item.ProductName"
-                                         onerror="this.src='/Files/Images/default-product.jpg'">
-                                </div>
-                            </td>
-                            <td>
-                                <div class="product-meta">
-                                    <h5>@item.ProductName</h5>
-                                    <small class="text-muted">SKU: PRO-@item.ProductName.GetHashCode().ToString("X")</small>
-                                </div>
-                            </td>
-                            <td class="text-center fw-bold">
-                                @item.Price.ToString("N2") <small class="currency">EGP</small>
-                            </td>
-                            <td class="text-center">
-                                <span class="badge bg-dark border border-secondary px-3 py-2">@item.Quantity</span>
-                            </td>
-                            <td class="text-end fw-bold" style="color: var(--accent-gold); font-size: 1.2rem;">
-                                @((item.Price * item.Quantity).ToString("N2")) <small class="currency">EGP</small>
-                            </td>
-                        </tr>
+                <div class="col-md-5 text-md-end">
+                    @{
+                        var statusClass = !string.IsNullOrEmpty(Model.status) ? Model.status.ToLower() switch
+                        {
+                            "pending" => "status-pending",
+                            "shipped" => "status-shipped",
+                            "delivered" => "status-delivered",
+                            "cancelled" => "status-cancelled",
+                            _ => "status-default"
+                        } : "status-default";
                     }
-                </tbody>
-            </table>
+                    <div class="status-pill @statusClass">@(Model.status ?? "Unknown")</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="empty-state">
+            <i class="bi bi-inboxes"></i>
+            <h3>No Items in This Order</h3>
+            <p>This order doesn't contain any items or the items information is not available.</p>
+            <a href="@Url.Action("GetUserOrders", "Order")" class="btn btn-primary">
+                <i class="bi bi-arrow-left"></i> Back to Orders
+            </a>
         </div>
     </div>
-</div>
+}
+else
+{
+    <div class="container pb-5">
+        <div class="order-header-box">
+            <div class="row align-items-center">
+                <div class="col-md-7">
+                    <a href="@Url.Action("GetUserOrders", "Order")" class="btn-back-custom">
+                        <i class="bi bi-arrow-left"></i> Back to Orders
+                    </a>
+                    <h1 class="order-id-title">Order <span>#@Model.orderid</span></h1>
+                    <p class="text-muted">
+                        <i class="bi bi-calendar3 me-2"></i>
+                        Date: @Model.orderDate.ToString("MMM dd, yyyy | hh:mm tt")
+                    </p>
+                </div>
+                <div class="col-md-5 text-md-end">
+                    @{
+                        var statusClass = Model.status.ToLower() switch
+                        {
+                            "pending" => "status-pending",
+                            "shipped" => "status-shipped",
+                            "delivered" => "status-delivered",
+                            "cancelled" => "status-cancelled",
+                            _ => "status-default"
+                        };
+                    }
+                    <div class="status-pill @statusClass">@Model.status</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="luxury-card">
+                    <div class="card-label"><i class="bi bi-person-badge"></i> Customer Information</div>
+                    <div class="mb-4">
+                        <span class="info-sub">Shipping Address:</span>
+                        <strong class="info-value">@(string.IsNullOrEmpty(Model.Address) ? "No address provided" : Model.Address)</strong>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <span class="info-sub">Email Address:</span>
+                            <strong class="info-value">@(string.IsNullOrEmpty(Model.BuyerEmail) ? "N/A" : Model.BuyerEmail)</strong>
+                        </div>
+                        <div class="col-6">
+                            <span class="info-sub">Phone Number:</span>
+                            <strong class="info-value">@(string.IsNullOrEmpty(Model.PhoneNumber) ? "N/A" : Model.PhoneNumber)</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="luxury-card">
+                    <div class="card-label"><i class="bi bi-credit-card"></i> Payment Summary</div>
+                    <div class="summary-row">
+                        <span class="text-muted">Subtotal:</span>
+                        <span>@Model.subTotal.ToString("N2") <small class="currency">EGP</small></span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="text-muted">Shipping Fee:</span>
+                        <span>@Model.Deliverycost.ToString("N2") <small class="currency">EGP</small></span>
+                    </div>
+                    <div class="summary-row total-amount-box">
+                        <span>Grand Total:</span>
+                        <span>@totalAmount.ToString("N2") <small class="currency" style="color:var(--accent-gold)">EGP</small></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="items-container">
+            <h3 class="items-title">Ordered Items</h3>
+            <div class="table-responsive">
+                <table class="luxury-table">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Details</th>
+                            <th class="text-center">Price</th>
+                            <th class="text-center">Qty</th>
+                            <th class="text-end">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Items)
+                        {
+                            <tr class="item-row">
+                                <td style="width: 120px;">
+                                    <div class="item-img-wrapper">
+                                        <img src="@(string.IsNullOrEmpty(item.PictureUrl) ? "/Files/Images/default-product.jpg" : item.PictureUrl)"
+                                             alt="@item.ProductName"
+                                             onerror="this.src='/Files/Images/default-product.jpg'">
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="product-meta">
+                                        <h5>@(string.IsNullOrEmpty(item.ProductName) ? "Unnamed Product" : item.ProductName)</h5>
+                                        @if (!string.IsNullOrEmpty(item.ProductName))
+                                        {
+                                            <small class="text-muted">SKU: PRO-@item.ProductName.GetHashCode().ToString("X").Substring(0, Math.Min(8, item.ProductName.GetHashCode().ToString("X").Length))</small>
+                                        }
+                                    </div>
+                                </td>
+                                <td class="text-center fw-bold">
+                                    @item.Price.ToString("N2") <small class="currency">EGP</small>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-dark border border-secondary px-3 py-2">@item.Quantity</span>
+                                </td>
+                                <td class="text-end fw-bold" style="color: var(--accent-gold); font-size: 1.2rem;">
+                                    @((item.Price * item.Quantity).ToString("N2")) <small class="currency">EGP</small>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // تحسين تجربة المستخدم مع الصور المعطلة
+            $('img').on('error', function () {
+                $(this).attr('src', '/Files/Images/default-product.jpg');
+            });
+
+            // إضافة تأثيرات تفاعلية للصفوف
+            $('.item-row').hover(
+                function () {
+                    $(this).css('transform', 'translateY(-2px)');
+                    $(this).css('box-shadow', '0 5px 15px rgba(0, 0, 0, 0.2)');
+                },
+                function () {
+                    $(this).css('transform', 'translateY(0)');
+                    $(this).css('box-shadow', 'none');
+                }
+            );
+
+            // نسخ رقم الطلب عند النقر عليه
+            $('.order-id-title span').click(function () {
+                const orderId = $(this).text();
+                navigator.clipboard.writeText(orderId).then(function () {
+                    const originalText = $(this).text();
+                    $(this).html('<i class="bi bi-check2"></i> Copied!');
+
+                    setTimeout(() => {
+                        $(this).text(originalText);
+                    }, 2000);
+                }.bind(this));
+            });
+        });
+    </script>
+}

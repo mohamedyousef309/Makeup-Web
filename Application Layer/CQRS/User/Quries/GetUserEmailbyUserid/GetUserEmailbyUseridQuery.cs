@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Application_Layer.CQRS.User.Quries.GetUserEmailbyUserid
 {
-    public record GetUserEmailbyUseridQuery(int userid):ICommand<RequestRespones<UserToreturn>>;
+    public record GetUserEmailbyUseridQuery(int userid): IRequest<RequestRespones<UserToreturn>>;
 
     public class GetUserEmailbyUseridQueryHandler : IRequestHandler<GetUserEmailbyUseridQuery, RequestRespones<UserToreturn>>
     {

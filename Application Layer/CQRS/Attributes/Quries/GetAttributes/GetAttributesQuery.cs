@@ -18,7 +18,7 @@ namespace Application_Layer.CQRS.Attributes.Quries.GetAttributes
     public record GetAttributesQuery(
         int PageNumber = 1,
         int PageSize = 10
-    ) : ICommand<RequestRespones<PaginatedListDto<AttributeDto>>>;
+    ) : IRequest<RequestRespones<PaginatedListDto<AttributeDto>>>;
 
     public class GetAttributesQueryHandler :BaseQueryHandler, IRequestHandler<GetAttributesQuery, RequestRespones<PaginatedListDto<AttributeDto>>>
     {

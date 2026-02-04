@@ -577,7 +577,10 @@
             <div class="col-lg-8">
                 @foreach (var item in Model.items)
                 {
-                    <div class="basket-item" id="item-row-@item.productid">
+                    <div class="basket-item" id="item-row-@item.productid-@item.ProductVariantid"
+                         data-product-id="@item.productid"
+                         data-variant-id="@item.productid">
+
                         @if (!string.IsNullOrEmpty(item.VariantImageUrl))
                         {
                             <img src="@item.VariantImageUrl"
@@ -632,7 +635,7 @@
                                 </div>
                                 <button type="button"
                                         class="btn-remove"
-                                        onclick="showRemoveModal('@item.productid', '@item.ProductName.Replace("'", "\\'")')"
+                                        onclick="showRemoveModal('@item.productid', '@item.ProductVariantid', '@item.ProductName.Replace("'", "\\'")')"
                                         title="Remove Item">
                                     <i class="bi bi-trash3" style="font-size: 1.2rem;"></i>
                                 </button>
@@ -640,21 +643,21 @@
 
                             <div class="item-price">
                                 <span class="price-label">Price:</span>
-                                <span id="unit-price-@item.productid">@item.Price.ToString("F2")</span> $
+                                <span id="unit-price-@item.productid-@item.ProductVariantid">@item.Price.ToString("F2")</span> $
                             </div>
 
                             <div class="d-flex align-items-center justify-content-between">
                                 <div class="quantity-controls">
                                     <button type="button"
                                             class="qty-btn"
-                                            onclick="updateQuantity('@item.productid', -1)"
+                                            onclick="updateQuantity('@item.productid', '@item.ProductVariantid', -1)"
                                             title="Decrease Quantity">
                                         -
                                     </button>
-                                    <span class="qty-value" id="qty-@item.productid">@item.Quantity</span>
+                                    <span class="qty-value" id="qty-@item.productid-@item.ProductVariantid">@item.Quantity</span>
                                     <button type="button"
                                             class="qty-btn"
-                                            onclick="updateQuantity('@item.productid', 1)"
+                                            onclick="updateQuantity('@item.productid', '@item.ProductVariantid', 1)"
                                             title="Increase Quantity">
                                         +
                                     </button>
@@ -662,7 +665,7 @@
 
                                 <div class="item-total-section">
                                     <small class="total-label">Total:</small>
-                                    <span class="item-total" id="item-total-@item.productid">
+                                    <span class="item-total" id="item-total-@item.productid-@item.ProductVariantid">
                                         @((item.Price * item.Quantity).ToString("F2")) $
                                     </span>
                                 </div>
@@ -713,10 +716,12 @@
 @section Scripts {
     <script>
         let itemToRemoveId = null;
+        let itemVariantToRemoveId = null;
         let itemNameToRemove = "";
 
-        function showRemoveModal(productId, productName) {
+        function showRemoveModal(productId, productVariantId, productName) {
             itemToRemoveId = productId;
+            itemVariantToRemoveId = productVariantId;
             itemNameToRemove = productName;
             const message = document.getElementById('confirmMessage');
             message.innerHTML = `Are you sure you want to remove <strong>"${productName}"</strong> from your luxury bag?`;
@@ -728,16 +733,18 @@
             document.getElementById('customConfirmModal').style.display = 'none';
             document.body.style.overflow = 'auto';
             itemToRemoveId = null;
+            itemVariantToRemoveId = null;
         }
 
         async function confirmRemoveItem() {
-            if (!itemToRemoveId) return;
+            if (!itemToRemoveId || !itemVariantToRemoveId) return;
 
-            const itemRow = document.getElementById(`item-row-${itemToRemoveId}`);
+            const itemRow = document.getElementById(`item-row-${itemToRemoveId}-${itemVariantToRemoveId}`);
             const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
 
             const formData = new FormData();
             formData.append('productId', itemToRemoveId);
+            formData.append('productVariantId', itemVariantToRemoveId);
 
             try {
                 const response = await fetch('@Url.Action("RemoveItemFromBasket", "basket")', {
@@ -766,9 +773,9 @@
             }
         }
 
-        async function updateQuantity(productId, change) {
-            const qtyElement = document.getElementById(`qty-${productId}`);
-            const itemRow = document.getElementById(`item-row-${productId}`);
+        async function updateQuantity(productId, productVariantId, change) {
+            const qtyElement = document.getElementById(`qty-${productId}-${productVariantId}`);
+            const itemRow = document.getElementById(`item-row-${productId}-${productVariantId}`);
             let currentQty = parseInt(qtyElement.innerText);
             let updatedQty = currentQty + change;
 
@@ -784,15 +791,19 @@
                         'Content-Type': 'application/json',
                         'RequestVerificationToken': token
                     },
-                    body: JSON.stringify({ ProductId: parseInt(productId), NewQuantity: updatedQty })
+                    body: JSON.stringify({
+                        ProductId: parseInt(productId),
+                        ProductVariantId: parseInt(productVariantId),
+                        NewQuantity: updatedQty
+                    })
                 });
 
                 if (response.ok) {
                     const result = await response.json();
 
                     qtyElement.innerText = updatedQty;
-                    const unitPrice = parseFloat(document.getElementById(`unit-price-${productId}`).innerText);
-                    document.getElementById(`item-total-${productId}`).innerText = (unitPrice * updatedQty).toFixed(2) + " $";
+                    const unitPrice = parseFloat(document.getElementById(`unit-price-${productId}-${productVariantId}`).innerText);
+                    document.getElementById(`item-total-${productId}-${productVariantId}`).innerText = (unitPrice * updatedQty).toFixed(2) + " $";
 
                     let totalSum = 0;
                     result.items.forEach(item => {

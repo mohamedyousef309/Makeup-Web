@@ -14,7 +14,7 @@ using System.Windows.Input;
 
 namespace Application_Layer.CQRS.Permission.Queries.GetAllPermissions
 {
-    public record GetAllPermissionsQuery():ICommand<RequestRespones<IEnumerable<UserPermissionsDTo>>>;
+    public record GetAllPermissionsQuery(): IRequest<RequestRespones<IEnumerable<UserPermissionsDTo>>>;
 
     public class GetAllPermissionsQueryHandler : IRequestHandler<GetAllPermissionsQuery, RequestRespones<IEnumerable<UserPermissionsDTo>>>
     {
