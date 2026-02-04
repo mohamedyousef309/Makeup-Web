@@ -20,6 +20,8 @@ namespace Domain_Layer.DTOs.ProductVariantDtos
         public string? VariantImage { get; set; }
 
         public IEnumerable<AttributeValueResponseDto> SelectedAttributes { get; set; }=new HashSet<AttributeValueResponseDto>();
+        public List<int> AttributeValueIds => SelectedAttributes.Select(a => a.Id).ToList();
     }
-
 }
+
+
