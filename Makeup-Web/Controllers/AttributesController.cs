@@ -1,12 +1,13 @@
 ﻿using Application_Layer.CQRS.Attributes.Commands.addAttribute;
 using Application_Layer.CQRS.Attributes.Commands.AddAttributesWithValues;
-using Application_Layer.CQRS.Attributes.Commands.updateAttribute;
-using Application_Layer.CQRS.Attributes.Commands.deleteAttribute;
 using Application_Layer.CQRS.Attributes.Commands.AddValuesToAttribute;
-using Application_Layer.CQRS.Attributes.Commands.UpdateAttributeValue;
+using Application_Layer.CQRS.Attributes.Commands.deleteAttribute;
 using Application_Layer.CQRS.Attributes.Commands.DeleteAttributeValue;
+using Application_Layer.CQRS.Attributes.Commands.updateAttribute;
+using Application_Layer.CQRS.Attributes.Commands.UpdateAttributeValue;
 using Application_Layer.CQRS.Attributes.Quries.GetAttributes;
 using Application_Layer.CQRS.Attributes.Quries.GetAttributesLookup;
+using Application_Layer.CQRS.Attributes.Quries.GetAttributesWithValues;
 using Application_Layer.CQRS.Attributes.Quries.GetAttributeWithValueByid;
 using Domain_Layer.DTOs.Attribute;
 using Domain_Layer.ViewModels.AttributesViewModle;
@@ -56,6 +57,15 @@ namespace Makeup_Web.Controllers
         {
             var GetAttributeByidResult = await mediator.Send(new GetAttributeWithValueByidQuery(id));
             if (!GetAttributeByidResult.IsSuccess) return BadRequest(GetAttributeByidResult.Message);
+            return Json(GetAttributeByidResult.Data);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAttributesWithValues()
+        {
+            var GetAttributeByidResult = await mediator.Send(new GetAttributesWithValuesQuery());
+            if (!GetAttributeByidResult.IsSuccess) return Json(new { success = false, message = GetAttributeByidResult.Message });
+
             return Json(GetAttributeByidResult.Data);
         }
 

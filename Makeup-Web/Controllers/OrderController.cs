@@ -113,10 +113,7 @@ namespace Makeup_Web.Controllers
         #endregion
 
         #region Update Order Details (Items & Inventory)
-        /// <summary>
-        /// تحديث أصناف الطلب (إضافة/حذف/تعديل كميات)
-        /// يتم استدعاؤها غالباً عبر AJAX JSON
-        /// </summary>
+     
         [HttpPost]
         public async Task<IActionResult> UpdateOrderDetails([FromBody] UpdateOrderDetailsCommand command)
         {

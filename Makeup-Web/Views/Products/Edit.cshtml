@@ -543,6 +543,7 @@
             font-size: 1.2rem;
         }
 
+        /* Animation Keyframes */
         @@keyframes slideInRight {
             from {
                 transform: translateX(100%);
@@ -555,7 +556,6 @@
             }
         }
 
-        /* Animations */
         @@keyframes fadeInUp {
             from {
                 opacity: 0;
@@ -566,6 +566,31 @@
                 opacity: 1;
                 transform: translateY(0);
             }
+        }
+
+        /* Slide Out Animation for Deleted Row */
+        @@keyframes slideOutLeft {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+
+            to {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+        }
+
+        .row-delete-animation {
+            animation: slideOutLeft 0.4s ease forwards;
+            pointer-events: none;
+        }
+
+        /* Spinner */
+        .spinner-border-sm {
+            width: 1rem;
+            height: 1rem;
+            border-width: 0.15em;
         }
 
         .animate-up {
@@ -891,7 +916,10 @@
             </div>
             <div class="modal-footer" style="border-top: 1px solid #333;">
                 <button type="button" class="btn-secondary" data-bs-dismiss="modal" style="padding: 8px 20px; margin: 0;">Cancel</button>
-                <button type="button" class="btn-delete" id="confirmDeleteBtn" style="padding: 8px 20px; margin: 0;">Delete</button>
+                <button type="button" class="btn-delete" id="confirmDeleteBtn" style="padding: 8px 20px; margin: 0;">
+                    <span id="deleteButtonText">Delete</span>
+                    <span id="deleteSpinner" class="spinner-border spinner-border-sm" role="status" style="display: none;"></span>
+                </button>
             </div>
         </div>
     </div>
@@ -1050,44 +1078,71 @@
         function confirmDeleteVariant(id, name) {
             variantToDelete = id;
             document.getElementById('variantNameToDelete').textContent = name;
+            // إعادة تعيين حالة زر الحذف
+            document.getElementById('deleteButtonText').style.display = 'inline';
+            document.getElementById('deleteSpinner').style.display = 'none';
+            document.getElementById('confirmDeleteBtn').disabled = false;
 
             const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
             modal.show();
         }
 
-        // تنفيذ حذف الفاريانت
+        // تنفيذ حذف الفاريانت - مع تحسينات الأنيميشن
         document.getElementById('confirmDeleteBtn').addEventListener('click', async function() {
             if (!variantToDelete) return;
 
+            // عرض حالة التحميل على زر الحذف
+            document.getElementById('deleteButtonText').style.display = 'none';
+            document.getElementById('deleteSpinner').style.display = 'inline-block';
+            this.disabled = true;
+
             try {
-                const response = await fetch('@Url.Action("DeleteVariant", "Products")/' + variantToDelete, {
-                    method: 'DELETE',
+                const response = await fetch('@Url.Action("DeleteVariant", "ProductVariant")', {
+                    method: 'POST',
                     headers: {
+                        'Content-Type': 'application/json',
                         'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
-                    }
+                    },
+                    body: JSON.stringify(variantToDelete)
                 });
 
-                if (response.ok) {
+                const result = await response.json();
+
+                if (result.success) {
                     // إخفاء المودال
                     const modal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
                     modal.hide();
 
-                    // إزالة الصف من الجدول
+                    // إزالة الصف من الجدول بأنيميشن رائع
                     const row = document.getElementById('variant-row-' + variantToDelete);
                     if (row) {
-                        row.style.transition = 'all 0.3s ease';
-                        row.style.opacity = '0';
-                        setTimeout(() => row.remove(), 300);
+                        // إضافة كلاس الأنيميشن
+                        row.classList.add('row-delete-animation');
+                        // إزالة العنصر بعد انتهاء الأنيميشن
+                        setTimeout(() => {
+                            if (row.parentNode) {
+                                row.remove();
+                            }
+                            // عرض رسالة نجاح بعد إزالة الصف
+                            showToast(result.message || 'Variant deleted successfully', 'success');
+                        }, 400); // مدة الأنيميشن 0.4s
+                    } else {
+                        showToast(result.message || 'Variant deleted successfully', 'success');
                     }
-
-                    // عرض رسالة نجاح
-                    showToast('Variant deleted successfully', 'success');
                 } else {
-                    showToast('Error deleting variant', 'error');
+                    showToast(result.message || 'Error deleting variant', 'error');
+                    // إعادة تعيين زر الحذف
+                    document.getElementById('deleteButtonText').style.display = 'inline';
+                    document.getElementById('deleteSpinner').style.display = 'none';
+                    document.getElementById('confirmDeleteBtn').disabled = false;
                 }
             } catch (error) {
                 console.error('Error:', error);
                 showToast('Error deleting variant', 'error');
+                // إعادة تعيين زر الحذف
+                document.getElementById('deleteButtonText').style.display = 'inline';
+                document.getElementById('deleteSpinner').style.display = 'none';
+                document.getElementById('confirmDeleteBtn').disabled = false;
             }
         });
 

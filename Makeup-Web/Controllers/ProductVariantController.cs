@@ -212,19 +212,7 @@ namespace Makeup_Web.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> DeleteVariant(int id, int productId)
-        {
-            var result = await _mediator.Send(new DeleteProductVariantCommand(id));
-
-            if (!result.IsSuccess)
-                TempData["ErrorMessage"] = result.Message;
-
-            return RedirectToAction(nameof(GetAllVariants), new { productId });
-        } 
-
-
-        [HttpPost]
-        public async Task<IActionResult> AddAttributeValueIdToVariant(AddAttrputeToVariantViewModle Modle) 
+        public async Task<IActionResult> AddAttributeValueIdToVariant([FromBody]AddAttrputeToVariantViewModle Modle) 
         {
             if (!ModelState.IsValid)
             {
@@ -255,6 +243,18 @@ namespace Makeup_Web.Controllers
             var result = await _mediator.Send
                 (new RemoceAttrputeFromVariantCommand(Modle.ProductVariantId, Modle.AttributeValueId));
 
+
+            if (result.IsSuccess)
+                return Json(new { success = true, message = result.Message });
+
+            return Json(new { success = false, message = result.Message });
+
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteVariant([FromBody]int Variantid)
+        {
+            var result = await _mediator.Send(new DeleteProductVariantCommand(Variantid));
 
             if (result.IsSuccess)
                 return Json(new { success = true, message = result.Message });

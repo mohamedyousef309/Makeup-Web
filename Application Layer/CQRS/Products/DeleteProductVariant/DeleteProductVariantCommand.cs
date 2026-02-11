@@ -30,8 +30,11 @@ namespace Application_Layer.CQRS.Products.Commands.UpdateVariants
             DeleteProductVariantCommand request,
             CancellationToken cancellationToken)
         {
-            var variant = _variantRepo.GetAll()
-                .FirstOrDefault(v => v.Id == request.VariantId);
+            var variant = _variantRepo.GetByCriteriaQueryable(x=>x.Id==request.VariantId).Select(x=> new ProductVariant 
+            {
+                Id=x.Id,
+            })
+                .FirstOrDefault();
 
             if (variant == null)
                 return RequestRespones<bool>
@@ -40,7 +43,7 @@ namespace Application_Layer.CQRS.Products.Commands.UpdateVariants
             _variantRepo.Delete(variant); 
             await _variantRepo.SaveChanges();
 
-            return new RequestRespones<bool>(true);
+            return new RequestRespones<bool>(true,"Deleted Successfully");
         }
     }
 }

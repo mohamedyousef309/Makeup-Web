@@ -6,6 +6,8 @@
     var hasOrders = Model?.Items?.Any() == true;
 }
 
+@Html.AntiForgeryToken()
+
 @section Styles {
     <style>
         :root {
@@ -59,46 +61,113 @@
             overflow: hidden;
         }
 
-        /* Table Styling */
+        /* ===== Desktop Table Layout ===== */
         .orders-table {
             width: 100%;
             border-collapse: separate;
             border-spacing: 0;
         }
 
+        .orders-table thead {
+            background: linear-gradient(45deg, #1a1a1a, #0f0f0f);
+        }
+
+        .orders-table th {
+            padding: 20px 25px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            border-bottom: 2px solid var(--primary-pink);
+            white-space: nowrap;
+        }
+
+        .orders-table td {
+            padding: 20px 25px;
+            border-bottom: 1px solid #252525;
+            vertical-align: middle;
+        }
+
+        .orders-table tbody tr {
+            transition: all 0.3s ease;
+        }
+
+        .orders-table tbody tr:hover {
+            background: rgba(214, 138, 138, 0.05);
+        }
+
+        .orders-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* ===== Mobile Card Layout (max-width: 992px) ===== */
+        @@media (max-width: 992px) {
             .orders-table thead {
-                background: linear-gradient(45deg, #1a1a1a, #0f0f0f);
+                display: none;
             }
 
-            .orders-table th {
-                padding: 20px 25px;
-                text-align: left;
-                font-weight: 600;
-                font-size: 0.9rem;
-                text-transform: uppercase;
-                letter-spacing: 1px;
-                color: var(--text-muted);
-                border-bottom: 2px solid var(--primary-pink);
-                white-space: nowrap;
-            }
-
+            .orders-table,
+            .orders-table tbody,
+            .orders-table tr,
             .orders-table td {
-                padding: 20px 25px;
-                border-bottom: 1px solid #252525;
-                vertical-align: middle;
+                display: block;
+                width: 100%;
             }
 
-            .orders-table tbody tr {
+            .orders-table tr {
+                background: var(--input-bg);
+                margin-bottom: 20px;
+                border-radius: 12px;
+                padding: 20px;
+                border: 1px solid #333;
                 transition: all 0.3s ease;
             }
 
-                .orders-table tbody tr:hover {
-                    background: rgba(214, 138, 138, 0.05);
-                }
+            .orders-table td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 12px 0;
+                border-bottom: 1px solid #252525;
+            }
 
-                .orders-table tbody tr:last-child td {
-                    border-bottom: none;
-                }
+            .orders-table td:last-child {
+                border-bottom: none;
+            }
+
+            .orders-table td::before {
+                content: attr(data-label);
+                font-weight: 600;
+                color: var(--text-muted);
+                margin-right: 15px;
+                flex-shrink: 0;
+                width: 110px;
+            }
+
+            .status-container {
+                width: 100%;
+            }
+
+            .status-badge {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .action-buttons {
+                justify-content: flex-end;
+            }
+
+            .search-filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box {
+                max-width: 100%;
+            }
+        }
 
         /* Status Badges with Dropdown */
         .status-container {
@@ -169,6 +238,18 @@
             border: 1px solid rgba(214, 138, 138, 0.3);
         }
 
+        .status-refunded {
+            background: rgba(108, 117, 125, 0.15);
+            color: #adb5bd;
+            border: 1px solid rgba(108, 117, 125, 0.3);
+        }
+
+        .status-shipped {
+            background: rgba(23, 162, 184, 0.15);
+            color: var(--info-blue);
+            border: 1px solid rgba(23, 162, 184, 0.3);
+        }
+
         /* Status Dropdown Menu */
         .status-dropdown {
             position: absolute;
@@ -178,7 +259,7 @@
             border: 1px solid #333;
             border-radius: 8px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            min-width: 200px;
+            min-width: 220px;
             z-index: 1000;
             display: none;
             overflow: hidden;
@@ -206,13 +287,13 @@
             color: var(--text-light);
         }
 
+        .status-option:last-child {
+            border-bottom: none;
+        }
+
         .status-option:hover {
             background: rgba(255, 255, 255, 0.05);
             padding-left: 25px;
-        }
-
-        .status-option:last-child {
-            border-bottom: none;
         }
 
         .status-option i {
@@ -246,10 +327,10 @@
             border: 1px solid rgba(255, 77, 77, 0.3);
         }
 
-            .btn-delete:hover {
-                background: rgba(255, 77, 77, 0.2);
-                transform: translateY(-2px);
-            }
+        .btn-delete:hover {
+            background: rgba(255, 77, 77, 0.2);
+            transform: translateY(-2px);
+        }
 
         .btn-view {
             background: rgba(214, 138, 138, 0.1);
@@ -257,10 +338,10 @@
             border: 1px solid rgba(214, 138, 138, 0.3);
         }
 
-            .btn-view:hover {
-                background: rgba(214, 138, 138, 0.2);
-                transform: translateY(-2px);
-            }
+        .btn-view:hover {
+            background: rgba(214, 138, 138, 0.2);
+            transform: translateY(-2px);
+        }
 
         /* Search and Filter Bar */
         .search-filter-bar {
@@ -279,30 +360,30 @@
             max-width: 400px;
         }
 
-            .search-box input {
-                width: 100%;
-                padding: 12px 20px 12px 45px;
-                background: var(--dark-bg);
-                border: 1px solid #333;
-                border-radius: 8px;
-                color: var(--text-light);
-                font-size: 0.95rem;
-                transition: all 0.3s ease;
-            }
+        .search-box input {
+            width: 100%;
+            padding: 12px 20px 12px 45px;
+            background: var(--dark-bg);
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: var(--text-light);
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
 
-                .search-box input:focus {
-                    outline: none;
-                    border-color: var(--primary-pink);
-                    box-shadow: 0 0 0 3px rgba(214, 138, 138, 0.1);
-                }
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary-pink);
+            box-shadow: 0 0 0 3px rgba(214, 138, 138, 0.1);
+        }
 
-            .search-box i {
-                position: absolute;
-                left: 15px;
-                top: 50%;
-                transform: translateY(-50%);
-                color: var(--text-muted);
-            }
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
 
         /* Pagination */
         .pagination-container {
@@ -327,46 +408,46 @@
             padding: 0;
         }
 
-            .pagination .page-item {
-                margin: 0;
-            }
+        .pagination .page-item {
+            margin: 0;
+        }
 
-                .pagination .page-item .page-link {
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    min-width: 40px;
-                    height: 40px;
-                    padding: 0 15px;
-                    background: var(--input-bg);
-                    border: 1px solid #333;
-                    border-radius: 8px;
-                    color: var(--text-light);
-                    text-decoration: none;
-                    font-weight: 600;
-                    font-size: 0.9rem;
-                    transition: all 0.3s ease;
-                }
+        .pagination .page-item .page-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 40px;
+            height: 40px;
+            padding: 0 15px;
+            background: var(--input-bg);
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
 
-                    .pagination .page-item .page-link:hover {
-                        background: rgba(214, 138, 138, 0.1);
-                        border-color: var(--primary-pink);
-                        transform: translateY(-2px);
-                    }
+        .pagination .page-item .page-link:hover {
+            background: rgba(214, 138, 138, 0.1);
+            border-color: var(--primary-pink);
+            transform: translateY(-2px);
+        }
 
-                .pagination .page-item.active .page-link {
-                    background: var(--primary-pink);
-                    border-color: var(--primary-pink);
-                    color: white;
-                }
+        .pagination .page-item.active .page-link {
+            background: var(--primary-pink);
+            border-color: var(--primary-pink);
+            color: white;
+        }
 
-                .pagination .page-item.disabled .page-link {
-                    background: var(--dark-bg);
-                    border-color: #333;
-                    color: #666;
-                    cursor: not-allowed;
-                    transform: none;
-                }
+        .pagination .page-item.disabled .page-link {
+            background: var(--dark-bg);
+            border-color: #333;
+            color: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
 
         /* Empty State */
         .empty-state {
@@ -374,24 +455,24 @@
             text-align: center;
         }
 
-            .empty-state i {
-                font-size: 4rem;
-                color: var(--text-muted);
-                margin-bottom: 20px;
-                opacity: 0.5;
-            }
+        .empty-state i {
+            font-size: 4rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
 
-            .empty-state h3 {
-                color: var(--text-light);
-                font-size: 1.5rem;
-                margin-bottom: 10px;
-            }
+        .empty-state h3 {
+            color: var(--text-light);
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
 
-            .empty-state p {
-                color: var(--text-muted);
-                font-size: 1rem;
-                margin-bottom: 30px;
-            }
+        .empty-state p {
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin-bottom: 30px;
+        }
 
         /* Modal Styles */
         .modal-overlay {
@@ -419,15 +500,8 @@
         }
 
         @@keyframes modalSlideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-50px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .modal-header {
@@ -437,11 +511,11 @@
             margin-bottom: 20px;
         }
 
-            .modal-header h3 {
-                font-size: 1.5rem;
-                color: var(--text-light);
-                margin: 0;
-            }
+        .modal-header h3 {
+            font-size: 1.5rem;
+            color: var(--text-light);
+            margin: 0;
+        }
 
         .modal-close {
             background: none;
@@ -459,21 +533,21 @@
             transition: all 0.3s ease;
         }
 
-            .modal-close:hover {
-                background: rgba(255, 255, 255, 0.1);
-                color: var(--text-light);
-            }
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+        }
 
         .modal-body {
             margin-bottom: 30px;
         }
 
-            .modal-body p {
-                color: var(--text-muted);
-                font-size: 1.1rem;
-                line-height: 1.6;
-                margin: 0;
-            }
+        .modal-body p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin: 0;
+        }
 
         .modal-footer {
             display: flex;
@@ -492,9 +566,9 @@
             transition: all 0.3s ease;
         }
 
-            .btn-cancel:hover {
-                background: rgba(255, 255, 255, 0.1);
-            }
+        .btn-cancel:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
 
         .btn-confirm-delete {
             background: rgba(255, 77, 77, 0.1);
@@ -507,9 +581,9 @@
             transition: all 0.3s ease;
         }
 
-            .btn-confirm-delete:hover {
-                background: rgba(255, 77, 77, 0.2);
-            }
+        .btn-confirm-delete:hover {
+            background: rgba(255, 77, 77, 0.2);
+        }
 
         /* Toast Notification */
         .custom-toast {
@@ -556,27 +630,6 @@
             color: var(--accent-gold) !important;
             font-weight: 500;
             font-size: 0.9rem;
-        }
-
-        /* Responsive */
-        @@media (max-width: 992px) {
-            .orders-table {
-                display: block;
-                overflow-x: auto;
-            }
-
-            .search-filter-bar {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .search-box {
-                max-width: 100%;
-            }
-
-            .action-buttons {
-                flex-wrap: wrap;
-            }
         }
     </style>
 }
@@ -660,10 +713,10 @@
                         @foreach (var order in Model.Items)
                         {
                             <tr data-order-id="@order.orderid">
-                                <td>
+                                <td data-label="Order ID">
                                     <strong>#@order.orderid</strong>
                                 </td>
-                                <td>
+                                <td data-label="Buyer Email">
                                     @if (!string.IsNullOrEmpty(order.BuyerEmail))
                                     {
                                         <a href="mailto:@order.BuyerEmail" class="text-decoration-none" style="color: var(--primary-pink);">
@@ -675,7 +728,7 @@
                                         <span class="text-muted">N/A</span>
                                     }
                                 </td>
-                                <td>
+                                <td data-label="Phone Number">
                                     @if (!string.IsNullOrEmpty(order.PhoneNumber))
                                     {
                                         <a href="tel:@order.PhoneNumber" class="text-decoration-none" style="color: var(--text-light);">
@@ -687,63 +740,39 @@
                                         <span class="text-muted">N/A</span>
                                     }
                                 </td>
-                                <td>
+                                <td data-label="Order Date">
                                     @order.orderDate.ToString("dd MMM yyyy")
                                     <br>
                                     <small class="time-display">@order.orderDate.ToString("hh:mm tt")</small>
                                 </td>
-                                <td>
+                                <td data-label="Sub Total">
                                     <strong style="color: var(--accent-gold);">@order.subTotal.ToString("N2") EGP</strong>
                                 </td>
-                                <td>
+                                <td data-label="Status">
                                     <div class="status-container">
                                         @{
-                                            var statusClass = "status-pending";
-                                            if (order.status?.ToLower() == "completed") statusClass = "status-completed";
-                                            else if (order.status?.ToLower() == "processing") statusClass = "status-processing";
-                                            else if (order.status?.ToLower() == "cancelled") statusClass = "status-cancelled";
-                                            else if (order.status?.ToLower() == "delivered") statusClass = "status-delivered";
-                                            
-                                            var hasDropdown = order.status?.ToLower() == "pending" || order.status?.ToLower() == "processing";
+                                            var statusClass = order.status?.ToLower() switch
+                                            {
+                                                "completed" => "status-completed",
+                                                "processing" => "status-processing",
+                                                "cancelled" => "status-cancelled",
+                                                "delivered" => "status-delivered",
+                                                "refunded" => "status-refunded",
+                                                "shipped" => "status-shipped",
+                                                _ => "status-pending"
+                                            };
                                         }
-                                        <span class="status-badge @statusClass @(hasDropdown ? "has-dropdown" : "")" 
+                                        <span class="status-badge @statusClass has-dropdown" 
                                               data-order-id="@order.orderid" 
                                               data-current-status="@order.status">
                                             <i class="bi bi-circle-fill" style="font-size: 0.5rem;"></i>
-                                            @order.status
+                                            <span class="status-text">@order.status</span>
                                         </span>
                                         
-                                        @if (hasDropdown)
-                                        {
-                                            <div class="status-dropdown" id="dropdown-@order.orderid">
-                                                <div class="status-option" onclick="changeOrderStatus(@order.orderid, 'completed')">
-                                                    <i class="bi bi-check-circle" style="color: var(--success-green);"></i>
-                                                    <span>Mark as Completed</span>
-                                                </div>
-                                                @if (order.status?.ToLower() == "pending")
-                                                {
-                                                    <div class="status-option" onclick="changeOrderStatus(@order.orderid, 'processing')">
-                                                        <i class="bi bi-gear" style="color: var(--info-blue);"></i>
-                                                        <span>Mark as Processing</span>
-                                                    </div>
-                                                }
-                                                <div class="status-option" onclick="changeOrderStatus(@order.orderid, 'cancelled')">
-                                                    <i class="bi bi-x-circle" style="color: var(--danger-red);"></i>
-                                                    <span>Mark as Cancelled</span>
-                                                </div>
-                                                <div class="status-option" onclick="showStatusHistory(@order.orderid)">
-                                                    <i class="bi bi-clock-history" style="color: var(--warning-yellow);"></i>
-                                                    <span>View Status History</span>
-                                                </div>
-                                                <div class="status-option" onclick="updateStatusNote(@order.orderid)">
-                                                    <i class="bi bi-pencil" style="color: var(--primary-pink);"></i>
-                                                    <span>Add Status Note</span>
-                                                </div>
-                                            </div>
-                                        }
+                                        <div class="status-dropdown" id="dropdown-@order.orderid"></div>
                                     </div>
                                 </td>
-                                <td>
+                                <td data-label="Actions">
                                     <div class="action-buttons">
                                         <a href="@Url.Action("GetOrderbyid", "Order", new { id = order.orderid })" class="btn-action btn-view">
                                             <i class="bi bi-eye"></i>
@@ -813,46 +842,150 @@
 </div>
 
 @section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
     <script>
+        // ========== المتغيرات العامة ==========
         let orderIdToDelete = null;
         let currentOpenDropdown = null;
+        let orderStatuses = []; // لتخزين حالات الطلب من السيرفر
+
         const deleteModal = document.getElementById('deleteModal');
         const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
         const toast = document.getElementById('customToast');
         const toastMessage = document.getElementById('toastMessage');
 
-        // Initialize status dropdowns
-        document.addEventListener('DOMContentLoaded', function() {
-            // Add click event to status badges with dropdown
+        // ========== تحميل حالات الطلب من الـ API ==========
+        async function loadOrderStatuses() {
+            try {
+                const response = await fetch('@Url.Action("GetAllOrderStatus", "Order")');
+                const result = await response.json();
+                if (result.succes) {
+                    orderStatuses = result.Message; // قائمة الحالات
+                    // إضافة أيقونات وألوان لكل حالة
+                    orderStatuses = orderStatuses.map(status => ({
+                        ...status,
+                        icon: getStatusIcon(status.name),
+                        colorClass: getStatusColorClass(status.name)
+                    }));
+                    // بعد تحميل الحالات، نقوم بملء القوائم المنسدلة
+                    populateDropdowns();
+                } else {
+                    console.error('Failed to load order statuses');
+                }
+            } catch (error) {
+                console.error('Error loading statuses:', error);
+            }
+        }
+
+        // ========== دالة مساعدة لاختيار الأيقونة ==========
+        function getStatusIcon(statusName) {
+            const icons = {
+                'Pending': 'bi-hourglass-split',
+                'Processing': 'bi-gear',
+                'Completed': 'bi-check-circle',
+                'Cancelled': 'bi-x-circle',
+                'Delivered': 'bi-box-seam',
+                'Shipped': 'bi-truck',
+                'Refunded': 'bi-arrow-return-left'
+            };
+            return icons[statusName] || 'bi-circle';
+        }
+
+        // ========== دالة مساعدة لاختيار كلاس اللون ==========
+        function getStatusColorClass(statusName) {
+            const colors = {
+                'Pending': 'status-pending',
+                'Processing': 'status-processing',
+                'Completed': 'status-completed',
+                'Cancelled': 'status-cancelled',
+                'Delivered': 'status-delivered',
+                'Shipped': 'status-shipped',
+                'Refunded': 'status-refunded'
+            };
+            return colors[statusName] || 'status-pending';
+        }
+
+        // ========== دالة مساعدة للحصول على كود اللون من الكلاس ==========
+        function getStatusColorCode(colorClass) {
+            const colorMap = {
+                'status-pending': 'var(--warning-yellow)',
+                'status-processing': 'var(--info-blue)',
+                'status-completed': 'var(--success-green)',
+                'status-cancelled': 'var(--danger-red)',
+                'status-delivered': 'var(--primary-pink)',
+                'status-shipped': 'var(--info-blue)',
+                'status-refunded': 'var(--text-muted)'
+            };
+            return colorMap[colorClass] || 'var(--text-muted)';
+        }
+
+        // ========== تعبئة القوائم المنسدلة لكل أوردر ==========
+        function populateDropdowns() {
+            document.querySelectorAll('.status-badge.has-dropdown').forEach(badge => {
+                const orderId = badge.getAttribute('data-order-id');
+                const dropdown = document.getElementById(`dropdown-${orderId}`);
+                if (!dropdown) return;
+
+                const currentStatus = badge.getAttribute('data-current-status');
+                
+                // تصفية الحالات: استبعاد الحالة الحالية
+                const availableStatuses = orderStatuses.filter(s => 
+                    s.name.toLowerCase() !== currentStatus?.toLowerCase()
+                );
+
+                dropdown.innerHTML = availableStatuses.map(status => `
+                    <div class="status-option" onclick="changeOrderStatus(${orderId}, ${status.value}, '${status.name}')">
+                        <i class="bi ${status.icon}" style="color: ${getStatusColorCode(status.colorClass)};"></i>
+                        <span>${status.displayName || status.name}</span>
+                    </div>
+                `).join('');
+
+                // إضافة خيارات إضافية (ثابتة)
+                dropdown.innerHTML += `
+                    <div class="status-option" onclick="showStatusHistory(${orderId})">
+                        <i class="bi bi-clock-history" style="color: var(--warning-yellow);"></i>
+                        <span>View Status History</span>
+                    </div>
+                    <div class="status-option" onclick="updateStatusNote(${orderId})">
+                        <i class="bi bi-pencil" style="color: var(--primary-pink);"></i>
+                        <span>Add Status Note</span>
+                    </div>
+                `;
+            });
+        }
+
+        // ========== إدارة فتح/غلق القوائم المنسدلة ==========
+        function initDropdowns() {
             document.querySelectorAll('.status-badge.has-dropdown').forEach(badge => {
                 badge.addEventListener('click', function(e) {
                     e.stopPropagation();
                     const orderId = this.getAttribute('data-order-id');
                     const dropdown = document.getElementById(`dropdown-${orderId}`);
                     
-                    // Close other open dropdowns
+                    // إغلاق أي قائمة مفتوحة حالياً
                     if (currentOpenDropdown && currentOpenDropdown !== dropdown) {
                         currentOpenDropdown.classList.remove('show');
                         const otherBadge = currentOpenDropdown.previousElementSibling;
                         if (otherBadge) otherBadge.classList.remove('dropdown-open');
                     }
                     
-                    // Toggle current dropdown
+                    // تبديل عرض القائمة الحالية
                     dropdown.classList.toggle('show');
                     this.classList.toggle('dropdown-open');
                     
-                    // Update current open dropdown
                     if (dropdown.classList.contains('show')) {
                         currentOpenDropdown = dropdown;
                         
-                        // Close dropdown when clicking outside
+                        // إغلاق القائمة عند النقر خارجها
                         setTimeout(() => {
-                            document.addEventListener('click', function closeDropdownHandler(e) {
-                                if (!dropdown.contains(e.target) && e.target !== badge) {
+                            document.addEventListener('click', function closeHandler(ev) {
+                                if (!dropdown.contains(ev.target) && ev.target !== badge && !badge.contains(ev.target)) {
                                     dropdown.classList.remove('show');
                                     badge.classList.remove('dropdown-open');
                                     currentOpenDropdown = null;
-                                    document.removeEventListener('click', closeDropdownHandler);
+                                    document.removeEventListener('click', closeHandler);
                                 }
                             });
                         }, 10);
@@ -861,8 +994,8 @@
                     }
                 });
             });
-            
-            // Close dropdowns when pressing Escape
+
+            // إغلاق القوائم عند الضغط على Escape
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape' && currentOpenDropdown) {
                     currentOpenDropdown.classList.remove('show');
@@ -871,83 +1004,97 @@
                     currentOpenDropdown = null;
                 }
             });
-        });
+        }
 
-        // Change order status
-        async function changeOrderStatus(orderId, newStatus) {
+        // ========== تحديث حالة الطلب ==========
+        async function changeOrderStatus(orderId, newStatusValue, newStatusName) {
             try {
-                // Show loading on badge
+                // إظهار حالة التحميل
                 const badge = document.querySelector(`.status-badge[data-order-id="${orderId}"]`);
-                const originalText = badge.textContent;
-                badge.innerHTML = '<i class="bi bi-hourglass-split"></i> Updating...';
+                const originalText = badge.querySelector('.status-text').textContent;
+                badge.querySelector('.status-text').innerHTML = '<i class="bi bi-hourglass-split"></i> Updating...';
                 
-                // Get AntiForgery token
+                // الحصول على AntiForgery token
                 const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
-                
-                // Send update request
+                if (!token) {
+                    throw new Error('AntiForgery token not found');
+                }
+
+                const payload = {
+                    Orderid: orderId,
+                    OrderStatus: newStatusValue
+                };
+
                 const response = await fetch('@Url.Action("UpdateOrderStatus", "Order")', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'RequestVerificationToken': token
                     },
-                    body: JSON.stringify({
-                        orderId: orderId,
-                        newStatus: newStatus
-                    })
+                    body: JSON.stringify(payload)
                 });
 
-                if (response.ok) {
-                    const result = await response.json();
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Failed to update status');
+                }
+
+                const result = await response.json();
+
+                if (result.succes) {
+                    // تحديث واجهة المستخدم
+                    badge.setAttribute('data-current-status', newStatusName);
+                    badge.querySelector('.status-text').textContent = newStatusName;
                     
-                    if (result.success) {
-                        // Update badge appearance
-                        const statusClasses = {
-                            'pending': 'status-pending',
-                            'processing': 'status-processing',
-                            'completed': 'status-completed',
-                            'cancelled': 'status-cancelled',
-                            'delivered': 'status-delivered'
-                        };
-                        
-                        const statusText = {
-                            'pending': 'PENDING',
-                            'processing': 'PROCESSING',
-                            'completed': 'COMPLETED',
-                            'cancelled': 'CANCELLED',
-                            'delivered': 'DELIVERED'
-                        };
-                        
-                        // Update badge
-                        badge.className = `status-badge ${statusClasses[newStatus]} has-dropdown`;
-                        badge.innerHTML = `<i class="bi bi-circle-fill" style="font-size: 0.5rem;"></i> ${statusText[newStatus]}`;
-                        
-                        // Show success message
-                        showToast('Success', `Order #${orderId} status updated to ${statusText[newStatus]}`, 'success');
-                        
-                        // Close dropdown
-                        const dropdown = document.getElementById(`dropdown-${orderId}`);
-                        dropdown.classList.remove('show');
-                        badge.classList.remove('dropdown-open');
-                        currentOpenDropdown = null;
-                    } else {
-                        showToast('Error', result.message || 'Failed to update status', 'error');
-                        badge.innerHTML = originalText;
-                    }
+                    // تحديث كلاس البادج
+                    badge.className = badge.className.replace(/status-\w+/g, '');
+                    badge.classList.add(getStatusColorClass(newStatusName), 'status-badge', 'has-dropdown');
+                    
+                    // تحديث القائمة المنسدلة (إزالة الحالة الجديدة من الخيارات)
+                    const dropdown = document.getElementById(`dropdown-${orderId}`);
+                    const availableStatuses = orderStatuses.filter(s => s.value !== newStatusValue);
+                    dropdown.innerHTML = availableStatuses.map(s => `
+                        <div class="status-option" onclick="changeOrderStatus(${orderId}, ${s.value}, '${s.name}')">
+                            <i class="bi ${s.icon}" style="color: ${getStatusColorCode(s.colorClass)};"></i>
+                            <span>${s.displayName || s.name}</span>
+                        </div>
+                    `).join('') + `
+                        <div class="status-option" onclick="showStatusHistory(${orderId})">
+                            <i class="bi bi-clock-history" style="color: var(--warning-yellow);"></i>
+                            <span>View Status History</span>
+                        </div>
+                        <div class="status-option" onclick="updateStatusNote(${orderId})">
+                            <i class="bi bi-pencil" style="color: var(--primary-pink);"></i>
+                            <span>Add Status Note</span>
+                        </div>
+                    `;
+
+                    // إغلاق القائمة
+                    dropdown.classList.remove('show');
+                    badge.classList.remove('dropdown-open');
+                    currentOpenDropdown = null;
+
+                    showToast('Success', `Order #${orderId} status updated to ${newStatusName}`, 'success');
                 } else {
-                    throw new Error('Network response was not ok');
+                    badge.querySelector('.status-text').textContent = originalText;
+                    showToast('Error', result.message || 'Failed to update status', 'error');
                 }
             } catch (error) {
                 console.error('Error updating status:', error);
-                showToast('Error', 'An error occurred while updating status', 'error');
+                showToast('Error', error.message || 'An error occurred', 'error');
+                // إعادة النص الأصلي
+                const badge = document.querySelector(`.status-badge[data-order-id="${orderId}"]`);
+                if (badge) {
+                    const originalText = badge.getAttribute('data-current-status');
+                    badge.querySelector('.status-text').textContent = originalText;
+                }
             }
         }
 
-        // Show status history
+        // ========== عرض تاريخ الحالة (مثال) ==========
         function showStatusHistory(orderId) {
-            alert(`Status history for Order #${orderId}\n\n1. PENDING - 03 Feb 2026 10:30 AM\n2. PROCESSING - 03 Feb 2026 11:45 AM\n\nLast updated by: Admin`);
-            
-            // Close dropdown
+            showToast('Status History', 'This feature is under development', 'info');
+            // إغلاق القائمة
             const dropdown = document.getElementById(`dropdown-${orderId}`);
             dropdown.classList.remove('show');
             const badge = dropdown.previousElementSibling;
@@ -955,64 +1102,52 @@
             currentOpenDropdown = null;
         }
 
-        // Update status note
+        // ========== إضافة ملاحظة (مثال) ==========
         function updateStatusNote(orderId) {
             const note = prompt('Enter a note for this status change:', '');
-            if (note !== null) {
-                // Here you would typically send this to your backend
-                showToast('Success', `Note added for Order #${orderId}`, 'success');
-                
-                // Close dropdown
-                const dropdown = document.getElementById(`dropdown-${orderId}`);
-                dropdown.classList.remove('show');
-                const badge = dropdown.previousElementSibling;
-                badge.classList.remove('dropdown-open');
-                currentOpenDropdown = null;
+            if (note) {
+                showToast('Note Added', `Note for order #${orderId}: ${note}`, 'success');
             }
+            // إغلاق القائمة
+            const dropdown = document.getElementById(`dropdown-${orderId}`);
+            dropdown.classList.remove('show');
+            const badge = dropdown.previousElementSibling;
+            badge.classList.remove('dropdown-open');
+            currentOpenDropdown = null;
         }
 
-        // Open delete confirmation modal
+        // ========== إدارة مودال الحذف ==========
         function openDeleteModal(orderId) {
             orderIdToDelete = orderId;
             deleteModal.style.display = 'flex';
             document.body.style.overflow = 'hidden';
         }
 
-        // Close modal
         function closeModal() {
             deleteModal.style.display = 'none';
             document.body.style.overflow = 'auto';
             orderIdToDelete = null;
         }
 
-        // Close modal when clicking outside
-        deleteModal.addEventListener('click', function (event) {
+        deleteModal.addEventListener('click', function(event) {
             if (event.target === deleteModal) {
                 closeModal();
             }
         });
 
-        // Get AntiForgery token
-        function getAntiForgeryToken() {
-            return document.querySelector('input[name="__RequestVerificationToken"]').value;
-        }
-
-        // Handle delete confirmation
-        confirmDeleteBtn.addEventListener('click', async function () {
+        // ========== تنفيذ الحذف ==========
+        confirmDeleteBtn.addEventListener('click', async function() {
             if (!orderIdToDelete) return;
 
             try {
-                // Show loading state
                 confirmDeleteBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Deleting...';
                 confirmDeleteBtn.disabled = true;
 
-                // إضافة AntiForgery Token
-                const token = getAntiForgeryToken();
+                const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
                 
-                // Send delete request - استخدام FormData بدلاً من JSON
                 const formData = new FormData();
                 formData.append('orderid', orderIdToDelete);
-                
+
                 const response = await fetch('@Url.Action("DeletOrder", "Order")', {
                     method: 'POST',
                     headers: {
@@ -1021,35 +1156,22 @@
                     body: formData
                 });
 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 const result = await response.json();
 
                 if (result.success) {
-                    // Show success toast
                     showToast('Success', result.message, 'success');
                     
-                    // Remove the row from table
                     const row = document.querySelector(`tr[data-order-id="${orderIdToDelete}"]`);
                     if (row) {
                         row.style.backgroundColor = 'rgba(255, 77, 77, 0.1)';
                         setTimeout(() => {
                             row.remove();
-                            
-                            // Check if table is empty
-                            const rows = document.querySelectorAll('.orders-table tbody tr');
-                            if (rows.length === 0) {
-                                // Reload the page to show empty state
-                                setTimeout(() => {
-                                    window.location.reload();
-                                }, 1000);
+                            if (document.querySelectorAll('.orders-table tbody tr').length === 0) {
+                                setTimeout(() => window.location.reload(), 1000);
                             }
                         }, 300);
                     }
-                    
-                    // Update pagination info if needed
                     updateOrderCount();
                 } else {
                     showToast('Error', result.message || 'Failed to delete order', 'error');
@@ -1064,7 +1186,7 @@
             }
         });
 
-        // Update order count display
+        // ========== تحديث عداد الطلبات ==========
         function updateOrderCount() {
             const countElement = document.querySelector('.pagination-info');
             if (countElement) {
@@ -1076,36 +1198,37 @@
             }
         }
 
-        // Show toast notification
-        function showToast(title, message, type = "success") {
+        // ========== عرض Toast ==========
+        function showToast(title, message, type = 'success') {
             const toastIcon = toast.querySelector('.toast-icon i');
             const toastTitle = toast.querySelector('.toast-content h4');
 
             toastTitle.textContent = title;
             toastMessage.textContent = message;
 
-            if (type === "error") {
-                toast.style.borderLeftColor = "#ff4444";
-                toastIcon.style.color = "#ff4444";
-                toastIcon.className = "bi bi-exclamation-circle";
+            if (type === 'error') {
+                toast.style.borderLeftColor = '#ff4444';
+                toastIcon.style.color = '#ff4444';
+                toastIcon.className = 'bi bi-exclamation-circle';
+            } else if (type === 'warning') {
+                toast.style.borderLeftColor = 'var(--warning-yellow)';
+                toastIcon.style.color = 'var(--warning-yellow)';
+                toastIcon.className = 'bi bi-exclamation-triangle';
+            } else if (type === 'info') {
+                toast.style.borderLeftColor = 'var(--info-blue)';
+                toastIcon.style.color = 'var(--info-blue)';
+                toastIcon.className = 'bi bi-info-circle';
             } else {
-                toast.style.borderLeftColor = "var(--primary-pink)";
-                toastIcon.style.color = "var(--primary-pink)";
-                toastIcon.className = "bi bi-check-circle";
+                toast.style.borderLeftColor = 'var(--primary-pink)';
+                toastIcon.style.color = 'var(--primary-pink)';
+                toastIcon.className = 'bi bi-check-circle';
             }
 
             toast.classList.add('toast-show');
             setTimeout(() => toast.classList.remove('toast-show'), 3000);
         }
 
-        // Keyboard shortcuts
-        document.addEventListener('keydown', function (event) {
-            if (event.key === 'Escape' && deleteModal.style.display === 'flex') {
-                closeModal();
-            }
-        });
-
-        // Sort functionality
+        // ========== الفرز (Desktop فقط) ==========
         function sortTable(column) {
             const currentSortBy = '@Context.Request.Query["sortBy"]' || 'id';
             const currentSortDir = '@Context.Request.Query["sortDir"]' || 'desc';
@@ -1116,18 +1239,34 @@
             }
             
             window.location.href = '@Url.Action("GetAllOrders")' + 
-                `?sortBy=${column}&sortDir=${newSortDir}&pageIndex=1&pageSize=${@Model.PageSize}`;
+                `?sortBy=${column}&sortDir=${newSortDir}&pageIndex=1&pageSize=${@Model.PageSize}&search=${encodeURIComponent('@Context.Request.Query["search"]')}`;
         }
 
-        // Add sorting click handlers to table headers
-        document.querySelectorAll('.orders-table th').forEach((th, index) => {
-            th.style.cursor = 'pointer';
-            th.addEventListener('click', function () {
-                const columns = ['id', 'BuyerEmail', 'PhoneNumber', 'orderDate', 'subTotal', 'status'];
-                if (columns[index]) {
-                    sortTable(columns[index]);
-                }
-            });
+        // ========== التهيئة عند تحميل الصفحة ==========
+        document.addEventListener('DOMContentLoaded', async function() {
+            // تحميل حالات الطلب
+            await loadOrderStatuses();
+            
+            // تهيئة القوائم المنسدلة
+            initDropdowns();
+
+            // إضافة خاصية الفرز لعناوين الجدول في وضع الديسكتوب فقط
+            if (window.innerWidth > 992) {
+                document.querySelectorAll('.orders-table th').forEach((th, index) => {
+                    th.style.cursor = 'pointer';
+                    th.addEventListener('click', function() {
+                        const columns = ['id', 'BuyerEmail', 'PhoneNumber', 'orderDate', 'subTotal', 'status'];
+                        if (columns[index]) {
+                            sortTable(columns[index]);
+                        }
+                    });
+                });
+            }
+
+            // التأكد من وجود AntiForgery token
+            if (!document.querySelector('input[name="__RequestVerificationToken"]')) {
+                console.error('AntiForgery token not found!');
+            }
         });
     </script>
 }

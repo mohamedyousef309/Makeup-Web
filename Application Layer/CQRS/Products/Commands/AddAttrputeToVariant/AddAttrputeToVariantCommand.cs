@@ -26,7 +26,7 @@ namespace Application_Layer.CQRS.Products.Commands.AddAttrputeToVariant
         {
             var variantAttributeValue = await genaricRepository.GetByCriteriaQueryable(v => v.ProductVariantId == request.ProductVariantId && v.AttributeValueId == request.AttributeValueId).
                 FirstOrDefaultAsync();
-            if (variantAttributeValue==null)
+            if (variantAttributeValue!=null)
             {
                 return RequestRespones<bool>.Fail(" Varient AllReadyExist", 404);
             }
