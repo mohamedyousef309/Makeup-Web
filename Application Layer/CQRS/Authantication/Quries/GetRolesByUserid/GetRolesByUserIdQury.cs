@@ -49,11 +49,12 @@ namespace Application_Layer.CQRS.Authantication.Quries.GetRolesByUserid
             }
 
             var cacheOptions = new MemoryCacheEntryOptions()
-                    .SetSlidingExpiration(TimeSpan.FromMinutes(60)) 
-                    .SetAbsoluteExpiration(DateTime.UtcNow.AddHours(3))
-                   .SetPriority(CacheItemPriority.High);
+                .SetSlidingExpiration(TimeSpan.FromMinutes(35))
+                .SetAbsoluteExpiration(TimeSpan.FromHours(1)).
+                SetPriority(CacheItemPriority.High);
 
             memoryCache.Set(Cash_Key_User, UserRoles, cacheOptions);
+
             return RequestRespones<IEnumerable<UserRolsDTo>>.Success(UserRoles);
         }
     }

@@ -51,8 +51,8 @@ namespace Application_Layer.CQRS.Authantication.Quries.GetPermissionsByUserid
             }
 
             var cacheOptions = new MemoryCacheEntryOptions()
-                    .SetSlidingExpiration(TimeSpan.FromMinutes(60))
-                    .SetAbsoluteExpiration(DateTime.UtcNow.AddHours(3))
+                    .SetSlidingExpiration(TimeSpan.FromMinutes(45))
+                    .SetAbsoluteExpiration(DateTime.UtcNow.AddHours(1))
                    .SetPriority(CacheItemPriority.High);
 
             memoryCache.Set(Cash_Key_User, UserPermissions, cacheOptions);

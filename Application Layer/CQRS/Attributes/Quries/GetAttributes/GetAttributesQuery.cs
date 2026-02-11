@@ -6,6 +6,7 @@ using Domain_Layer.Interfaces.Repositryinterfaces;
 using Domain_Layer.Respones;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,28 +24,44 @@ namespace Application_Layer.CQRS.Attributes.Quries.GetAttributes
     public class GetAttributesQueryHandler :BaseQueryHandler, IRequestHandler<GetAttributesQuery, RequestRespones<PaginatedListDto<AttributeDto>>>
     {
         private readonly IGenaricRepository<Domain_Layer.Entites.Attribute> genaricRepository;
+        private readonly IMemoryCache memoryCache;
+        private const string AttributesCacheKey = "AllAttributesList"; 
 
-        public GetAttributesQueryHandler(IGenaricRepository<Domain_Layer.Entites.Attribute> genaricRepository)
+        public GetAttributesQueryHandler(IGenaricRepository<Domain_Layer.Entites.Attribute> genaricRepository, IMemoryCache memoryCache)
         {
             this.genaricRepository = genaricRepository;
+            this.memoryCache = memoryCache;
         }
         public async Task<RequestRespones<PaginatedListDto<AttributeDto>>> Handle(GetAttributesQuery request, CancellationToken cancellationToken)
         {
-            var query = genaricRepository.GetAll().Select(a => new AttributeDto 
+            if (!memoryCache.TryGetValue(AttributesCacheKey, out List<AttributeDto> cachedAttributes))
             {
-                id=a.Id,
-                AttributeName=a.Name
-            }).Distinct();
+                cachedAttributes = await genaricRepository.GetAll()
+                    .Select(a => new AttributeDto
+                    {
+                        id = a.Id,
+                        AttributeName = a.Name
+                    })
+                    .Distinct()
+                    .ToListAsync(cancellationToken);
 
-            var totalCount = await query.CountAsync(cancellationToken);
+                var cacheOptions = new MemoryCacheEntryOptions()
+                    .SetSlidingExpiration(TimeSpan.FromMinutes(40)) 
+                    .SetAbsoluteExpiration(TimeSpan.FromHours(1)) 
+                    .SetPriority(CacheItemPriority.Normal);
+
+                memoryCache.Set(AttributesCacheKey, cachedAttributes, cacheOptions);
+            }
+
+            var totalCount = cachedAttributes.Count;
 
             if (totalCount == 0)
-                return RequestRespones<PaginatedListDto<AttributeDto>>
-                    .Fail("There is no attributes yet", 404);
+                return RequestRespones<PaginatedListDto<AttributeDto>>.Fail("There is no attributes yet", 404);
 
-            var pagedQuery = ApplayPagination(query, request.PageNumber, request.PageSize);
-
-            var items = await pagedQuery.ToListAsync(cancellationToken);
+            var items = cachedAttributes
+                .Skip((request.PageNumber - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .ToList();
 
             var result = new PaginatedListDto<AttributeDto>
             {
@@ -54,8 +71,7 @@ namespace Application_Layer.CQRS.Attributes.Quries.GetAttributes
                 TotalCount = totalCount
             };
 
-            return RequestRespones<PaginatedListDto<AttributeDto>>
-                .Success(result, 200);
+            return RequestRespones<PaginatedListDto<AttributeDto>>.Success(result, 200);
 
         }
     }

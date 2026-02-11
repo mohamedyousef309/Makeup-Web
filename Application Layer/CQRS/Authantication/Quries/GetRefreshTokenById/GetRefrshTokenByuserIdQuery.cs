@@ -46,11 +46,19 @@ namespace Application_Layer.CQRS.Authantication.Quries.GetRefreshToken
                 return RequestRespones<RefreshTokens>.Fail("No RefreshToken Found For This User", 404);
             }
 
+            var timeUntilExpiry = RefreshToken.ExpiresOn - DateTime.UtcNow;
+
+            var cacheDuration = timeUntilExpiry < TimeSpan.FromHours(1)
+                                ? timeUntilExpiry
+                                : TimeSpan.FromHours(1);
+
             var cacheOptions = new MemoryCacheEntryOptions()
-                    .SetSlidingExpiration(TimeSpan.FromMinutes(45)) 
-                    .SetAbsoluteExpiration(RefreshToken.ExpiresOn); 
+                .SetSlidingExpiration(TimeSpan.FromMinutes(35)) 
+                .SetAbsoluteExpiration(cacheDuration)          
+                .SetPriority(CacheItemPriority.High);          
 
             memoryCache.Set(userCacheKey, RefreshToken, cacheOptions);
+
             return RequestRespones<RefreshTokens>.Success(RefreshToken);
 
 

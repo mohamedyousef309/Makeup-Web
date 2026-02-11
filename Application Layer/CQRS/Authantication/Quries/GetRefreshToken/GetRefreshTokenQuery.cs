@@ -73,14 +73,21 @@ namespace Application_Layer.CQRS.Authantication.Quries.GetRefreshToken
             }
         }).FirstOrDefaultAsync(cancellationToken);
 
-            if (token == null || !token.IsActive)
+            if (token != null && token.IsActive)
             {
-                return null;
+                var timeUntilExpiry = token.ExpiresOn - DateTime.UtcNow;
+
+                var cacheDuration = timeUntilExpiry < TimeSpan.FromHours(1)
+                                    ? timeUntilExpiry
+                                    : TimeSpan.FromHours(1);
+
+                var cacheOptions = new MemoryCacheEntryOptions()
+                    .SetAbsoluteExpiration(cacheDuration) 
+                    .SetSlidingExpiration(TimeSpan.FromMinutes(35)) 
+                    .SetPriority(CacheItemPriority.High);
+
+                _memoryCache.Set(cacheKey, token, cacheOptions);
             }
-
-            _memoryCache.Set(cacheKey, token,TimeSpan.FromHours(2));
-
-
 
             return token;
 

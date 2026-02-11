@@ -34,8 +34,7 @@ namespace Application_Layer.CQRS.Caegories.Queries.GetCategoriesLookupQuery
         {
             var categories = await _cache.GetOrCreateAsync(CacheKey, async entry =>  // to solve Race condition
             {
-                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1); 
-                entry.SlidingExpiration = TimeSpan.FromMinutes(20);           
+                entry.SlidingExpiration = TimeSpan.FromMinutes(25);           
                 entry.Priority = CacheItemPriority.Normal;
 
                 return await _categoryRepo.GetAll()

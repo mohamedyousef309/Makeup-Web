@@ -4,6 +4,7 @@ using Domain_Layer.Interfaces.Repositryinterfaces;
 using Domain_Layer.Respones;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,25 +18,44 @@ namespace Application_Layer.CQRS.Attributes.Quries.GetAttributeWithValueByid
     public class GetAttributeWithValueByidQueryHandler:IRequestHandler<GetAttributeWithValueByidQuery,RequestRespones<AttributeWithValueDTo>>
     {
         private readonly IGenaricRepository<Domain_Layer.Entites.Attribute> genaricRepository;
+        private readonly IMemoryCache memoryCache;
 
-        public GetAttributeWithValueByidQueryHandler(IGenaricRepository<Domain_Layer.Entites.Attribute> genaricRepository)
+        private const string AttributeCacheKeyPrefix = "AttributeDetail_";
+        public GetAttributeWithValueByidQueryHandler(IGenaricRepository<Domain_Layer.Entites.Attribute> genaricRepository,IMemoryCache memoryCache)
         {
             this.genaricRepository = genaricRepository;
+            this.memoryCache = memoryCache;
         }
         public async Task<RequestRespones<AttributeWithValueDTo>> Handle(GetAttributeWithValueByidQuery request, CancellationToken cancellationToken)
         {
-          var attribute= await genaricRepository.GetByCriteriaQueryable(x => x.Id == request.Attributeid).Select(x => new AttributeWithValueDTo
-          {
-              Attributeid = x.Id,
-              Name=x.Name,
-                Attributes = x.Values.Select(av => new AttributeValueDto
-                {
-                   id = av.Id,
-                    AttributeId = av.Id,
-                    Value = av.Value
-                }).ToList()
+            string cacheKey = $"{AttributeCacheKeyPrefix}{request.Attributeid}";
 
-          }).FirstOrDefaultAsync();
+            if (!memoryCache.TryGetValue(cacheKey, out AttributeWithValueDTo? attribute))
+            {
+                // 2. لو مش موجود في الكاش، هاته من الداتابيز
+                attribute = await genaricRepository.GetByCriteriaQueryable(x => x.Id == request.Attributeid)
+                    .Select(x => new AttributeWithValueDTo
+                    {
+                        Attributeid = x.Id,
+                        Name = x.Name,
+                        Attributes = x.Values.Select(av => new AttributeValueDto
+                        {
+                            id = av.Id,
+                            AttributeId = av.AttributeId, 
+                            Value = av.Value
+                        }).ToList()
+                    }).FirstOrDefaultAsync(cancellationToken);
+
+                if (attribute != null)
+                {
+                    var cacheOptions = new MemoryCacheEntryOptions()
+                        .SetSlidingExpiration(TimeSpan.FromMinutes(30)) 
+                        .SetAbsoluteExpiration(TimeSpan.FromMinutes(45))   
+                        .SetPriority(CacheItemPriority.Low); 
+
+                    memoryCache.Set(cacheKey, attribute, cacheOptions);
+                }
+            }
 
             if (attribute == null)
             {

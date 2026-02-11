@@ -4,6 +4,7 @@ using Application_Layer.CQRS.Authantication.Commads.Login;
 using Application_Layer.CQRS.Authantication.Commads.Register;
 using Autofac.Core;
 using Domain_Layer.Behaviors;
+using Domain_Layer.Entites.Authantication;
 using Domain_Layer.ViewModels.AuthanticationViewModles.Register;
 using FluentValidation;
 using Infastructure_Layer.Data;
@@ -14,12 +15,14 @@ using Makeup_Web.Middlewares;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using StackExchange.Redis;
 using System.Reflection;
 using System.Text;
+using System.Threading.RateLimiting;
 using System.Threading.Tasks;
 namespace Makeup_Web
 {
@@ -75,6 +78,41 @@ namespace Makeup_Web
            }
             );
 
+            builder.Services.AddRateLimiter(option =>  
+            {
+                option.AddPolicy("WritePolicy", httpContext =>
+                {
+                    var userid= httpContext.User.Claims.FirstOrDefault(c => c.Type == "id")?.Value
+                    ??httpContext.Connection.RemoteIpAddress?.ToString()
+                    ?? "anonymous";
+
+                    return RateLimitPartition.GetTokenBucketLimiter(userid, _ => new TokenBucketRateLimiterOptions
+                    {
+                        TokenLimit = 40,
+                        TokensPerPeriod = 20,
+                        ReplenishmentPeriod = TimeSpan.FromMinutes(1),
+                        AutoReplenishment = true,
+                        QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                        QueueLimit = 0
+                    });
+                });
+
+                option.AddPolicy("ReadPolicy", httpContext => 
+                {
+                    var userid = httpContext.User.Claims.FirstOrDefault(c => c.Type == "id")?.Value
+                    ?? httpContext.Connection.RemoteIpAddress?.ToString()
+                    ?? "anonymous";
+
+                    return RateLimitPartition.GetTokenBucketLimiter(userid  , _ => new TokenBucketRateLimiterOptions
+                    {
+                        TokenLimit = 100,            
+                        TokensPerPeriod = 50,
+                        ReplenishmentPeriod = TimeSpan.FromMinutes(1),
+                        QueueLimit = 0
+                    });
+                });
+
+            });
 
 
             builder.Services.AddTransient<GlobalExceptionHandler>();
