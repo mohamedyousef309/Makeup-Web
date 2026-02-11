@@ -15,9 +15,9 @@ using Domain_Layer.DTOs.Attribute;
 using Domain_Layer.DTOs.ProductDtos;
 using Domain_Layer.DTOs.ProductVariantDtos;
 using Domain_Layer.Respones;
-using Domain_Layer.ViewModels.ProductsViewModels;
-using Domain_Layer.ViewModels.ProductsViewModels.ListItemViewModel;
-using Domain_Layer.ViewModels.ProductsViewModels.UpdateProductsViewModel;
+using Domain_Layer.ViewModels.ProductsViewModels.Product;
+using Domain_Layer.ViewModels.ProductsViewModels.Product.ProductsListItemViewModel;
+using Domain_Layer.ViewModels.ProductsViewModels.Product.UpdateProductsViewModel;
 using Infastructure_Layer.DynamicRBASystem;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -150,12 +150,7 @@ namespace Makeup_Web.Controllers
             if (!result.IsSuccess) return NotFound();
 
             var productDto = result.Data;
-            var viewModel = new UpdateProductViewModel
-            {
-                Id = productDto.Id,
-                Name = productDto.Name,
-                Description = productDto.Description,
-            };
+         
 
             var categoriesResult = await _mediator.Send(new GetCategoryLookupQuery());
             if (categoriesResult.IsSuccess)
@@ -167,7 +162,7 @@ namespace Makeup_Web.Controllers
                 ViewBag.Categories = new List<CategoryLookupDto>();
             }
 
-            return View(viewModel);
+            return View(result.Data);
         }
 
         [HttpPost]
@@ -187,7 +182,7 @@ namespace Makeup_Web.Controllers
                 Id = modle.Id,
                 Name = modle.Name,
                 Description = modle.Description,
-                ImageFile = modle.Image,
+                ImageFile = modle.ImageUrl,
                 CategoryId = modle.CategoryId,
                 IsActive = modle.IsActive,
             };

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain_Layer.ViewModels.ProductsViewModels.ListItemViewModel
+namespace Domain_Layer.ViewModels.ProductsViewModels.Product.ProductsListItemViewModel
 {
     public class ProductListItemViewModel
     {

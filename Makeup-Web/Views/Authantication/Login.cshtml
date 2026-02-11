@@ -125,6 +125,33 @@
             margin-bottom: 8px;
         }
 
+        .input-validation-error {
+            border-color: #dc3545 !important;
+        }
+
+        .field-validation-error {
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 5px;
+            display: block;
+        }
+
+        .validation-summary-errors {
+            background: rgba(220, 53, 69, 0.1);
+            border: 1px solid rgba(220, 53, 69, 0.3);
+            color: #dc3545;
+            margin: 0 2rem 1rem;
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+        }
+
+            .validation-summary-errors ul {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+
         /* تنسيق رابط نسيت كلمة المرور */
         .forgot-password-wrapper {
             text-align: right;
@@ -213,6 +240,10 @@
             </div>
         </div>
 
+        <!-- عرض رسائل التحقق العامة -->
+        <div asp-validation-summary="All" class="validation-summary-errors"></div>
+
+        <!-- عرض رسائل الخطأ العامة من السيرفر -->
         @if (!string.IsNullOrEmpty(Model.ErrorMessage))
         {
             <div class="error-message">
@@ -220,7 +251,7 @@
             </div>
         }
 
-        <form asp-action="Login" asp-controller="Authantication" method="post" class="login-form px-4 needs-validation" novalidate>
+        <form asp-action="Login" asp-controller="Authantication" method="post" class="login-form px-4">
             <div class="mb-3">
                 <label class="form-label">Email Address</label>
                 <input asp-for="Email"
@@ -228,7 +259,7 @@
                        class="form-control form-control-custom"
                        placeholder="Enter your email"
                        required>
-                <span asp-validation-for="Email" class="text-danger small"></span>
+                <span asp-validation-for="Email" class="field-validation-error"></span>
             </div>
 
             <div class="mb-2">
@@ -243,7 +274,7 @@
                         Forgot password?
                     </a>
                 </div>
-                <span asp-validation-for="Password" class="text-danger small"></span>
+                <span asp-validation-for="Password" class="field-validation-error"></span>
             </div>
 
             <button type="submit" class="login-btn">Log In</button>
@@ -255,18 +286,48 @@
         </div>
     </div>
 
+    <!-- إضافة مكتبات jQuery Validation -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
+
+    <!-- تعديل CSS عند وجود أخطاء -->
     <script>
         $(document).ready(function () {
-            var forms = document.querySelectorAll('.needs-validation');
-            Array.prototype.slice.call(forms).forEach(function (form) {
-                form.addEventListener('submit', function (event) {
-                    if (!form.checkValidity()) {
-                        event.preventDefault();
-                        event.stopPropagation();
-                    }
-                    form.classList.add('was-validated');
-                }, false);
+            // إضافة CSS class للحقول التي بها أخطاء
+            $('.field-validation-error').each(function () {
+                var inputName = $(this).attr('data-valmsg-for');
+                if (inputName) {
+                    $('input[name="' + inputName + '"]').addClass('input-validation-error');
+                }
+            });
+
+            // منع الإرسال إذا كان هناك أخطاء
+            $('form').submit(function (e) {
+                var validator = $(this).validate();
+                if (!validator.form()) {
+                    e.preventDefault();
+
+                    // تحديث تنسيق الحقول عند وجود أخطاء
+                    $('input').each(function () {
+                        var inputName = $(this).attr('name');
+                        var errorSpan = $('[data-valmsg-for="' + inputName + '"]');
+                        if (errorSpan.text() !== '') {
+                            $(this).addClass('input-validation-error');
+                        } else {
+                            $(this).removeClass('input-validation-error');
+                        }
+                    });
+                }
+            });
+
+            // تحديث تنسيق الحقول عند الكتابة
+            $('input').on('input', function () {
+                var inputName = $(this).attr('name');
+                var errorSpan = $('[data-valmsg-for="' + inputName + '"]');
+                if (errorSpan.text() === '') {
+                    $(this).removeClass('input-validation-error');
+                }
             });
         });
     </script>

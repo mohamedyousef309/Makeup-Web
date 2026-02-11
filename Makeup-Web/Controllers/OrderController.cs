@@ -54,6 +54,12 @@ namespace Makeup_Web.Controllers
             }
 
             var CreatOrderResult = await _Mediator.Send(new CreatOrderOrchestrator(modle.BuyerEmail, userId, modle.PhoneNumber, modle.Address));
+            if (!CreatOrderResult.IsSuccess)
+            {
+                TempData["ErrorMessage"] = CreatOrderResult.Message;
+                return RedirectToAction("GetUserBasketByUserid", "basket");
+
+            }
             TempData["SuccessMessage"] = "Order created successfully!";
             return RedirectToAction(nameof(GetUserOrders));
         }

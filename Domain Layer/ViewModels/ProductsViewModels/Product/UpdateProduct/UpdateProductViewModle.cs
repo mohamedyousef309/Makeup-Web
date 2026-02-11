@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain_Layer.ViewModels.ProductsViewModels.UpdateProduct
+namespace Domain_Layer.ViewModels.ProductsViewModels.Product.UpdateProduct
 {
     public class UpdateProductViewModle
     {

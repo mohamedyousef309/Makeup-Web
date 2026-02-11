@@ -8,6 +8,7 @@ namespace Domain_Layer.DTOs.Attribute
 {
     public class AttributeGroupDto
     {
+        public int AttributeId { get; set; }
         public string Name { get; set; } = default!;
         public IEnumerable<AttributeValueSelectionDto> Values { get; set; } = new HashSet<AttributeValueSelectionDto>();
     }

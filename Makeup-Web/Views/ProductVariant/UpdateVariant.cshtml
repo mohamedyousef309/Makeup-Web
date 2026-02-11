@@ -1,319 +1,190 @@
-﻿@using Domain_Layer.ViewModels.ProductsViewModels.UpdateProductsVariantViewModel
-@model UpdateProductVariantViewModel
+﻿@using Domain_Layer.DTOs.ProductVariantDtos
+@using Domain_Layer.DTOs.Attribute
+@model dynamic
 
 @{
-    ViewData["Title"] = "Edit Variant | Pro Makeup Studio";
+    ViewData["Title"] = "تعديل الـ Variant";
 }
 
-@section Styles {
-    <style>
-        :root {
-            --primary-pink: #d68a8a;
-            --primary-hover: #c27676;
-            --dark-bg: #0f0f0f;
-            --card-bg: #1a1a1a;
-            --input-bg: #252525;
-            --text-light: #ffffff;
-            --text-muted: #a0a0a0;
-            --accent-gold: #c5a059;
-            --danger-red: #ff4d4d;
-            --success-green: #28a745;
-        }
+@* سطر مهم لضمان عمل الـ AJAX مع الـ Post *@
+@Html.AntiForgeryToken()
 
-        body {
-            background-color: var(--dark-bg);
-            color: var(--text-light);
-            font-family: 'Inter', sans-serif;
-        }
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-7">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">تعديل بيانات الـ Variant الأساسية</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="UpdateVariant" method="post" enctype="multipart/form-data">
+                        <input type="hidden" name="Id" value="@Model.Id" id="variantId" />
+                        <input type="hidden" name="ProductId" value="@Model.Productid" />
 
-        /* Header Section */
-        .page-header {
-            padding: 40px 0 20px;
-            text-align: center;
-            background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
-            border-bottom: 1px solid #252525;
-            margin-bottom: 30px;
-        }
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">اسم الـ Variant</label>
+                            <input type="text" name="VariantName" class="form-control" value="@Model.VariantName" required />
+                        </div>
 
-        .page-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 2.5rem;
-            font-weight: 700;
-            line-height: 1.2;
-            margin-bottom: 10px;
-            background: linear-gradient(45deg, #fff 30%, var(--primary-pink) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label class="form-label fw-bold">السعر</label>
+                                <input type="number" step="0.01" name="Price" class="form-control" value="@Model.Price" required />
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label fw-bold">المخزون</label>
+                                <input type="number" name="Stock" class="form-control" value="@Model.Stock" required />
+                            </div>
+                        </div>
 
-        .page-subtitle {
-            color: var(--text-muted);
-            font-size: 1rem;
-            max-width: 600px;
-            margin: 0 auto;
-        }
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">الصورة الحالية</label>
+                            <div class="mb-2">
+                                <img src="@Model.ImageUrl" id="imagePreview" class="rounded border" style="width: 120px; height: 120px; object-fit: cover;" />
+                            </div>
+                            <label class="form-label">تغيير الصورة (اختياري)</label>
+                            <input type="file" name="ImageFile" class="form-control" onchange="previewFile(event)" />
+                        </div>
 
-        /* Form Container */
-        .form-container {
-            max-width: 600px;
-            margin: 0 auto 60px;
-            background: var(--card-bg);
-            border-radius: 16px;
-            border: 1px solid #252525;
-            overflow: hidden;
-        }
-
-        .form-header {
-            background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
-            padding: 30px;
-            text-align: center;
-            border-bottom: 1px solid #333;
-        }
-
-        .form-icon {
-            color: var(--primary-pink);
-            font-size: 2.5rem;
-            margin-bottom: 15px;
-        }
-
-        .form-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-
-        /* Form Body */
-        .form-body {
-            padding: 30px;
-        }
-
-        /* Validation */
-        .validation-summary {
-            background: rgba(255, 77, 77, 0.1);
-            border: 1px solid var(--danger-red);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 25px;
-            color: #ff9e9e;
-        }
-
-            .validation-summary ul {
-                margin: 0;
-                padding-left: 20px;
-            }
-
-            .validation-summary li {
-                font-size: 0.9rem;
-            }
-
-        /* Form Groups */
-        .form-group-custom {
-            margin-bottom: 25px;
-        }
-
-        .form-label-custom {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--text-light);
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .form-control-custom {
-            width: 100%;
-            background: var(--input-bg);
-            border: 1px solid #333;
-            border-radius: 12px;
-            color: var(--text-light);
-            padding: 12px 15px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-            .form-control-custom:focus {
-                border-color: var(--primary-pink);
-                outline: none;
-                box-shadow: 0 0 0 3px rgba(214, 138, 138, 0.2);
-            }
-
-            .form-control-custom.input-validation-error {
-                border-color: var(--danger-red);
-            }
-
-        .field-validation-error {
-            display: block;
-            color: var(--danger-red);
-            font-size: 0.85rem;
-            margin-top: 5px;
-        }
-
-        /* Price Input */
-        .price-input-container {
-            position: relative;
-        }
-
-        .price-symbol {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-            font-weight: 600;
-        }
-
-        .price-input {
-            padding-left: 40px !important;
-        }
-
-        /* Form Actions */
-        .form-actions {
-            display: flex;
-            gap: 15px;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #333;
-        }
-
-        .btn-update {
-            flex: 1;
-            background: linear-gradient(45deg, var(--primary-pink), var(--accent-gold));
-            color: white;
-            border: none;
-            border-radius: 12px;
-            padding: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            text-decoration: none;
-        }
-
-            .btn-update:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 10px 20px rgba(214, 138, 138, 0.3);
-            }
-
-        .btn-cancel {
-            flex: 1;
-            background: transparent;
-            color: var(--text-light);
-            border: 1px solid #444;
-            border-radius: 12px;
-            padding: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-            .btn-cancel:hover {
-                background: #333;
-                border-color: #555;
-                color: white;
-            }
-
-        /* Info Area */
-        .info-section {
-            background: rgba(214, 138, 138, 0.1);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 25px;
-            border: 1px solid rgba(214, 138, 138, 0.3);
-            font-size: 0.85rem;
-        }
-
-        @@media (max-width: 768px) {
-            .form-actions {
-                flex-direction: column;
-            }
-        }
-    </style>
-}
-
-<div class="container">
-    @if (TempData["ErrorMessage"] != null)
-    {
-        <div class="alert alert-danger mt-4" style="border-radius: 12px; background: rgba(255, 77, 77, 0.1); color: #ff9e9e; border: 1px solid var(--danger-red); padding: 15px;">
-            <i class="bi bi-exclamation-triangle me-2"></i> @TempData["ErrorMessage"]
-        </div>
-    }
-
-    <div class="page-header">
-        <h1 class="page-title">Edit Product Variant</h1>
-        <p class="page-subtitle">Update the pricing and identification of your variant</p>
-    </div>
-
-    <div class="form-container">
-        <div class="form-header">
-            <div class="form-icon">
-                <i class="bi bi-pencil-square"></i>
-            </div>
-            <h2 class="form-title">Variant Settings</h2>
-        </div>
-
-        <div class="form-body">
-            <div class="info-section">
-                <div class="d-flex justify-content-between">
-                    <span><strong class="text-pink">Variant ID:</strong> @Model.Id</span>
-                    <span><strong class="text-pink">Product ID:</strong> @Model.ProductId</span>
+                        <hr />
+                        <button type="submit" class="btn btn-success w-100 fw-bold shadow-sm">حفظ التغييرات</button>
+                    </form>
                 </div>
             </div>
+        </div>
 
-            <form asp-action="UpdateVariant" method="post">
-                @Html.AntiForgeryToken()
-                <input type="hidden" asp-for="Id" />
-                <input type="hidden" asp-for="ProductId" />
-
-                <div class="form-group-custom">
-                    <label class="form-label-custom" asp-for="VariantName">Variant Name</label>
-                    <input asp-for="VariantName" class="form-control-custom" placeholder="e.g., Color, Size" />
-                    <span asp-validation-for="VariantName" class="field-validation-error"></span>
+        <div class="col-md-5">
+            <div class="card shadow-sm border-0 border-start border-4 border-warning">
+                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">السمات (Attributes)</h5>
+                    <button class="btn btn-sm btn-warning fw-bold" onclick="openAddAttributeModal()">+ Attribute</button>
                 </div>
+                <div class="card-body">
+                    @if (Model.attributeValues != null)
+                    {
+                        foreach (var attr in Model.attributeValues)
+                        {
+                            <div class="mb-4 p-3 bg-light rounded shadow-sm border">
+                                <div class="d-flex justify-content-between align-items-center mb-2 border-bottom pb-1">
+                                    <span class="fw-bold text-primary text-uppercase small">@attr.Name</span>
+                                    <button class="btn btn-link btn-sm text-success p-0 text-decoration-none"
+                                            onclick="addValueToAttr(@attr.AttributeId, '@attr.Name')">
+                                        + Add Value
+                                    </button>
+                                </div>
 
-                <div class="form-group-custom">
-                    <label class="form-label-custom" asp-for="VariantValue">Variant Value</label>
-                    <input asp-for="VariantValue" class="form-control-custom" placeholder="e.g., Matte Crimson" />
-                    <span asp-validation-for="VariantValue" class="field-validation-error"></span>
+                                <div class="d-flex flex-wrap gap-2 mt-2">
+                                    @foreach (var val in attr.Values)
+                                    {
+                                        <div class="badge bg-white text-dark border p-2 d-flex align-items-center shadow-xs">
+                                            <span class="me-2">@val.Value</span>
+                                            <a href="javascript:void(0)" class="text-danger"
+                                               onclick="deleteValue(@Model.Id, @val.Id)" title="حذف">
+                                                <i class="bi bi-x-circle-fill">X</i>
+                                            </a>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    }
                 </div>
-
-                <div class="form-group-custom">
-                    <label class="form-label-custom" asp-for="Price">Price (EGP)</label>
-                    <div class="price-input-container">
-                        <span class="price-symbol">£</span>
-                        <input asp-for="Price" type="number" step="0.01" class="form-control-custom price-input" />
-                    </div>
-                    <span asp-validation-for="Price" class="field-validation-error"></span>
-                </div>
-
-                <div class="form-actions">
-                    <button type="submit" class="btn-update">
-                        <i class="bi bi-check-circle"></i> Save Changes
-                    </button>
-
-                    @* العودة لصفحة تفاصيل المنتج باستخدام الـ id الصحيح *@
-                    <a asp-controller="Products"
-                       asp-action="Details"
-                       asp-route-id="@Model.ProductId"
-                       class="btn-cancel">
-                        <i class="bi bi-x-circle"></i> Cancel
-                    </a>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
 </div>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // 1. معاينة الصورة
+        function previewFile(event) {
+            var reader = new FileReader();
+            reader.onload = function () {
+                var output = document.getElementById('imagePreview');
+                output.src = reader.result;
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        }
+
+        // 2. دالة إرسال الـ AJAX الموحدة
+        async function sendAttributeRequest(url, data) {
+            // سحب التوكن من الصفحة
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': token // مهم جداً للأمان في ASP.NET MVC
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert(result.message || "تمت العملية بنجاح");
+                    location.reload();
+                } else {
+                    alert("فشل العملية: " + result.message);
+                }
+            } catch (error) {
+                console.error("Fetch Error:", error);
+                alert("حدث خطأ في الشبكة أو السيرفر غير متاح");
+            }
+        }
+
+        // 3. دالة حذف قيمة (Remove)
+        function deleteValue(variantId, valueId) {
+            if (confirm("هل أنت متأكد من حذف هذه السمة من هذا الـ Variant؟")) {
+                const url = '@Url.Action("RemoveAttributeValueIdFromVariant", "ProductVariant")';
+
+                const data = {
+                    ProductVariantId: parseInt(variantId),
+                    AttributeValueId: parseInt(valueId)
+                };
+
+                sendAttributeRequest(url, data);
+            }
+        }
+
+        // 4. دالة إضافة قيمة (Add)
+        function addValueToAttr(attrId, attrName) {
+            let valueId = prompt(`أدخل الـ ID الخاص بالقيمة لسمة ${attrName}:`);
+
+            if (valueId && !isNaN(valueId)) {
+                const url = '@Url.Action("AddAttributeValueIdToVariant", "ProductVariant")';
+
+                const data = {
+                    ProductVariantId: parseInt(document.getElementById('variantId').value),
+                    AttributeValueId: parseInt(valueId)
+                };
+
+                sendAttributeRequest(url, data);
+            } else if (valueId) {
+                alert("يرجى إدخال رقم ID صحيح");
+            }
+        }
+
+        function openAddAttributeModal() {
+            alert("هنا يمكنك ربط Modal لاختيار Attribute جديد");
+        }
+    </script>
+
+    <style>
+        .badge i:hover {
+            color: #dc3545 !important;
+            cursor: pointer;
+        }
+
+        .shadow-xs {
+            box-shadow: 0 .125rem .25rem rgba(0,0,0,.075);
+        }
+
+        .badge {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+    </style>
 }

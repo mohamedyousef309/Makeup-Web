@@ -86,7 +86,7 @@ namespace Makeup_Web.Controllers
         {
             if (!TryGetUserId(out var userId))
             {
-                return RedirectToAction("Login", "Authantication");
+                return RedirectToAction("Login", "z");
             }
             if (!ModelState.IsValid)
             {

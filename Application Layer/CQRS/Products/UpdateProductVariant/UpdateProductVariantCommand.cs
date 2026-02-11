@@ -2,6 +2,7 @@
 using Domain_Layer.Entites;
 using Domain_Layer.Interfaces.Abstraction;
 using Domain_Layer.Interfaces.Repositryinterfaces;
+using Domain_Layer.Interfaces.ServiceInterfaces;
 using Domain_Layer.Respones;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -24,15 +25,12 @@ namespace Application_Layer.CQRS.Products.Commands.UpdateVariants
     : IRequestHandler<UpdateProductVariantCommand, RequestRespones<bool>>
     {
         private readonly IGenaricRepository<ProductVariant> _variantRepo;
-        
-        
+        private readonly IAttachmentService attachmentService;
 
-        public UpdateProductVariantCommandHandler(
-            IGenaricRepository<ProductVariant> variantRepo)
-          
+        public UpdateProductVariantCommandHandler(IGenaricRepository<ProductVariant> variantRepo, IAttachmentService attachmentService)   
         {
             _variantRepo = variantRepo;
-           
+            this.attachmentService = attachmentService;
         }
 
         public async Task<RequestRespones<bool>> Handle(
@@ -46,11 +44,41 @@ namespace Application_Layer.CQRS.Products.Commands.UpdateVariants
             if (variant == null)
                 return RequestRespones<bool>.Fail("There is no Variant with this id", 404);
 
-           
+            string? imageUrl = null;
+
+
+            if (request.ImageUrl!=null)
+            {
+                var originalFileName = Path.GetFileName(request.ImageUrl.FileName);
+
+                var existingPath = await _variantRepo.GetAll()
+                    .Where(p => p.ImageUrl != null && p.ImageUrl.EndsWith("_" + originalFileName))
+                    .Select(p => p.ImageUrl)
+                    .FirstOrDefaultAsync(cancellationToken);
+
+                if (existingPath != null)
+                {
+                    var fullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", existingPath.TrimStart('/'));
+                    if (File.Exists(fullPath))
+                    {
+                        imageUrl = existingPath;
+                    }
+                    
+                }
+
+                if (imageUrl == null)
+                {
+                    imageUrl = attachmentService.UploadImage(request.ImageUrl, "Images/VariantImges");
+                }
+
+
+            }
+
             variant.Price = request.Price;
             variant.VariantName = request.VariantName;
             variant.Stock = request.Stock;
-            _variantRepo.SaveInclude(variant,nameof(variant.Price),nameof(variant.VariantName),nameof(variant.Stock));
+            variant.ImageUrl = imageUrl;
+            _variantRepo.SaveInclude(variant,nameof(variant.Price),nameof(variant.VariantName),nameof(variant.Stock),nameof(variant.ImageUrl));
 
 
 

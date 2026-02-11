@@ -1,4 +1,5 @@
 ﻿using Domain_Layer.DTOs.ProductDtos;
+using Domain_Layer.DTOs.ProductVariantDtos;
 using Domain_Layer.Entites;
 using Domain_Layer.Interfaces.Repositryinterfaces;
 using Domain_Layer.Respones;
@@ -31,6 +32,16 @@ namespace Application_Layer.CQRS.Products.Queries.GetProductByid
                     Name = p.Name,
                     Description = p.Description,
                     CategoryId = p.CategoryId,
+                    ImageUrl = p.ImageUrl,
+                    VariantsDto = p.Variants.Select(v=> new VariantDbDto
+                    {
+                        id=v.Id,
+                        Stock=v.Stock,
+                        price=v.Price,
+                        ImageUrl =v.ImageUrl,
+                        VariantName=v.VariantName,
+
+                    }).ToList()
                 }).FirstOrDefaultAsync(cancellationToken);
 
             if (product==null)

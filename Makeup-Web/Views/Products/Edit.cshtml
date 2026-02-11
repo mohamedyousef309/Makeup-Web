@@ -1,19 +1,29 @@
-﻿@using Domain_Layer.ViewModels.ProductsViewModels.UpdateProductsViewModel
-@model UpdateProductViewModel
+﻿@using Domain_Layer.DTOs.ProductDtos
+@model ProductDto
 
 @{
-    ViewData["Title"] = "Edit Product - Pro Makeup Studio";
+    ViewData["Title"] = "Edit Product";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 
-    // هذه القائمة ستأتي من ViewBag
-    var categories = ViewBag.Categories as IEnumerable<Domain_Layer.DTOs._ِCategoryDtos.CategoryLookupDto> ??
-                     new List<Domain_Layer.DTOs._ِCategoryDtos.CategoryLookupDto>();
-
-    // جلب الـ Variants من ViewBag
-    var variants = ViewBag.Variants as IEnumerable<dynamic> ?? new List<dynamic>();
-    var totalStock = variants.Sum(v => v?.Stock ?? 0);
+    // تحويل CategoryLookupDto إلى SelectListItem
+    var categoriesList = new List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
+    if (ViewBag.Categories != null)
+    {
+        var categories = ViewBag.Categories as List<Domain_Layer.DTOs._ِCategoryDtos.CategoryLookupDto>;
+        if (categories != null)
+        {
+            foreach (var category in categories)
+            {
+                categoriesList.Add(new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem
+                {
+                    Text = category.Name,
+                    Value = category.Id.ToString(),
+                    Selected = category.Id == Model.CategoryId
+                });
+            }
+        }
+    }
 }
-
-@Html.AntiForgeryToken()
 
 @section Styles {
     <style>
@@ -29,7 +39,7 @@
             --danger-red: #ff4d4d;
             --success-green: #28a745;
             --warning-yellow: #ffc107;
-            --variant-blue: #6a8fd8;
+            --info-blue: #6a8fd8;
         }
 
         body {
@@ -38,792 +48,1062 @@
             font-family: 'Inter', sans-serif;
         }
 
-        .edit-header {
+        /* Page Header */
+        .page-header {
             padding: 60px 0 30px;
-            text-align: center;
-            background: linear-gradient(to bottom, #1a1a1a 0%, #0f0f0f 100%);
-            margin-bottom: 30px;
-            border-bottom: 1px solid #222;
+            background: linear-gradient(135deg, rgba(214, 138, 138, 0.1), rgba(197, 160, 89, 0.05));
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
         }
 
-        .edit-title {
+            .page-header::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 1px;
+                background: linear-gradient(90deg, transparent, var(--primary-pink), transparent);
+            }
+
+        .page-title {
             font-family: 'Playfair Display', serif;
-            font-size: 2.5rem;
-            font-weight: 800;
-            text-transform: uppercase;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
             background: linear-gradient(45deg, #fff 30%, var(--primary-pink) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            letter-spacing: 2px;
         }
 
-        .edit-card {
-            background: var(--card-bg);
-            border-radius: 20px;
-            padding: 40px;
-            border: 1px solid #252525;
-            max-width: 1000px;
+        .page-subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        /* Form Container */
+        .form-container {
+            max-width: 1200px;
             margin: 0 auto;
+            padding: 0 20px;
         }
 
-        .form-label {
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        @@media (max-width: 992px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+        }
+
+        /* Form Cards */
+        .form-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 30px;
+            border: 1px solid #252525;
+            transition: all 0.3s ease;
+        }
+
+            .form-card:hover {
+                border-color: var(--primary-pink);
+                box-shadow: 0 10px 30px rgba(214, 138, 138, 0.1);
+            }
+
+        .card-title {
+            font-size: 1.5rem;
             font-weight: 600;
-            margin-bottom: 8px;
-            display: block;
             color: var(--text-light);
-        }
-
-        .form-control, .form-select {
-            background-color: var(--input-bg);
-            border: 1px solid #333;
-            border-radius: 12px;
-            color: var(--text-light);
-            padding: 12px 16px;
-            transition: all 0.3s ease;
-        }
-
-            .form-control:focus, .form-select:focus {
-                border-color: var(--primary-pink);
-                box-shadow: 0 0 0 3px rgba(214, 138, 138, 0.1);
-                background-color: var(--input-bg);
-                color: var(--text-light);
-            }
-
-            .form-control::placeholder {
-                color: var(--text-muted);
-            }
-
-        .form-select {
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23d68a8a' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right 12px center;
-            background-size: 16px 12px;
-            padding-right: 40px;
-        }
-
-        .form-text {
-            color: var(--text-muted);
-            font-size: 0.875rem;
-            margin-top: 4px;
-        }
-
-        .text-danger {
-            color: var(--danger-red) !important;
-        }
-
-        .btn-submit {
-            background: var(--primary-pink);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            padding: 14px 40px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
-            width: 100%;
-            margin-top: 20px;
-        }
-
-            .btn-submit:hover {
-                background: var(--primary-hover);
-                transform: translateY(-2px);
-                box-shadow: 0 10px 25px rgba(214, 138, 138, 0.3);
-            }
-
-        .btn-cancel {
-            background: transparent;
-            color: var(--text-light);
-            border: 1px solid #444;
-            border-radius: 12px;
-            padding: 14px 40px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
-            width: 100%;
-            margin-top: 10px;
-            text-align: center;
-            text-decoration: none;
-            display: block;
-        }
-
-            .btn-cancel:hover {
-                background: #333;
-                border-color: #555;
-                color: var(--text-light);
-            }
-
-        .image-preview-container {
-            margin-top: 20px;
-            text-align: center;
-        }
-
-        .image-preview {
-            max-width: 200px;
-            max-height: 200px;
-            border-radius: 12px;
-            border: 1px solid #333;
-            margin-bottom: 15px;
-        }
-
-        .image-upload-label {
-            display: inline-block;
-            padding: 12px 24px;
-            background: var(--input-bg);
-            border: 1px dashed #444;
-            border-radius: 12px;
-            color: var(--text-muted);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-            .image-upload-label:hover {
-                border-color: var(--primary-pink);
-                color: var(--primary-pink);
-            }
-
-        .checkbox-container {
+            margin-bottom: 25px;
             display: flex;
             align-items: center;
             gap: 10px;
-            margin: 15px 0;
+        }
+
+            .card-title i {
+                color: var(--primary-pink);
+            }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            color: var(--text-light);
+            font-weight: 500;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .form-control-custom {
+            background: var(--input-bg);
+            border: 1px solid #333;
+            color: var(--text-light);
+            border-radius: 8px;
+            padding: 12px 15px;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+            .form-control-custom:focus {
+                outline: none;
+                border-color: var(--primary-pink);
+                box-shadow: 0 0 0 3px rgba(214, 138, 138, 0.1);
+            }
+
+        .form-check {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .form-check-input {
-            width: 22px;
-            height: 22px;
-            border: 2px solid #444;
-            border-radius: 6px;
-            background-color: var(--input-bg);
+            width: 20px;
+            height: 20px;
             cursor: pointer;
         }
-
-            .form-check-input:checked {
-                background-color: var(--primary-pink);
-                border-color: var(--primary-pink);
-            }
 
         .form-check-label {
             color: var(--text-light);
             cursor: pointer;
         }
 
-        .select-container {
-            position: relative;
+        /* Image Preview */
+        .image-preview-container {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #252525;
         }
 
-        .select-clear-btn {
-            position: absolute;
-            right: 40px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: transparent;
+        .current-image {
+            width: 100%;
+            height: 300px;
+            object-fit: contain;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .image-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-align: center;
+            display: block;
+        }
+
+        /* Variants Table */
+        .variants-table-container {
+            margin-top: 30px;
+        }
+
+        .variants-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+            .variants-table th {
+                background: rgba(255, 255, 255, 0.03);
+                color: var(--text-muted);
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                font-size: 0.85rem;
+                padding: 15px;
+                border-bottom: 1px solid #252525;
+                text-align: left;
+            }
+
+            .variants-table td {
+                padding: 15px;
+                color: var(--text-light);
+                border-bottom: 1px solid #252525;
+            }
+
+            .variants-table tbody tr {
+                transition: all 0.3s ease;
+            }
+
+                .variants-table tbody tr:hover {
+                    background: rgba(214, 138, 138, 0.05);
+                }
+
+        .variant-image {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+
+        /* Badges */
+        .badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+            .badge:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            }
+
+        .badge-success {
+            background: rgba(40, 167, 69, 0.2);
+            color: #6fcf97;
+            border: 1px solid rgba(40, 167, 69, 0.3);
+        }
+
+        .badge-warning {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffe066;
+            border: 1px solid rgba(255, 193, 7, 0.3);
+        }
+
+        .badge-danger {
+            background: rgba(255, 77, 77, 0.2);
+            color: #ff8a8a;
+            border: 1px solid rgba(255, 77, 77, 0.3);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-edit {
+            background: rgba(106, 143, 216, 0.1);
+            border: 1px solid var(--info-blue);
+            color: var(--info-blue);
+            border-radius: 6px;
+            padding: 8px 15px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+        }
+
+            .btn-edit:hover {
+                background: var(--info-blue);
+                color: white;
+                text-decoration: none;
+            }
+
+        .btn-delete {
+            background: rgba(255, 77, 77, 0.1);
+            border: 1px solid var(--danger-red);
+            color: var(--danger-red);
+            border-radius: 6px;
+            padding: 8px 15px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+            .btn-delete:hover {
+                background: var(--danger-red);
+                color: white;
+            }
+
+        .btn-stock {
+            background: rgba(214, 138, 138, 0.1);
+            border: 1px solid var(--primary-pink);
+            color: var(--primary-pink);
+            border-radius: 6px;
+            padding: 8px 15px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+            .btn-stock:hover {
+                background: var(--primary-pink);
+                color: white;
+            }
+
+        /* Form Actions */
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid #252525;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--primary-pink), var(--accent-gold));
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+            .btn-primary:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 10px 20px rgba(214, 138, 138, 0.3);
+            }
+
+        .btn-secondary {
+            background: var(--input-bg);
+            border: 1px solid #333;
+            color: var(--text-light);
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+            .btn-secondary:hover {
+                background: #2a2a2a;
+                text-decoration: none;
+                color: var(--text-light);
+            }
+
+        /* Add Variant Button */
+        .add-variant-btn {
+            background: linear-gradient(45deg, var(--primary-pink), var(--accent-gold));
+            border: none;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+            .add-variant-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 20px rgba(214, 138, 138, 0.3);
+                color: white;
+            }
+
+        /* Empty State */
+        .empty-state {
+            padding: 40px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            border: 1px solid #252525;
+        }
+
+            .empty-state i {
+                font-size: 3rem;
+                color: var(--text-muted);
+                margin-bottom: 15px;
+                opacity: 0.5;
+            }
+
+            .empty-state h4 {
+                color: var(--text-light);
+                margin-bottom: 10px;
+            }
+
+            .empty-state p {
+                color: var(--text-muted);
+                margin-bottom: 20px;
+            }
+
+        /* Error Messages */
+        .text-danger {
+            color: #ff6b6b;
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+
+        .validation-summary {
+            background: rgba(255, 107, 107, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-left: 4px solid #ff6b6b;
+        }
+
+            .validation-summary ul {
+                margin: 0;
+                padding-left: 20px;
+                color: #ff6b6b;
+            }
+
+        /* Modal Custom Styles */
+        .modal-content {
+            background: var(--card-bg);
+            border: 1px solid #252525;
+            border-radius: 16px;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid #252525;
+            padding: 20px 30px;
+        }
+
+        .modal-title {
+            color: var(--text-light);
+            font-weight: 600;
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .modal-footer {
+            border-top: 1px solid #252525;
+            padding: 20px 30px;
+        }
+
+        .btn-close-custom {
+            filter: invert(1);
+            opacity: 0.7;
+        }
+
+        /* Toast Notification */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+
+        .toast {
+            background: var(--card-bg);
+            border: 1px solid #252525;
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            min-width: 300px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            animation: slideInRight 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        .toast-success {
+            border-left: 4px solid var(--success-green);
+        }
+
+        .toast-error {
+            border-left: 4px solid var(--danger-red);
+        }
+
+        .toast-warning {
+            border-left: 4px solid var(--warning-yellow);
+        }
+
+        .toast-message {
+            color: var(--text-light);
+            flex-grow: 1;
+        }
+
+        .toast-close {
+            background: none;
             border: none;
             color: var(--text-muted);
             cursor: pointer;
             font-size: 1.2rem;
-            padding: 5px;
         }
 
-            .select-clear-btn:hover {
-                color: var(--danger-red);
+        @@keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
             }
 
-        /* Variants Section */
-        .variants-section {
-            background: rgba(214, 138, 138, 0.05);
-            border: 1px solid rgba(214, 138, 138, 0.1);
-            border-radius: 16px;
-            padding: 30px;
-            margin-top: 30px;
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
 
-        .section-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.5rem;
-            color: var(--text-light);
-            margin-bottom: 25px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #252525;
-        }
-
-        .variant-card {
-            background: var(--input-bg);
-            border: 1px solid #333;
-            border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 20px;
-            position: relative;
-            transition: all 0.3s ease;
-        }
-
-            .variant-card:hover {
-                border-color: var(--primary-pink);
-                box-shadow: 0 10px 20px rgba(214, 138, 138, 0.1);
+        /* Animations */
+        @@keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
             }
 
-        .variant-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-        }
-
-        .variant-field {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .variant-label {
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .variant-value {
-            color: var(--text-light);
-            font-weight: 600;
-            padding: 8px 12px;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 8px;
-            border: 1px solid #333;
-        }
-
-        .btn-add-variant {
-            background: rgba(40, 167, 69, 0.1);
-            border: 1px dashed rgba(40, 167, 69, 0.3);
-            color: var(--success-green);
-            border-radius: 12px;
-            padding: 14px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 20px;
-            text-decoration: none;
-            text-align: center;
-        }
-
-            .btn-add-variant:hover {
-                background: rgba(40, 167, 69, 0.2);
-                border-color: var(--success-green);
-                color: white;
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
-
-        .variant-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid #333;
         }
 
-        .btn-edit-variant {
-            background: rgba(106, 143, 216, 0.1);
-            color: var(--variant-blue);
-            border: 1px solid var(--variant-blue);
-            border-radius: 8px;
-            padding: 8px 15px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.85rem;
+        .animate-up {
+            animation: fadeInUp 0.6s ease forwards;
         }
 
-            .btn-edit-variant:hover {
-                background: var(--variant-blue);
-                color: white;
-                transform: translateY(-2px);
-                box-shadow: 0 5px 15px rgba(106, 143, 216, 0.2);
-            }
-
-        .btn-delete-variant {
-            background: rgba(255, 77, 77, 0.1);
-            color: var(--danger-red);
-            border: 1px solid var(--danger-red);
-            border-radius: 8px;
-            padding: 8px 15px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.85rem;
-        }
-
-            .btn-delete-variant:hover {
-                background: var(--danger-red);
-                color: white;
-                transform: translateY(-2px);
-                box-shadow: 0 5px 15px rgba(255, 77, 77, 0.2);
-            }
-
-        .stock-summary {
-            background: rgba(214, 138, 138, 0.1);
-            border: 1px solid rgba(214, 138, 138, 0.2);
-            border-radius: 12px;
-            padding: 20px;
-            margin-top: 20px;
-        }
-
-        .stock-total {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            color: var(--primary-pink);
-            font-weight: 600;
-            font-size: 1.2rem;
-        }
-
-        /* Toast Notification */
-        .custom-toast {
-            position: fixed;
-            top: 30px;
-            right: 30px;
-            background: var(--card-bg);
-            color: white;
-            padding: 20px 25px;
-            border-radius: 12px;
-            border-left: 4px solid var(--primary-pink);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            z-index: 99999;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            transform: translateX(150%);
-            transition: transform 0.4s ease;
-            max-width: 400px;
-        }
-
-        .toast-show {
-            transform: translateX(0);
-        }
-
-        .toast-icon {
-            color: var(--primary-pink);
-            font-size: 1.5rem;
-        }
-
-        .toast-content h4 {
-            margin: 0 0 5px 0;
-            font-size: 1.1rem;
-        }
-
-        .toast-content p {
-            margin: 0;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-        }
-
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 12px;
-            border: 2px dashed #333;
-        }
-
-        .empty-state-icon {
-            font-size: 3rem;
-            color: var(--text-muted);
-            margin-bottom: 15px;
-            opacity: 0.5;
-        }
-
-        .empty-state-text {
-            color: var(--text-muted);
-            font-size: 1rem;
-        }
-
-        /* Responsive Design */
+        /* Responsive */
         @@media (max-width: 768px) {
-            .edit-card {
-                padding: 25px 20px;
-                margin: 0 15px;
-            }
-
-            .edit-title {
+            .page-title {
                 font-size: 2rem;
             }
 
-            .variant-grid {
-                grid-template-columns: 1fr;
+            .form-card {
+                padding: 20px;
             }
 
-            .variant-actions {
+            .action-buttons {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .btn-edit, .btn-delete, .btn-stock {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .form-actions {
                 flex-direction: column;
             }
 
-            .btn-edit-variant,
-            .btn-delete-variant {
+            .btn-primary, .btn-secondary {
                 width: 100%;
                 justify-content: center;
+            }
+
+            .toast {
+                min-width: calc(100vw - 40px);
             }
         }
     </style>
 }
 
-<!-- Toast Notification -->
-<div id="customToast" class="custom-toast">
-    <div class="toast-icon">
-        <i class="bi bi-check-circle"></i>
-    </div>
-    <div class="toast-content">
-        <h4>Notification</h4>
-        <p id="toastMessage"></p>
-    </div>
-</div>
-
-<div class="edit-header">
+<!-- Page Header -->
+<div class="page-header animate-up">
     <div class="container">
-        <h1 class="edit-title">Edit Product</h1>
-        <p class="text-muted mt-2">Update product details and maintain luxury standards</p>
+        <h1 class="page-title">Edit Product</h1>
+        <p class="page-subtitle">Update product details and manage variants</p>
     </div>
 </div>
 
-<div class="container mb-5">
-    <div class="edit-card">
-        <form asp-action="Edit" method="post" enctype="multipart/form-data" id="editForm">
-            <input type="hidden" asp-for="Id" />
+<div class="container form-container">
+    <!-- Validation Summary -->
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="validation-summary animate-up">
+            @Html.ValidationSummary(true)
+        </div>
+    }
 
-            <div class="row">
-                <!-- Basic Information -->
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label asp-for="Name" class="form-label">Product Name</label>
-                        <input asp-for="Name" class="form-control" placeholder="Enter product name" />
-                        <span asp-validation-for="Name" class="text-danger"></span>
+    <form asp-action="Edit" method="post" enctype="multipart/form-data" class="animate-up" style="animation-delay: 0.1s">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <input type="hidden" asp-for="Id" />
+
+        <div class="form-grid">
+            <!-- Left Column: Product Info -->
+            <div class="form-card">
+                <h3 class="card-title">
+                    <i class="bi bi-box-seam"></i>
+                    Product Information
+                </h3>
+
+                <div class="form-group">
+                    <label class="form-label">Product Name *</label>
+                    <input asp-for="Name" class="form-control-custom" placeholder="Enter product name" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea asp-for="Description" class="form-control-custom" rows="4" placeholder="Enter product description"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Category</label>
+                    <select asp-for="CategoryId" asp-items="categoriesList" class="form-control-custom">
+                        <option value="">-- Select Category --</option>
+                    </select>
+                    <span asp-validation-for="CategoryId" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <div class="form-check">
+                        <input asp-for="IsActive" class="form-check-input" />
+                        <label class="form-check-label">Active Product</label>
                     </div>
+                </div>
+            </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Category</label>
-                        <div class="select-container">
-                            <select asp-for="CategoryId" class="form-select" id="categorySelect">
-                                <option value="">-- Select Category --</option>
-                                @foreach (var category in categories)
-                                {
-                                    <option value="@category.Id" selected="@(Model.CategoryId == category.Id)">
-                                        @category.Name
-                                    </option>
-                                }
-                            </select>
-                            @if (Model.CategoryId.HasValue)
-                            {
-                                <button type="button" class="select-clear-btn" onclick="clearCategorySelection()" title="Clear selection">
-                                    <i class="bi bi-x-circle"></i>
-                                </button>
-                            }
-                        </div>
-                        <small class="form-text">Choose a category or leave empty</small>
-                        <span asp-validation-for="CategoryId" class="text-danger"></span>
+            <!-- Right Column: Image & Preview -->
+            <div class="form-card">
+                <h3 class="card-title">
+                    <i class="bi bi-image"></i>
+                    Product Image
+                </h3>
+
+                <div class="form-group">
+                    <label class="form-label">Current Image</label>
+                    <div class="image-preview-container">
+                        <img src="@(Model.ImageUrl ?? "/images/default-product.png")"
+                             alt="Current Product Image"
+                             class="current-image"
+                             id="currentImagePreview" />
+                        <span class="image-label">Current product image</span>
                     </div>
                 </div>
 
-                <!-- Additional Information -->
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label asp-for="Description" class="form-label">Description</label>
-                        <textarea asp-for="Description" class="form-control" rows="4"
-                                  placeholder="Enter product description..."></textarea>
-                        <span asp-validation-for="Description" class="text-danger"></span>
-                        <small class="form-text">Max 1000 characters</small>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Product Image</label>
-                        <input asp-for="Image" type="file" class="form-control" id="imageInput"
-                               accept="image/*" onchange="previewImage(event)" />
-                        <span asp-validation-for="Image" class="text-danger"></span>
-                        <small class="form-text">Upload new image (optional)</small>
-
-                        <div class="image-preview-container" id="imagePreviewContainer" style="display: none;">
-                            <img id="imagePreview" class="image-preview" />
-                            <button type="button" class="btn btn-sm text-danger mt-2" onclick="clearImage()">
-                                <i class="bi bi-trash"></i> Remove Image
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="checkbox-container">
-                        <input asp-for="IsActive" class="form-check-input" type="checkbox" id="isActiveCheckbox" />
-                        <label class="form-check-label" for="isActiveCheckbox">
-                            Product is Active
-                        </label>
-                    </div>
-                    <small class="form-text d-block mb-3">
-                        When active, product is visible to customers
+                <div class="form-group">
+                    <label class="form-label">Upload New Image</label>
+                    <input type="file" name="ImageFile" class="form-control-custom" accept="image/*" />
+                    <small class="text-muted" style="color: var(--text-muted); display: block; margin-top: 8px;">
+                        Leave empty to keep current image. Allowed formats: JPG, PNG, GIF.
                     </small>
-                </div>
-            </div>
-
-            <!-- Variants Section -->
-            <div class="variants-section">
-                <h4 class="section-title">
-                    <i class="bi bi-stars me-2"></i>Product Variants
-                </h4>
-                <p class="text-muted mb-4">
-                    <i class="bi bi-info-circle me-1"></i>
-                    Note: Product variants are managed separately. Price and stock are handled at the variant level.
-                </p>
-
-                <!-- Button to add new variant -->
-                <a asp-action="CreateVariant"
-                   asp-controller="Products"
-                   asp-route-productId="@Model.Id"
-                   class="btn-add-variant">
-                    <i class="bi bi-plus-circle"></i> Add New Variant
-                </a>
-
-                <!-- Display existing variants -->
-                <div id="variantsContainer" class="mt-4">
-                    @if (variants != null && variants.Any())
-                    {
-                        foreach (var variant in variants)
-                        {
-                            <div class="variant-card">
-                                <div class="variant-grid">
-                                    <div class="variant-field">
-                                        <label class="variant-label">Variant Type</label>
-                                        <div class="variant-value">
-                                            @variant.VariantName
-                                        </div>
-                                    </div>
-                                    <div class="variant-field">
-                                        <label class="variant-label">Value</label>
-                                        <div class="variant-value">
-                                            @variant.VariantValue
-                                        </div>
-                                    </div>
-                                    <div class="variant-field">
-                                        <label class="variant-label">Price</label>
-                                        <div class="variant-value">
-                                            @variant.Price.ToString("C")
-                                        </div>
-                                    </div>
-                                    <div class="variant-field">
-                                        <label class="variant-label">Stock</label>
-                                        <div class="variant-value">
-                                            @variant.Stock units
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Variant Actions -->
-                                <div class="variant-actions">
-                                    <a asp-action="UpdateVariant"
-                                       asp-controller="Products"
-                                       asp-route-VariantId="@variant.Id"
-                                       class="btn-edit-variant">
-                                        <i class="bi bi-pencil"></i>
-                                        Edit Variant
-                                    </a>
-
-                                    <a asp-action="DeleteVariant"
-                                       asp-controller="Products"
-                                       asp-route-variantId="@variant.Id"
-                                       class="btn-delete-variant"
-                                       onclick="return confirm('Are you sure you want to delete this variant? This action cannot be undone.')">
-                                        <i class="bi bi-trash"></i>
-                                        Delete
-                                    </a>
-                                </div>
-                            </div>
-                        }
-                    }
-                    else
-                    {
-                        <div class="empty-state">
-                            <div class="empty-state-icon">
-                                <i class="bi bi-box-seam"></i>
-                            </div>
-                            <p class="empty-state-text">No variants available</p>
-                            <small class="text-muted">Add variants to manage prices and stock</small>
-                        </div>
-                    }
+                    <input type="hidden" asp-for="ImageUrl" />
                 </div>
 
-                <!-- Stock Summary -->
-                <div class="stock-summary">
-                    <div class="stock-total">
-                        <span>Total Stock Across All Variants:</span>
-                        <span id="totalStockValue">@totalStock units</span>
+                <div class="form-group" id="newImagePreviewContainer" style="display: none;">
+                    <label class="form-label">New Image Preview</label>
+                    <div class="image-preview-container">
+                        <img src="#" alt="New Image Preview" class="current-image" id="newImagePreview" />
+                        <span class="image-label">New image preview</span>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Form Actions -->
-            <div class="row mt-4">
-                <div class="col-md-6">
-                    <button type="submit" class="btn-submit">
-                        <i class="bi bi-check-circle me-2"></i>Update Product
-                    </button>
+        <!-- Variants Section -->
+        <div class="form-card variants-table-container animate-up" style="animation-delay: 0.2s">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                <h3 class="card-title" style="margin: 0;">
+                    <i class="bi bi-layers"></i>
+                    Product Variants
+                </h3>
+                <a asp-action="AddVariantToProduct"
+                   asp-controller="ProductVariant"
+                   asp-route-productId="@Model.Id"
+                   class="add-variant-btn">
+                    <i class="bi bi-plus-circle"></i>
+                    Add New Variant
+                </a>
+            </div>
+
+            @if (Model.VariantsDto != null && Model.VariantsDto.Any())
+            {
+                <div class="table-responsive">
+                    <table class="variants-table">
+                        <thead>
+                            <tr>
+                                <th>Variant Name</th>
+                                <th>Price</th>
+                                <th>Stock</th>
+                                <th>Image</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var variant in Model.VariantsDto)
+                            {
+                                <tr id="variant-row-@variant.id">
+                                    <td>@variant.VariantName</td>
+                                    <td>$@variant.price.ToString("F2")</td>
+                                    <td>
+                                        <span class="stock-display" onclick="openUpdateStockModal(@variant.id, @Model.Id, @variant.Stock, '@variant.VariantName')" style="cursor: pointer;">
+                                            @if (variant.Stock > 10)
+                                            {
+                                                <span class="badge badge-success">@variant.Stock</span>
+                                            }
+                                            else if (variant.Stock > 0)
+                                            {
+                                                <span class="badge badge-warning">@variant.Stock</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge badge-danger">@variant.Stock</span>
+                                            }
+                                            <i class="bi bi-pencil-square ms-2" style="font-size: 0.8rem;"></i>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(variant.ImageUrl))
+                                        {
+                                            <img src="@variant.ImageUrl"
+                                                 alt="@variant.VariantName"
+                                                 class="variant-image" />
+                                        }
+                                        else
+                                        {
+                                            <span style="color: var(--text-muted);">No Image</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <a asp-controller="ProductVariant"
+                                               asp-action="UpdateVariant"
+                                               asp-route-VariantId="@variant.id"
+                                               class="btn-edit">
+                                                <i class="bi bi-pencil"></i>
+                                                Edit
+                                            </a>
+                                            <button type="button"
+                                                    class="btn-delete"
+                                                    onclick="confirmDeleteVariant(@variant.id, '@variant.VariantName')">
+                                                <i class="bi bi-trash"></i>
+                                                Delete
+                                            </button>
+                                            <button type="button"
+                                                    class="btn-stock"
+                                                    onclick="openUpdateStockModal(@variant.id, @Model.Id, @variant.Stock, '@variant.VariantName')">
+                                                <i class="bi bi-box"></i>
+                                                Stock
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
                 </div>
-                <div class="col-md-6">
-                    <a asp-action="GetAllProducts" class="btn-cancel">
-                        <i class="bi bi-x-circle me-2"></i>Cancel
+            }
+            else
+            {
+                <div class="empty-state">
+                    <i class="bi bi-inboxes"></i>
+                    <h4>No Variants Added Yet</h4>
+                    <p>This product doesn't have any variants configured yet.</p>
+                    <a asp-action="AddVariantToProduct"
+                       asp-controller="Products"
+                       asp-route-productId="@Model.Id"
+                       class="add-variant-btn">
+                        <i class="bi bi-plus-circle"></i>
+                        Add Your First Variant
                     </a>
                 </div>
+            }
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions animate-up" style="animation-delay: 0.3s">
+            <button type="submit" class="btn-primary">
+                <i class="bi bi-save"></i>
+                Update Product
+            </button>
+            <a asp-action="GetAllProducts" class="btn-secondary">
+                <i class="bi bi-arrow-left"></i>
+                Back to Products
+            </a>
+        </div>
+    </form>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Update Stock Modal -->
+<div class="modal fade" id="updateStockModal" tabindex="-1" aria-labelledby="updateStockModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateStockModalLabel">Update Stock</h5>
+                <button type="button" class="btn-close btn-close-custom" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-        </form>
+            <div class="modal-body">
+                <form id="updateStockForm">
+                    <input type="hidden" id="productVariantId" name="ProductVariantId" />
+                    <input type="hidden" id="productId" name="ProductId" />
+
+                    <div class="form-group">
+                        <label class="form-label">Variant</label>
+                        <input type="text" id="variantNameDisplay" class="form-control-custom" readonly />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Current Stock</label>
+                        <input type="number" id="currentStockDisplay" class="form-control-custom" readonly />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">New Stock *</label>
+                        <input type="number"
+                               id="newStock"
+                               name="NewStock"
+                               class="form-control-custom"
+                               min="0"
+                               required
+                               placeholder="Enter new stock quantity" />
+                        <span class="text-danger" id="stockError"></span>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn-primary" id="saveStockBtn">Update Stock</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background: var(--card-bg); color: var(--text-light);">
+            <div class="modal-header" style="border-bottom: 1px solid #333;">
+                <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="filter: invert(1);"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete variant "<span id="variantNameToDelete"></span>"?</p>
+                <p class="text-danger" style="color: #ff6b6b !important;">
+                    <small>This action cannot be undone.</small>
+                </p>
+            </div>
+            <div class="modal-footer" style="border-top: 1px solid #333;">
+                <button type="button" class="btn-secondary" data-bs-dismiss="modal" style="padding: 8px 20px; margin: 0;">Cancel</button>
+                <button type="button" class="btn-delete" id="confirmDeleteBtn" style="padding: 8px 20px; margin: 0;">Delete</button>
+            </div>
+        </div>
     </div>
 </div>
 
 @section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
     <script>
-        // عرض الصورة المختارة
-        function previewImage(event) {
-            const input = event.target;
-            const container = document.getElementById('imagePreviewContainer');
-            const preview = document.getElementById('imagePreview');
+        // متغيرات عامة
+        let variantToDelete = null;
+        let currentVariantId = null;
 
-            if (input.files && input.files[0]) {
+        // معاينة الصورة الجديدة
+        document.querySelector('input[name="ImageFile"]')?.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const previewContainer = document.getElementById('newImagePreviewContainer');
+            const preview = document.getElementById('newImagePreview');
+
+            if (file) {
                 const reader = new FileReader();
-
                 reader.onload = function(e) {
                     preview.src = e.target.result;
-                    container.style.display = 'block';
+                    previewContainer.style.display = 'block';
                 }
-
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-
-        // مسح الصورة المختارة
-        function clearImage() {
-            const input = document.getElementById('imageInput');
-            const container = document.getElementById('imagePreviewContainer');
-            const preview = document.getElementById('imagePreview');
-
-            input.value = '';
-            preview.src = '';
-            container.style.display = 'none';
-        }
-
-        // مسح اختيار الفئة
-        function clearCategorySelection() {
-            const select = document.getElementById('categorySelect');
-            select.value = '';
-
-            // إخفاء زر المسح
-            const clearBtn = document.querySelector('.select-clear-btn');
-            if (clearBtn) {
-                clearBtn.style.display = 'none';
-            }
-        }
-
-        // عرض/إخفاء زر مسح الفئة حسب الاختيار
-        document.getElementById('categorySelect').addEventListener('change', function() {
-            const clearBtn = document.querySelector('.select-clear-btn');
-            if (this.value) {
-                if (!clearBtn) {
-                    const container = this.parentElement;
-                    const newClearBtn = document.createElement('button');
-                    newClearBtn.type = 'button';
-                    newClearBtn.className = 'select-clear-btn';
-                    newClearBtn.innerHTML = '<i class="bi bi-x-circle"></i>';
-                    newClearBtn.title = 'Clear selection';
-                    newClearBtn.onclick = clearCategorySelection;
-                    container.appendChild(newClearBtn);
-                } else {
-                    clearBtn.style.display = 'block';
-                }
-            } else if (clearBtn) {
-                clearBtn.style.display = 'none';
+                reader.readAsDataURL(file);
+            } else {
+                previewContainer.style.display = 'none';
             }
         });
 
-        // Toast Notification
-        function showToast(title, message, type = "success") {
-            const toast = document.getElementById('customToast');
-            const toastMessage = document.getElementById('toastMessage');
-            const toastIcon = toast.querySelector('.toast-icon i');
+        // فتح مودال تحديث الـ stock
+        function openUpdateStockModal(variantId, productId, currentStock, variantName) {
+            currentVariantId = variantId;
 
-            toast.querySelector('h4').textContent = title;
-            toastMessage.textContent = message;
+            // تعبئة البيانات في النموذج
+            document.getElementById('productVariantId').value = variantId;
+            document.getElementById('productId').value = productId;
+            document.getElementById('variantNameDisplay').value = variantName;
+            document.getElementById('currentStockDisplay').value = currentStock;
+            document.getElementById('newStock').value = currentStock;
+            document.getElementById('stockError').textContent = '';
 
-            if (type === "error") {
-                toast.style.borderLeftColor = "#ff4444";
-                toastIcon.style.color = "#ff4444";
-                toastIcon.className = "bi bi-exclamation-circle";
-            } else {
-                toast.style.borderLeftColor = "var(--primary-pink)";
-                toastIcon.style.color = "var(--primary-pink)";
-                toastIcon.className = "bi bi-check-circle";
-            }
+            // فتح المودال
+            const modal = new bootstrap.Modal(document.getElementById('updateStockModal'));
+            modal.show();
 
-            toast.classList.add('toast-show');
-            setTimeout(() => toast.classList.remove('toast-show'), 3000);
+            // التركيز على حقل الـ stock الجديد
+            setTimeout(() => {
+                document.getElementById('newStock').focus();
+                document.getElementById('newStock').select();
+            }, 500);
         }
 
-        // التحقق من الصحة قبل الإرسال
-        document.getElementById('editForm').addEventListener('submit', function(event) {
-            // التحقق الأساسي فقط (الإسم مطلوب)
-            const name = document.querySelector('[name="Name"]');
+        // حفظ تحديث الـ stock
+        document.getElementById('saveStockBtn').addEventListener('click', async function() {
+            const form = document.getElementById('updateStockForm');
+            const formData = {
+                ProductVariantId: parseInt(document.getElementById('productVariantId').value),
+                ProductId: parseInt(document.getElementById('productId').value),
+                NewStock: parseInt(document.getElementById('newStock').value)
+            };
 
-            if (!name.value.trim()) {
-                event.preventDefault();
-                showToast("Validation Error", "Product name is required", "error");
-                name.focus();
+            // التحقق من صحة البيانات
+            if (isNaN(formData.NewStock) || formData.NewStock < 0) {
+                document.getElementById('stockError').textContent = 'Please enter a valid stock quantity (0 or greater)';
                 return;
             }
 
-            // إذا تم تمرير التحقق
-            showToast("Processing", "Updating product...", "success");
-        });
+            // إظهار حالة التحميل
+            const saveBtn = document.getElementById('saveStockBtn');
+            const originalText = saveBtn.innerHTML;
+            saveBtn.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Updating...';
+            saveBtn.disabled = true;
 
-        // عرض رسائل التحقق من الـ ModelState
-        @if (!ViewData.ModelState.IsValid)
-        {
-                    <text>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
-                        {
-                                    <text>
-                                    showToast("Validation Error", "@error.ErrorMessage", "error");
-                                    </text>
-                        }
-                    });
-                    </text>
-        }
+            try {
+                // إرسال الطلب AJAX
+                const response = await fetch('@Url.Action("UpdateVariantsStock", "ProductVariant")', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    body: JSON.stringify(formData)
+                });
 
-        // Show stock summary if there are variants
-        document.addEventListener('DOMContentLoaded', function() {
-            const variantsContainer = document.getElementById('variantsContainer');
-            const stockSummary = document.getElementById('stockSummary');
+                const result = await response.json();
 
-            if (variantsContainer && variantsContainer.children.length > 0) {
-                const variantCards = document.querySelectorAll('.variant-card');
-                if (variantCards.length > 0) {
-                    stockSummary.style.display = 'block';
+                if (result.success) {
+                    // إغلاق المودال
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('updateStockModal'));
+                    modal.hide();
+
+                    // تحديث عرض الـ stock في الجدول
+                    updateStockDisplay(formData.ProductVariantId, formData.NewStock);
+
+                    // عرض رسالة نجاح
+                    showToast('Stock updated successfully!', 'success');
+                } else {
+                    document.getElementById('stockError').textContent = result.message || 'Error updating stock';
+                    showToast(result.message || 'Error updating stock', 'error');
                 }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('stockError').textContent = 'Error updating stock';
+                showToast('Error updating stock', 'error');
+            } finally {
+                // إعادة تعيين زر الحفظ
+                saveBtn.innerHTML = originalText;
+                saveBtn.disabled = false;
             }
         });
 
-        // Confirm before deleting variant
-        const deleteButtons = document.querySelectorAll('.btn-delete-variant');
-        deleteButtons.forEach(button => {
-            button.addEventListener('click', function(e) {
-                if (!confirm('Are you sure you want to delete this variant? This action cannot be undone.')) {
-                    e.preventDefault();
-                }
-            });
-        });
-    </script>
+        // تحديث عرض الـ stock في الجدول
+        function updateStockDisplay(variantId, newStock) {
+            const stockDisplay = document.querySelector(`#variant-row-${variantId} .stock-display .badge`);
+            if (stockDisplay) {
+                // تحديث النص
+                stockDisplay.textContent = newStock;
 
-    <!-- jQuery Validation -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
+                // تحديث اللون حسب الكمية
+                stockDisplay.className = 'badge';
+                if (newStock > 10) {
+                    stockDisplay.classList.add('badge-success');
+                } else if (newStock > 0) {
+                    stockDisplay.classList.add('badge-warning');
+                } else {
+                    stockDisplay.classList.add('badge-danger');
+                }
+            }
+        }
+
+        // عرض Toast notification
+        function showToast(message, type = 'success') {
+            const toastContainer = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+
+            toast.innerHTML = `
+                <div class="toast-message">${message}</div>
+                <button class="toast-close" onclick="this.parentElement.remove()">&times;</button>
+            `;
+
+            toastContainer.appendChild(toast);
+
+            // إزالة الـ toast تلقائياً بعد 5 ثواني
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.remove();
+                }
+            }, 5000);
+        }
+
+        // تأكيد حذف فاريانت
+        function confirmDeleteVariant(id, name) {
+            variantToDelete = id;
+            document.getElementById('variantNameToDelete').textContent = name;
+
+            const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+            modal.show();
+        }
+
+        // تنفيذ حذف الفاريانت
+        document.getElementById('confirmDeleteBtn').addEventListener('click', async function() {
+            if (!variantToDelete) return;
+
+            try {
+                const response = await fetch('@Url.Action("DeleteVariant", "Products")/' + variantToDelete, {
+                    method: 'DELETE',
+                    headers: {
+                        'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                    }
+                });
+
+                if (response.ok) {
+                    // إخفاء المودال
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
+                    modal.hide();
+
+                    // إزالة الصف من الجدول
+                    const row = document.getElementById('variant-row-' + variantToDelete);
+                    if (row) {
+                        row.style.transition = 'all 0.3s ease';
+                        row.style.opacity = '0';
+                        setTimeout(() => row.remove(), 300);
+                    }
+
+                    // عرض رسالة نجاح
+                    showToast('Variant deleted successfully', 'success');
+                } else {
+                    showToast('Error deleting variant', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Error deleting variant', 'error');
+            }
+        });
+
+        // Bootstrap form validation
+        (function () {
+            'use strict'
+            var forms = document.querySelectorAll('form')
+            Array.prototype.slice.call(forms)
+                .forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault()
+                            event.stopPropagation()
+                        }
+                    }, false)
+                })
+        })()
+    </script>
 }

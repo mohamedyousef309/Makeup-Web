@@ -1,4 +1,4 @@
-﻿using Domain_Layer.ViewModels.ProductsViewModels.UpdateProductsVariantViewModel;
+﻿using Domain_Layer.ViewModels.ProductsViewModels;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain_Layer.ViewModels.ProductsViewModels.UpdateProductsViewModel
+namespace Domain_Layer.ViewModels.ProductsViewModels.Product.UpdateProductsViewModel
 {
     public class UpdateProductViewModel
     {
@@ -21,13 +21,6 @@ namespace Domain_Layer.ViewModels.ProductsViewModels.UpdateProductsViewModel
         [StringLength(1000, ErrorMessage = "Description must not exceed 1000 characters.")]
         public string Description { get; set; } = string.Empty;
 
-        //[Required(ErrorMessage = "Product price is required.")]
-        //[Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than 0.")]
-        //public decimal Price { get; set; }
-
-        //[Required(ErrorMessage = "Product stock is required.")]
-        //[Range(0, int.MaxValue, ErrorMessage = "Stock cannot be negative.")]
-        //public int Stock { get; set; }
 
         public int? CategoryId { get; set; }
 

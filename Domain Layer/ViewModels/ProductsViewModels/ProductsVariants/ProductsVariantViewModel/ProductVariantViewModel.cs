@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain_Layer.ViewModels.ProductsViewModels.ProductsVariantViewModel
+namespace Domain_Layer.ViewModels.ProductsViewModels.ProductsVariants.ProductsVariantViewModel
 {
     public class ProductVariantViewModel
     {

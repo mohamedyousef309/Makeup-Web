@@ -1,0 +1,798 @@
+﻿@using Domain_Layer.ViewModels.ProductsViewModels.ProductsVariants.AddVariantToproduct
+@model AddVariantToproductViewModle
+
+@{
+    ViewData["Title"] = "Add Variants to Product";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles {
+    <style>
+        :root {
+            --primary-pink: #d68a8a;
+            --primary-hover: #c27676;
+            --dark-bg: #0f0f0f;
+            --card-bg: #1a1a1a;
+            --input-bg: #252525;
+            --text-light: #ffffff;
+            --text-muted: #a0a0a0;
+            --accent-gold: #c5a059;
+            --danger-red: #ff4d4d;
+            --success-green: #28a745;
+            --warning-yellow: #ffc107;
+            --info-blue: #6a8fd8;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Page Header */
+        .page-header {
+            padding: 60px 0 30px;
+            background: linear-gradient(135deg, rgba(214, 138, 138, 0.1), rgba(197, 160, 89, 0.05));
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .page-header::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 1px;
+                background: linear-gradient(90deg, transparent, var(--primary-pink), transparent);
+            }
+
+        .page-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #fff 30%, var(--primary-pink) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Card Styling */
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            border: 1px solid #252525;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .card-header {
+            padding: 25px;
+            border-bottom: 1px solid #252525;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-body {
+            padding: 25px;
+        }
+
+        /* Form Controls */
+        .form-label {
+            color: var(--text-light);
+            font-weight: 500;
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+        }
+
+        .form-control, .form-select {
+            background: var(--input-bg);
+            border: 1px solid #333;
+            color: var(--text-light);
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+            .form-control:focus, .form-select:focus {
+                background: var(--input-bg);
+                border-color: var(--primary-pink);
+                color: var(--text-light);
+                box-shadow: 0 0 0 3px rgba(214, 138, 138, 0.1);
+            }
+
+        .input-group-text {
+            background: var(--input-bg);
+            border: 1px solid #333;
+            color: var(--text-muted);
+            border-radius: 8px 0 0 8px;
+        }
+
+        /* Variant Card */
+        .variant-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            border: 1px solid #333;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+            .variant-card:hover {
+                border-color: var(--primary-pink);
+            }
+
+        .variant-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #333;
+        }
+
+        .variant-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-light);
+        }
+
+        .btn-remove {
+            background: rgba(255, 77, 77, 0.1);
+            border: 1px solid var(--danger-red);
+            color: var(--danger-red);
+            border-radius: 8px;
+            padding: 8px 15px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+            .btn-remove:hover {
+                background: var(--danger-red);
+                color: white;
+                transform: translateY(-2px);
+                text-decoration: none;
+            }
+
+        /* Attribute Checkboxes */
+        .attribute-card {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 8px;
+            border: 1px solid #333;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+
+        .attribute-header {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 12px 15px;
+            border-bottom: 1px solid #333;
+        }
+
+        .attribute-name {
+            font-weight: 600;
+            color: var(--text-light);
+            margin: 0;
+        }
+
+        .attribute-values {
+            padding: 15px;
+        }
+
+        .form-check {
+            margin-bottom: 10px;
+        }
+
+        .form-check-input {
+            background-color: var(--input-bg);
+            border: 1px solid #444;
+        }
+
+            .form-check-input:checked {
+                background-color: var(--primary-pink);
+                border-color: var(--primary-pink);
+            }
+
+        .form-check-label {
+            color: var(--text-light);
+            margin-left: 8px;
+        }
+
+        /* Image Preview */
+        .image-preview-container {
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .image-preview {
+            max-width: 100%;
+            max-height: 150px;
+            border-radius: 8px;
+            border: 1px solid #333;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid #252525;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--primary-pink), var(--accent-gold));
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+            .btn-primary:hover {
+                background: linear-gradient(45deg, var(--primary-hover), #b8944d);
+                transform: translateY(-3px);
+                box-shadow: 0 10px 20px rgba(214, 138, 138, 0.2);
+            }
+
+        .btn-secondary {
+            background: var(--input-bg);
+            border: 1px solid #333;
+            color: var(--text-light);
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+            .btn-secondary:hover {
+                background: #2a2a2a;
+                transform: translateY(-3px);
+            }
+
+        .btn-success {
+            background: linear-gradient(45deg, var(--success-green), #2ecc71);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+            .btn-success:hover {
+                background: linear-gradient(45deg, #218838, #27ae60);
+                transform: translateY(-2px);
+            }
+
+        /* Alert Styling */
+        .alert {
+            border-radius: 12px;
+            border: 1px solid;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .alert-info {
+            background: rgba(106, 143, 216, 0.1);
+            border-color: var(--info-blue);
+            color: var(--info-blue);
+        }
+
+        .alert-warning {
+            background: rgba(255, 193, 7, 0.1);
+            border-color: var(--warning-yellow);
+            color: var(--warning-yellow);
+        }
+
+        .alert-danger {
+            background: rgba(255, 77, 77, 0.1);
+            border-color: var(--danger-red);
+            color: var(--danger-red);
+        }
+
+        /* Validation Styling */
+        .field-validation-error {
+            color: var(--danger-red);
+            font-size: 0.875rem;
+            margin-top: 5px;
+            display: block;
+        }
+
+        .input-validation-error {
+            border-color: var(--danger-red) !important;
+        }
+
+        .validation-summary-errors {
+            background: rgba(255, 77, 77, 0.1);
+            border: 1px solid var(--danger-red);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+            .validation-summary-errors ul {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            .validation-summary-errors li {
+                color: var(--danger-red);
+                margin-bottom: 5px;
+            }
+
+        /* Responsive Design */
+        @@media (max-width: 768px) {
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .card-header, .card-body {
+                padding: 20px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn-primary, .btn-secondary {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+}
+
+<div class="page-header">
+    <div class="container">
+        <h1 class="page-title">Add Variants to Product</h1>
+        <p class="page-subtitle">Add multiple variants to your product with different attributes and options</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                <i class="bi bi-plus-circle"></i>
+                Add New Variants
+            </h3>
+        </div>
+        <div class="card-body">
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-circle"></i> @TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            <form asp-action="AddVariantToProduct" method="post" enctype="multipart/form-data" id="addVariantsForm">
+                <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
+
+                <input type="hidden" asp-for="ProductId" />
+
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i>
+                    You can add multiple variants at once. Each variant will be created with the specified attributes.
+                </div>
+
+                <!-- Variants Container -->
+                <div id="variantsContainer">
+                    <!-- Default variant row -->
+                    <div class="variant-card">
+                        <div class="variant-header">
+                            <h4 class="variant-title">Variant #<span class="variant-number">1</span></h4>
+                            <button type="button" class="btn-remove remove-variant-btn">
+                                <i class="bi bi-trash"></i>
+                                Remove Variant
+                            </button>
+                        </div>
+                        <div class="row">
+                            <!-- Variant Name -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Variant Name *</label>
+                                <input type="text"
+                                       name="CreateProductVariants[0].VariantName"
+                                       class="form-control variant-name"
+                                       required
+                                       minlength="2"
+                                       maxlength="50"
+                                       placeholder="e.g., Small, Red, XL">
+                                <small class="text-muted">Variant identifier (2-50 characters)</small>
+                                <span class="field-validation-valid" data-valmsg-for="CreateProductVariants[0].VariantName" data-valmsg-replace="true"></span>
+                            </div>
+
+                            <!-- Variant Value -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Variant Value *</label>
+                                <input type="text"
+                                       name="CreateProductVariants[0].VariantValue"
+                                       class="form-control variant-value"
+                                       required
+                                       minlength="1"
+                                       maxlength="50"
+                                       placeholder="e.g., Small size, Red color">
+                                <small class="text-muted">Detailed value description</small>
+                                <span class="field-validation-valid" data-valmsg-for="CreateProductVariants[0].VariantValue" data-valmsg-replace="true"></span>
+                            </div>
+
+                            <!-- Price -->
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Price *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number"
+                                           name="CreateProductVariants[0].Price"
+                                           class="form-control price"
+                                           required
+                                           min="0.01"
+                                           step="0.01"
+                                           placeholder="0.00">
+                                </div>
+                                <small class="text-muted">Must be greater than 0</small>
+                                <span class="field-validation-valid" data-valmsg-for="CreateProductVariants[0].Price" data-valmsg-replace="true"></span>
+                            </div>
+
+                            <!-- Stock -->
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Stock *</label>
+                                <input type="number"
+                                       name="CreateProductVariants[0].Stock"
+                                       class="form-control stock"
+                                       required
+                                       min="0"
+                                       placeholder="0">
+                                <small class="text-muted">Available quantity</small>
+                                <span class="field-validation-valid" data-valmsg-for="CreateProductVariants[0].Stock" data-valmsg-replace="true"></span>
+                            </div>
+
+                            <!-- Variant Picture -->
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Variant Image</label>
+                                <input type="file"
+                                       name="CreateProductVariants[0].Variantpecture"
+                                       class="form-control variant-image"
+                                       accept="image/*">
+                                <small class="text-muted">Optional variant-specific image</small>
+                                <div class="mt-2 image-preview-container" style="display: none;">
+                                    <img class="image-preview img-thumbnail"
+                                         style="max-height: 100px; max-width: 100px;">
+                                </div>
+                            </div>
+
+                            <!-- Attribute Values -->
+                            <div class="col-12 mb-3">
+                                <label class="form-label">Attribute Values *</label>
+                                <small class="text-muted d-block mb-3">
+                                    Select at least one attribute value for this variant
+                                </small>
+
+                                @{
+                                    var allAttributes = ViewBag.Attributes as IEnumerable<Domain_Layer.DTOs.Attribute.AttributeWithValueDTo>;
+                                }
+
+                                @if (allAttributes != null && allAttributes.Any())
+                                {
+                                    <div class="row">
+                                        @foreach (var attr in allAttributes)
+                                        {
+                                            <div class="col-md-6 col-lg-4 mb-3">
+                                                <div class="attribute-card">
+                                                    <div class="attribute-header">
+                                                        <h5 class="attribute-name">@attr.Name</h5>
+                                                    </div>
+                                                    <div class="attribute-values">
+                                                        @if (attr.Attributes != null)
+                                                        {
+                                                            foreach (var val in attr.Attributes)
+                                                            {
+                                                                <div class="form-check">
+                                                                    <input class="form-check-input attribute-checkbox"
+                                                                           type="checkbox"
+                                                                           name="CreateProductVariants[0].AttributeValueId"
+                                                                           value="@val.id"
+                                                                           id="attr_0_@val.id">
+                                                                    <label class="form-check-label" for="attr_0_@val.id">
+                                                                        @val.Value
+                                                                    </label>
+                                                                </div>
+                                                            }
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="alert alert-warning">
+                                        <i class="bi bi-exclamation-triangle"></i>
+                                        No attributes found. Please add attributes first.
+                                    </div>
+                                }
+                                <span class="field-validation-valid" data-valmsg-for="CreateProductVariants[0].AttributeValueId" data-valmsg-replace="true"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <div>
+                        <button type="button" class="btn btn-success" id="addVariantBtn">
+                            <i class="bi bi-plus"></i> Add Another Variant
+                        </button>
+                        <button type="button" class="btn btn-secondary" id="resetFormBtn">
+                            <i class="bi bi-arrow-clockwise"></i> Reset Form
+                        </button>
+                    </div>
+                    <div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save"></i> Save All Variants
+                        </button>
+                        <a asp-action="Edit" asp-controller="Products"
+                           asp-route-id="@Model.ProductId"
+                           class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Back to Product
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
+
+    <script>
+        let variantCount = 1;
+
+        $(document).ready(function () {
+            initializeValidation();
+
+            // Handle image preview
+            $(document).on('change', '.variant-image', function(e) {
+                const file = e.target.files[0];
+                const previewContainer = $(this).siblings('.image-preview-container');
+                const preview = previewContainer.find('.image-preview');
+
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        preview.attr('src', e.target.result);
+                        previewContainer.show();
+                    }
+                    reader.readAsDataURL(file);
+                } else {
+                    previewContainer.hide();
+                }
+            });
+
+            // Add new variant
+            $('#addVariantBtn').on('click', function() {
+                addVariant();
+            });
+
+            // Remove variant
+            $(document).on('click', '.remove-variant-btn', function() {
+                removeVariant($(this).closest('.variant-card'));
+            });
+
+            // Reset form
+            $('#resetFormBtn').on('click', function() {
+                if (confirm('Are you sure you want to reset the form? All entered data will be lost.')) {
+                    resetForm();
+                }
+            });
+
+            // Form submission validation for checkboxes
+            $('#addVariantsForm').on('submit', function(e) {
+                let isValid = true;
+                const variantCards = $('.variant-card');
+
+                variantCards.each(function(index) {
+                    const checkboxes = $(this).find(`input[name="CreateProductVariants[${index}].AttributeValueId"]:checked`);
+
+                    if (checkboxes.length === 0) {
+                        isValid = false;
+                        // Highlight the attribute section
+                        const attributeSection = $(this).find('.col-12.mb-3');
+                        if (attributeSection) {
+                            attributeSection.addClass('border border-danger p-3 rounded');
+                        }
+                    } else {
+                        const attributeSection = $(this).find('.col-12.mb-3');
+                        if (attributeSection) {
+                            attributeSection.removeClass('border border-danger p-3 rounded');
+                        }
+                    }
+                });
+
+                if (!isValid) {
+                    e.preventDefault();
+                    alert('Please select at least one attribute value for each variant');
+                    return false;
+                }
+
+                return true;
+            });
+        });
+
+        function initializeValidation() {
+            // Initialize jQuery Validation
+            $('#addVariantsForm').validate({
+                errorClass: 'is-invalid',
+                validClass: 'is-valid',
+                errorElement: 'span',
+                errorPlacement: function (error, element) {
+                    error.addClass('text-danger small');
+                    element.closest('.mb-3').append(error);
+                },
+                highlight: function (element) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function (element) {
+                    $(element).removeClass('is-invalid');
+                }
+            });
+        }
+
+        function addVariant() {
+            variantCount++;
+
+            // Clone the first variant card
+            const firstVariant = $('.variant-card').first();
+            const clone = firstVariant.clone();
+
+            // Update the header
+            clone.find('.variant-number').text(variantCount);
+
+            // Update all input names
+            clone.find('input, select, textarea').each(function() {
+                const name = $(this).attr('name');
+                if (name && name.includes('[0]')) {
+                    const newName = name.replace('[0]', `[${variantCount - 1}]`);
+                    $(this).attr('name', newName);
+
+                    // Update IDs for checkboxes and labels
+                    if ($(this).attr('type') === 'checkbox') {
+                        const oldId = $(this).attr('id');
+                        if (oldId) {
+                            const newId = oldId.replace('attr_0_', `attr_${variantCount - 1}_`);
+                            $(this).attr('id', newId);
+                            $(this).next('label').attr('for', newId);
+                        }
+                    }
+                }
+            });
+
+            // Clear input values
+            clone.find('input[type="text"], input[type="number"], textarea').val('');
+            clone.find('input[type="file"]').val('');
+            clone.find('input[type="checkbox"]').prop('checked', false);
+            clone.find('.image-preview-container').hide();
+            clone.find('.border-danger').removeClass('border border-danger p-3 rounded');
+            clone.find('.is-invalid').removeClass('is-invalid');
+            clone.find('.field-validation-valid').text('');
+
+            // Add to container
+            $('#variantsContainer').append(clone);
+
+            // Reinitialize validation for new fields
+            $.validator.unobtrusive.parse('#addVariantsForm');
+        }
+
+        function removeVariant(variantCard) {
+            const totalVariants = $('.variant-card').length;
+
+            if (totalVariants <= 1) {
+                alert('You must have at least one variant');
+                return;
+            }
+
+            if (confirm('Are you sure you want to remove this variant?')) {
+                variantCard.remove();
+                renumberVariants();
+            }
+        }
+
+        function renumberVariants() {
+            $('.variant-card').each(function(index) {
+                $(this).find('.variant-number').text(index + 1);
+
+                // Update all input names
+                $(this).find('input, select, textarea').each(function() {
+                    const name = $(this).attr('name');
+                    if (name && name.includes('CreateProductVariants')) {
+                        const matches = name.match(/\[(\d+)\]/);
+                        if (matches) {
+                            const newName = name.replace(/\[(\d+)\]/, `[${index}]`);
+                            $(this).attr('name', newName);
+
+                            // Update checkbox IDs
+                            if ($(this).attr('type') === 'checkbox') {
+                                const oldId = $(this).attr('id');
+                                if (oldId) {
+                                    const newId = oldId.replace(/attr_(\d+)_/, `attr_${index}_`);
+                                    $(this).attr('id', newId);
+                                    $(this).next('label').attr('for', newId);
+                                }
+                            }
+                        }
+                    }
+                });
+            });
+            variantCount = $('.variant-card').length;
+        }
+
+        function resetForm() {
+            // Keep only the first variant
+            $('.variant-card:gt(0)').remove();
+
+            // Reset first variant
+            const firstVariant = $('.variant-card').first();
+            firstVariant.find('input[type="text"], input[type="number"], textarea').val('');
+            firstVariant.find('input[type="file"]').val('');
+            firstVariant.find('input[type="checkbox"]').prop('checked', false);
+            firstVariant.find('.image-preview-container').hide();
+            firstVariant.find('.border-danger').removeClass('border border-danger p-3 rounded');
+            firstVariant.find('.is-invalid').removeClass('is-invalid');
+            firstVariant.find('.field-validation-valid').text('');
+
+            // Reset validation
+            $('.text-danger').remove();
+            $('.is-invalid').removeClass('is-invalid');
+            variantCount = 1;
+
+            // Reinitialize validation
+            $.validator.unobtrusive.parse('#addVariantsForm');
+        }
+    </script>
+}

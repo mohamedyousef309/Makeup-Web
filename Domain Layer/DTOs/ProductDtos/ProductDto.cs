@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Domain_Layer.DTOs.ProductVariantDtos;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,5 +16,7 @@ namespace Domain_Layer.DTOs.ProductDtos
         public string ImageUrl { get; set; }
 
         public int? CategoryId { get; set; }
+
+        public IEnumerable<VariantDbDto> VariantsDto { get; set; } = new HashSet<VariantDbDto>();
     }
 }

@@ -34,6 +34,11 @@ namespace Application_Layer.CQRS.Orders.Commands.CreatOrder
         {
             var outOfStockEvents = await ProcessVariantStockReductionAsync(request.Items, cancellationToken);
 
+            if (!outOfStockEvents.IsSuccess)
+            {
+                return RequestRespones<bool>.Fail(outOfStockEvents.Message, 400);
+            }
+
             var order = new Order
             {
                     UserId = request.userid,
@@ -54,7 +59,7 @@ namespace Application_Layer.CQRS.Orders.Commands.CreatOrder
 
                 await OrderRepo.SaveChanges();
 
-            foreach (var Event in outOfStockEvents)
+            foreach (var Event in outOfStockEvents.Data)
             {
                 await mediator.Publish(Event);
             }
@@ -64,7 +69,7 @@ namespace Application_Layer.CQRS.Orders.Commands.CreatOrder
 
         }
 
-        public async Task<IEnumerable<OutOfStockEvent>> ProcessVariantStockReductionAsync(IEnumerable<OrderItems> items, CancellationToken CT ) 
+        public async Task<RequestRespones<IEnumerable<OutOfStockEvent>>> ProcessVariantStockReductionAsync(IEnumerable<OrderItems> items, CancellationToken CT ) 
         {
             var events = new List<OutOfStockEvent>();
             var ProductVariantIds = items.Select(x => x.ProductVariantId).ToList();
@@ -78,12 +83,13 @@ namespace Application_Layer.CQRS.Orders.Commands.CreatOrder
 
                 if (ProductVariant == null)
                 {
-                    throw new Exception($"Product with ID {item.Id} not found in database.");
+                    return RequestRespones<IEnumerable<OutOfStockEvent>>.Fail($"Product not found.",404);
                 }
 
                 if (ProductVariant.Stock < item.Quantity)
                 {
-                    throw new Exception($"Product {ProductVariant.Product.Name}-{ProductVariant.VariantName} Out Of Stock: {ProductVariant.Stock}");
+                    return RequestRespones<IEnumerable<OutOfStockEvent>>.Fail(
+                        $"Sorry, {ProductVariant.Product.Name} ({ProductVariant.VariantName}) is out of stock. Available: {ProductVariant.Stock}",404);
                 }
 
                 bool isFinished = ProductVariant.ReduceStock(item.Quantity);
@@ -94,8 +100,7 @@ namespace Application_Layer.CQRS.Orders.Commands.CreatOrder
                 }
             }
 
-            return events;
-
+            return RequestRespones<IEnumerable<OutOfStockEvent>>.Success(events);
         }
     
 

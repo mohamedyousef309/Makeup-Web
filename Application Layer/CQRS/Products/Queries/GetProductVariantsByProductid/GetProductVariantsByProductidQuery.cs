@@ -1,4 +1,5 @@
-﻿using Domain_Layer.DTOs.ProductVariantDtos;
+﻿using Domain_Layer.DTOs.Attribute;
+using Domain_Layer.DTOs.ProductVariantDtos;
 using Domain_Layer.Entites;
 using Domain_Layer.Interfaces.Abstraction;
 using Domain_Layer.Interfaces.Repositryinterfaces;
@@ -29,10 +30,15 @@ namespace Application_Layer.CQRS.Products.Queries.GetProductVariantsByProductid
                 .Select(x => new ProductVariantDto
                 {
                     Id = x.Id,
-                    //VariantName = x.VariantName,
-                    //VariantValue = x.VariantValue,
                     Price=x.Price,
-                    Stock=x.Stock
+                    Stock=x.Stock,
+                    VariantImage = x.ImageUrl, 
+                    SelectedAttributes = x.ProductVariantAttributeValues.Select(va => new AttributeValueResponseDto
+                    {
+                        Id = va.AttributeValueId,
+                        AttributeName = va.AttributeValue.Attribute.Name,
+                        Value = va.AttributeValue.Value
+                    }).ToList()
                 }).ToListAsync();
 
             if (!variants.Any())

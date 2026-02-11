@@ -60,6 +60,7 @@ namespace Application_Layer.CQRS.Orders.Commands.CreatOrder
                         ProductName = $"{dbVariant.ProductName} ({dbVariant.VariantValue})",
                         Price = dbVariant.price,
                         Quantity = item.Quantity,
+                        PictureUrl= item.VariantImageUrl
                     };
                 }).Where(x => x != null).ToList();
 

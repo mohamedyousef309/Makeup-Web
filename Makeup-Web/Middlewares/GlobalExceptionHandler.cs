@@ -47,12 +47,8 @@ namespace Makeup_Web.Middlewares
             {
                 logger.LogError(ex, "System Error");
 
-                var response = RequestRespones<string>.Fail(message: "Something went wrong", 500);
-
-                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-                context.Response.ContentType = "application/json";
-
-                await context.Response.WriteAsJsonAsync(response);
+                context.Response.Redirect($"/Home/Error?message=Something went wrong&statusCode=500");
+                return; 
             }
         }
     }

@@ -16,10 +16,6 @@ namespace Domain_Layer.DTOs.ProductVariantDtos
         [MaxLength(50, ErrorMessage = "Variant name must not exceed 50 characters")]
         public string VariantName { get; set; } = default!;
 
-        [Required(ErrorMessage = "Variant value is required")]
-        [MinLength(1, ErrorMessage = "Variant value cannot be empty")]
-        [MaxLength(50, ErrorMessage = "Variant value must not exceed 50 characters")]
-        public string VariantValue { get; set; } = default!;
 
         [Range(0, int.MaxValue, ErrorMessage = "Stock cannot be negative")]
         public int Stock { get; set; }

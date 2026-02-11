@@ -39,9 +39,7 @@ namespace Application_Layer.CQRS.Products.Commands.Createvariants
                       .NotEmpty()
                       .MaximumLength(50);
 
-            RuleFor(x => x.VariantValue)
-                .NotEmpty()
-                .MaximumLength(50);
+            
 
             RuleFor(x => x.Stock)
                 .GreaterThanOrEqualTo(0);

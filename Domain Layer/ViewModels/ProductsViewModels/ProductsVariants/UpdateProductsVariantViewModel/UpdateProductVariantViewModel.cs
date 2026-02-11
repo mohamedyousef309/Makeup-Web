@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain_Layer.ViewModels.ProductsViewModels.UpdateProductsVariantViewModel
+namespace Domain_Layer.ViewModels.ProductsViewModels.ProductsVariants.UpdateProductsVariantViewModel
 {
     public class UpdateProductVariantViewModel
     {

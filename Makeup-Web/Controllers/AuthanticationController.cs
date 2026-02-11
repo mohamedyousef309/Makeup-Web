@@ -44,7 +44,7 @@ namespace Makeup_Web.Controllers
                 var loginRespone = await mediator.Send(new LoginOrchestrator(model.Email, model.Password));
                 if (!loginRespone.IsSuccess)
                 {
-                    model.ErrorMessage = loginRespone.Message;
+                    model.ErrorMessage=loginRespone.Message;
                     return View(model);
                 }
 
