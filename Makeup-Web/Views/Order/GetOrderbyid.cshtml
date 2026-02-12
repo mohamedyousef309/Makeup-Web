@@ -26,6 +26,26 @@
             letter-spacing: 0.5px;
         }
 
+        /* Breadcrumb */
+        .breadcrumb {
+            padding: 0;
+            margin: 0 0 20px 0;
+            background: transparent;
+        }
+
+        .breadcrumb-item a {
+            color: var(--text-muted);
+            text-decoration: none;
+        }
+
+            .breadcrumb-item a:hover {
+                color: var(--primary-pink);
+            }
+
+        .breadcrumb-item.active {
+            color: var(--primary-pink);
+        }
+
         .order-header-box {
             padding: 40px 0;
             margin-bottom: 30px;
@@ -205,6 +225,25 @@
             margin-bottom: 15px;
         }
 
+        .btn-edit-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 25px;
+            border-radius: 50px;
+            background: rgba(214, 138, 138, 0.1);
+            border: 1px solid rgba(214, 138, 138, 0.3);
+            color: var(--primary-pink);
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+            .btn-edit-status:hover {
+                background: rgba(214, 138, 138, 0.2);
+                transform: translateY(-2px);
+            }
+
         .currency {
             font-size: 0.8rem;
             margin-left: 5px;
@@ -272,6 +311,15 @@
 @if (Model == null)
 {
     <div class="container">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Home</a></li>
+                <li class="breadcrumb-item"><a href="@Url.Action("GetAllOrders", "Order")">Orders</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Order Details</li>
+            </ol>
+        </nav>
+
         <div class="error-state">
             <i class="bi bi-exclamation-triangle"></i>
             <h3>Order Not Found</h3>
@@ -290,6 +338,15 @@
 else if (Model.Items == null || !Model.Items.Any())
 {
     <div class="container">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Home</a></li>
+                <li class="breadcrumb-item"><a href="@Url.Action("GetAllOrders", "Order")">Orders</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Order #@Model.orderid</li>
+            </ol>
+        </nav>
+
         <div class="order-header-box">
             <div class="row align-items-center">
                 <div class="col-md-7">
@@ -313,7 +370,12 @@ else if (Model.Items == null || !Model.Items.Any())
                             _ => "status-default"
                         } : "status-default";
                     }
-                    <div class="status-pill @statusClass">@(Model.status ?? "Unknown")</div>
+                    <div class="d-flex align-items-center justify-content-md-end gap-3">
+                        <div class="status-pill @statusClass">@(Model.status ?? "Unknown")</div>
+                        <a href="@Url.Action("EditStatus", "Order", new { orderId = Model.orderid })" class="btn-edit-status">
+                            <i class="bi bi-pencil-square"></i> Edit Status
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -331,6 +393,15 @@ else if (Model.Items == null || !Model.Items.Any())
 else
 {
     <div class="container pb-5">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Home</a></li>
+                <li class="breadcrumb-item"><a href="@Url.Action("GetAllOrders", "Order")">Orders</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Order #@Model.orderid</li>
+            </ol>
+        </nav>
+
         <div class="order-header-box">
             <div class="row align-items-center">
                 <div class="col-md-7">
@@ -354,7 +425,12 @@ else
                             _ => "status-default"
                         };
                     }
-                    <div class="status-pill @statusClass">@Model.status</div>
+                    <div class="d-flex align-items-center justify-content-md-end gap-3">
+                        <div class="status-pill @statusClass">@Model.status</div>
+                        <a href="@Url.Action("EditStatus", "Order", new { orderId = Model.orderid })" class="btn-edit-status">
+                            <i class="bi bi-pencil-square"></i> Edit Status
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
