@@ -27,6 +27,27 @@
             font-family: 'Inter', sans-serif;
         }
 
+        /* Breadcrumb */
+        .breadcrumb {
+            padding: 0;
+            margin: 0 0 20px 0;
+            background: transparent;
+            justify-content: center;
+        }
+
+        .breadcrumb-item a {
+            color: var(--text-muted);
+            text-decoration: none;
+        }
+
+            .breadcrumb-item a:hover {
+                color: var(--primary-pink);
+            }
+
+        .breadcrumb-item.active {
+            color: var(--primary-pink);
+        }
+
         .orders-header {
             padding: 40px 0 20px;
             text-align: center;
@@ -39,7 +60,6 @@
             margin-bottom: 5px;
         }
 
-        /* إصلاح مشكلة ظهور الجدول باللون الأبيض */
         .orders-table {
             background: var(--card-bg) !important;
             border-radius: 12px;
@@ -53,13 +73,12 @@
             background-color: transparent !important;
         }
 
-        /* إجبار الصفوف والخلايا على الخلفية الغامقة */
-        .table td, .table th {
-            background-color: var(--card-bg) !important; 
-            color: var(--text-light) !important;
-            border-bottom: 1px solid #333 !important;
-            padding: 15px 12px;
-        }
+            .table td, .table th {
+                background-color: var(--card-bg) !important;
+                color: var(--text-light) !important;
+                border-bottom: 1px solid #333 !important;
+                padding: 15px 12px;
+            }
 
         .orders-table thead th {
             background: #252525 !important;
@@ -70,11 +89,10 @@
             border-bottom: 2px solid var(--primary-pink) !important;
         }
 
-        /* تنسيق النصوص لتكون واضحة */
         .order-id {
             font-family: 'Courier New', monospace;
             font-weight: 700;
-            color: var(--primary-pink) !important; /* لون وردي للـ ID لتمييزه */
+            color: var(--primary-pink) !important;
         }
 
         .order-email {
@@ -111,10 +129,29 @@
             text-transform: uppercase;
         }
 
-        .status-badge.pending { background: rgba(255, 167, 38, 0.15); color: #FFA726; border: 1px solid #FFA726; }
-        .status-badge.shipped { background: rgba(102, 187, 106, 0.15); color: #66BB6A; border: 1px solid #66BB6A; }
-        .status-badge.delivered { background: rgba(38, 166, 154, 0.15); color: #26A69A; border: 1px solid #26A69A; }
-        .status-badge.cancelled { background: rgba(239, 83, 80, 0.15); color: #EF5350; border: 1px solid #EF5350; }
+            .status-badge.pending {
+                background: rgba(255, 167, 38, 0.15);
+                color: #FFA726;
+                border: 1px solid #FFA726;
+            }
+
+            .status-badge.shipped {
+                background: rgba(102, 187, 106, 0.15);
+                color: #66BB6A;
+                border: 1px solid #66BB6A;
+            }
+
+            .status-badge.delivered {
+                background: rgba(38, 166, 154, 0.15);
+                color: #26A69A;
+                border: 1px solid #26A69A;
+            }
+
+            .status-badge.cancelled {
+                background: rgba(239, 83, 80, 0.15);
+                color: #EF5350;
+                border: 1px solid #EF5350;
+            }
 
         .btn-view {
             border: 1px solid var(--primary-pink);
@@ -125,33 +162,50 @@
             transition: 0.3s;
         }
 
-        .btn-view:hover {
-            background: var(--primary-pink);
-            color: white;
-        }
+            .btn-view:hover {
+                background: var(--primary-pink);
+                color: white;
+            }
 
         /* Responsive Mobile Labels */
         @@media (max-width: 768px) {
-            .table thead { display: none; }
-            .table tr { display: block; margin-bottom: 1rem; border: 1px solid #333; }
-            .table td { 
-                display: flex; 
-                justify-content: space-between; 
-                text-align: right; 
+            .table thead {
+                display: none;
+            }
+
+            .table tr {
+                display: block;
+                margin-bottom: 1rem;
+                border: 1px solid #333;
+            }
+
+            .table td {
+                display: flex;
+                justify-content: space-between;
+                text-align: right;
                 border-bottom: 1px solid #222 !important;
             }
-            .table td::before {
-                content: attr(data-label);
-                font-weight: bold;
-                color: var(--primary-pink);
-                float: left;
-            }
+
+                .table td::before {
+                    content: attr(data-label);
+                    font-weight: bold;
+                    color: var(--primary-pink);
+                    float: left;
+                }
         }
     </style>
 }
 
 <div class="orders-header">
     <div class="container">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">My Orders</li>
+            </ol>
+        </nav>
+
         <h1 class="orders-title">My Orders</h1>
         <p style="color: var(--primary-pink)">Track your professional purchases</p>
     </div>
@@ -227,7 +281,7 @@
                                 <span class="status-badge @order.status.ToLower()">@order.status</span>
                             </td>
                             <td data-label="Actions">
-                                <a href="@Url.Action("GetOrderbyid", "Order", new { orderId = order.orderid })" class="btn-view">
+                                <a href="@Url.Action("GetOrderbyid", "Order", new { orderid = order.orderid })" class="btn-view">
                                     <i class="bi bi-eye"></i> Details
                                 </a>
                             </td>
@@ -244,7 +298,7 @@
                     @for (int i = 1; i <= Model.TotalPages; i++)
                     {
                         <li class="page-item @(i == Model.PageNumber ? "active" : "")">
-                            <a class="page-link bg-dark border-secondary text-light @(i == Model.PageNumber ? "bg-primary-pink" : "")" 
+                            <a class="page-link bg-dark border-secondary text-light @(i == Model.PageNumber ? "bg-primary-pink" : "")"
                                href="@Url.Action("GetUserOrders", new { pageIndex = i, search = searchTerm, sortBy = sortBy, sortDir = sortDir })">@i</a>
                         </li>
                     }
