@@ -17,7 +17,7 @@ namespace Application_Layer.CQRS.Products.Queries
         int PageSize = 10,
         int PageIndex = 1,
         string? SortBy = "id",
-        string? SortDir = "asc",
+        string? SortDir = "desc",
         string? SearchTerm = null
     ) : IRequest<RequestRespones<PaginatedListDto<GetAllProductsDto>>>;
 
@@ -48,35 +48,34 @@ namespace Application_Layer.CQRS.Products.Queries
     {
         { "id", p => p.Id },
         { "name", p => p.Name },
-        //{ "price", p => p.Price },
-        //{ "stock", p => p.Stock }
     };
 
             query = ApplySorting(query, request.SortBy, request.SortDir, sortColumns);
 
+            // ✅ 1. العدد الكلي الحقيقي (قبل Pagination)
             var totalCount = await query.CountAsync(cancellationToken);
 
+            // ✅ 2. تطبيق Pagination
             query = ApplayPagination(query, request.PageIndex, request.PageSize);
+
+            // ✅ 3. جلب العناصر الخاصة بالصفحة الحالية
+            var items = await query
+                .Select(p => new GetAllProductsDto
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    ImageUrl = p.ImageUrl ?? "",
+                    Description = p.Description
+                })
+                .ToListAsync(cancellationToken);
 
             var result = new PaginatedListDto<GetAllProductsDto>
             {
-                Items = await query
-           .Select(p => new GetAllProductsDto
-           {
-               Id = p.Id,
-               Name = p.Name,
-               //Price = p.Price,
-               ImageUrl = p.ImageUrl??"",
-               //Stock = p.Stock,
-               Description = p.Description
-           })
-           .ToListAsync(cancellationToken),
-
+                Items = items,
                 PageNumber = request.PageIndex,
                 PageSize = request.PageSize,
-                TotalCount = await query.CountAsync(cancellationToken) 
+                TotalCount = totalCount  
             };
-
 
             return RequestRespones<PaginatedListDto<GetAllProductsDto>>.Success(
                 result,

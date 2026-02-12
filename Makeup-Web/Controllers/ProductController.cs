@@ -41,7 +41,7 @@ namespace Makeup_Web.Controllers
             return View();
         }
 
-        public async Task<IActionResult> GetAllProducts(int pageIndex = 1, int pageSize = 10, string? sortBy = "id", string? sortDir = "asc", string? search = null)
+        public async Task<IActionResult> GetAllProducts(int pageIndex = 1, int pageSize = 10, string? sortBy = "id", string? sortDir = "desc", string? search = null)
         {
             var result = await _mediator.Send(new GetAllProductsQuery(pageSize, pageIndex, sortBy, sortDir, search));
 
@@ -134,7 +134,7 @@ namespace Makeup_Web.Controllers
                 model.Variants
             ));
 
-            if (result.IsSuccess) return RedirectToAction(nameof(Index));
+            if (result.IsSuccess) return Json(new {success=true,Message="Product Created Successfully"});
 
             ModelState.AddModelError("", result.Message);
             return View(model);
