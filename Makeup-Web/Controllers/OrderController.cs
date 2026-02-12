@@ -2,7 +2,7 @@
 using Application_Layer.CQRS.Orders.Commands.CreatOrder;
 using Application_Layer.CQRS.Orders.Commands.DeleteOrder;
 using Application_Layer.CQRS.Orders.Commands.UpdateOrder;
-using Application_Layer.CQRS.Orders.Commands.UpdateOrderDetails; // الـ Namespace الجديد
+using Application_Layer.CQRS.Orders.Commands.UpdateOrderDetails;
 using Application_Layer.CQRS.Orders.Commands.UpdateOrderStatus;
 using Application_Layer.CQRS.Orders.Quries.GetAllOrders;
 using Application_Layer.CQRS.Orders.Quries.GetAllOrdersForUser;
@@ -58,7 +58,6 @@ namespace Makeup_Web.Controllers
             {
                 TempData["ErrorMessage"] = CreatOrderResult.Message;
                 return RedirectToAction("GetUserBasketByUserid", "basket");
-
             }
             TempData["SuccessMessage"] = "Order created successfully!";
             return RedirectToAction(nameof(GetUserOrders));
@@ -79,15 +78,14 @@ namespace Makeup_Web.Controllers
 
             TempData["ErrorMessage"] = result.Message;
             return RedirectToAction(nameof(GetOrderbyid), new { orderid = orderId });
-
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateOrderStatus(UpdateOrderStatusViewModle Modle) 
+        public async Task<IActionResult> UpdateOrderStatus(UpdateOrderStatusViewModle Modle)
         {
             if (!ModelState.IsValid)
             {
-                var Errors = ModelState.Where(x=>x.Value.Errors.Any())
+                var Errors = ModelState.Where(x => x.Value.Errors.Any())
                     .ToDictionary(
                         kvp => kvp.Key,
                         kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray()
@@ -100,20 +98,66 @@ namespace Makeup_Web.Controllers
                 });
             }
 
-            var UpdateOrderStatusReslut= await _Mediator.Send(new UpdateOrderStatusCommand(Modle.Orderid,Modle.OrderStatus));
+            var UpdateOrderStatusReslut = await _Mediator.Send(new UpdateOrderStatusCommand(Modle.Orderid, Modle.OrderStatus));
 
             if (!UpdateOrderStatusReslut.IsSuccess)
             {
-                return Json(new { succes = false,Message="Error While Updating Status" });
+                return Json(new { succes = false, Message = "Error While Updating Status" });
             }
 
             return Json(new { succes = true, Message = "Updated Successfuly" });
+        }
+        #endregion
 
+        #region Edit Order Status (Full Page)
+        [HttpGet]
+        public async Task<IActionResult> EditStatus(int orderId)
+        {
+            var orderResult = await _Mediator.Send(new GetOrderbyidQuery(orderId));
+            if (!orderResult.IsSuccess || orderResult.Data == null)
+            {
+                TempData["ErrorMessage"] = "Order not found.";
+                return RedirectToAction(nameof(GetAllOrders));
+            }
+
+            var viewModel = new UpdateOrderStatusViewModle
+            {
+                Orderid = orderResult.Data.orderid,
+                OrderStatus = Enum.Parse<OrderStatus>(orderResult.Data.status)
+            };
+
+            ViewBag.Order = orderResult.Data;
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditStatus(UpdateOrderStatusViewModle model)
+        {
+            if (!ModelState.IsValid)
+            {
+                var orderResult = await _Mediator.Send(new GetOrderbyidQuery(model.Orderid));
+                ViewBag.Order = orderResult.Data;
+                return View(model);
+            }
+
+            var command = new UpdateOrderStatusCommand(model.Orderid, model.OrderStatus);
+            var result = await _Mediator.Send(command);
+
+            if (result.IsSuccess)
+            {
+                TempData["SuccessMessage"] = "Order status updated successfully.";
+                return RedirectToAction(nameof(GetOrderbyid), new { orderid = model.Orderid });
+            }
+
+            ModelState.AddModelError("", result.Message);
+            var reloadOrder = await _Mediator.Send(new GetOrderbyidQuery(model.Orderid));
+            ViewBag.Order = reloadOrder.Data;
+            return View(model);
         }
         #endregion
 
         #region Update Order Details (Items & Inventory)
-     
         [HttpPost]
         public async Task<IActionResult> UpdateOrderDetails([FromBody] UpdateOrderDetailsCommand command)
         {
@@ -200,7 +244,7 @@ namespace Makeup_Web.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllOrderStatus() 
+        public async Task<IActionResult> GetAllOrderStatus()
         {
             var GetStatusResult = await _Mediator.Send(new GetOrderStatusesQuery());
 
@@ -210,7 +254,6 @@ namespace Makeup_Web.Controllers
             }
 
             return Json(new { succes = true, Message = GetStatusResult.Message });
-
         }
         #endregion
 

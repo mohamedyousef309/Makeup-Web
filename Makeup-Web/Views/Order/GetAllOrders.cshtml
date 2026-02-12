@@ -31,6 +31,26 @@
             font-family: 'Inter', sans-serif;
         }
 
+        /* Breadcrumb */
+        .breadcrumb {
+            padding: 0;
+            margin: 0 0 20px 0;
+            background: transparent;
+        }
+
+        .breadcrumb-item a {
+            color: var(--text-muted);
+            text-decoration: none;
+        }
+
+            .breadcrumb-item a:hover {
+                color: var(--primary-pink);
+            }
+
+        .breadcrumb-item.active {
+            color: var(--primary-pink);
+        }
+
         /* Page Header */
         .page-header {
             padding: 30px 0;
@@ -68,41 +88,41 @@
             border-spacing: 0;
         }
 
-        .orders-table thead {
-            background: linear-gradient(45deg, #1a1a1a, #0f0f0f);
-        }
+            .orders-table thead {
+                background: linear-gradient(45deg, #1a1a1a, #0f0f0f);
+            }
 
-        .orders-table th {
-            padding: 20px 25px;
-            text-align: left;
-            font-weight: 600;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-muted);
-            border-bottom: 2px solid var(--primary-pink);
-            white-space: nowrap;
-        }
+            .orders-table th {
+                padding: 20px 25px;
+                text-align: left;
+                font-weight: 600;
+                font-size: 0.9rem;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                color: var(--text-muted);
+                border-bottom: 2px solid var(--primary-pink);
+                white-space: nowrap;
+            }
 
-        .orders-table td {
-            padding: 20px 25px;
-            border-bottom: 1px solid #252525;
-            vertical-align: middle;
-        }
+            .orders-table td {
+                padding: 20px 25px;
+                border-bottom: 1px solid #252525;
+                vertical-align: middle;
+            }
 
-        .orders-table tbody tr {
-            transition: all 0.3s ease;
-        }
+            .orders-table tbody tr {
+                transition: all 0.3s ease;
+            }
 
-        .orders-table tbody tr:hover {
-            background: rgba(214, 138, 138, 0.05);
-        }
+                .orders-table tbody tr:hover {
+                    background: rgba(214, 138, 138, 0.05);
+                }
 
-        .orders-table tbody tr:last-child td {
-            border-bottom: none;
-        }
+                .orders-table tbody tr:last-child td {
+                    border-bottom: none;
+                }
 
-        /* ===== Mobile Card Layout (max-width: 992px) ===== */
+        /* ===== Mobile Card Layout ===== */
         @@media (max-width: 992px) {
             .orders-table thead {
                 display: none;
@@ -116,35 +136,34 @@
                 width: 100%;
             }
 
-            .orders-table tr {
-                background: var(--input-bg);
-                margin-bottom: 20px;
-                border-radius: 12px;
-                padding: 20px;
-                border: 1px solid #333;
-                transition: all 0.3s ease;
-            }
+                .orders-table tr {
+                    background: var(--input-bg);
+                    margin-bottom: 20px;
+                    border-radius: 12px;
+                    padding: 20px;
+                    border: 1px solid #333;
+                }
 
-            .orders-table td {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 12px 0;
-                border-bottom: 1px solid #252525;
-            }
+                .orders-table td {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: 12px 0;
+                    border-bottom: 1px solid #252525;
+                }
 
-            .orders-table td:last-child {
-                border-bottom: none;
-            }
+                    .orders-table td:last-child {
+                        border-bottom: none;
+                    }
 
-            .orders-table td::before {
-                content: attr(data-label);
-                font-weight: 600;
-                color: var(--text-muted);
-                margin-right: 15px;
-                flex-shrink: 0;
-                width: 110px;
-            }
+                    .orders-table td::before {
+                        content: attr(data-label);
+                        font-weight: 600;
+                        color: var(--text-muted);
+                        margin-right: 15px;
+                        flex-shrink: 0;
+                        width: 110px;
+                    }
 
             .status-container {
                 width: 100%;
@@ -191,22 +210,22 @@
             position: relative;
         }
 
-        .status-badge:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        }
+            .status-badge:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            }
 
-        .status-badge.has-dropdown::after {
-            content: '▼';
-            font-size: 10px;
-            margin-left: 5px;
-            opacity: 0.7;
-            transition: transform 0.3s ease;
-        }
+            .status-badge.has-dropdown::after {
+                content: '▼';
+                font-size: 10px;
+                margin-left: 5px;
+                opacity: 0.7;
+                transition: transform 0.3s ease;
+            }
 
-        .status-badge.dropdown-open::after {
-            transform: rotate(180deg);
-        }
+            .status-badge.dropdown-open::after {
+                transform: rotate(180deg);
+            }
 
         .status-pending {
             background: rgba(255, 193, 7, 0.15);
@@ -266,14 +285,21 @@
             margin-top: 5px;
         }
 
-        .status-dropdown.show {
-            display: block;
-            animation: fadeIn 0.2s ease;
-        }
+            .status-dropdown.show {
+                display: block;
+                animation: fadeIn 0.2s ease;
+            }
 
         @@keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .status-option {
@@ -287,24 +313,25 @@
             color: var(--text-light);
         }
 
-        .status-option:last-child {
-            border-bottom: none;
-        }
+            .status-option:last-child {
+                border-bottom: none;
+            }
 
-        .status-option:hover {
-            background: rgba(255, 255, 255, 0.05);
-            padding-left: 25px;
-        }
+            .status-option:hover {
+                background: rgba(255, 255, 255, 0.05);
+                padding-left: 25px;
+            }
 
-        .status-option i {
-            width: 20px;
-            text-align: center;
-        }
+            .status-option i {
+                width: 20px;
+                text-align: center;
+            }
 
         /* Action Buttons */
         .action-buttons {
             display: flex;
             gap: 10px;
+            flex-wrap: wrap;
         }
 
         .btn-action {
@@ -319,7 +346,15 @@
             transition: all 0.3s ease;
             border: none;
             cursor: pointer;
+            background: rgba(214, 138, 138, 0.1);
+            color: var(--primary-pink);
+            border: 1px solid rgba(214, 138, 138, 0.3);
         }
+
+            .btn-action:hover {
+                background: rgba(214, 138, 138, 0.2);
+                transform: translateY(-2px);
+            }
 
         .btn-delete {
             background: rgba(255, 77, 77, 0.1);
@@ -327,10 +362,9 @@
             border: 1px solid rgba(255, 77, 77, 0.3);
         }
 
-        .btn-delete:hover {
-            background: rgba(255, 77, 77, 0.2);
-            transform: translateY(-2px);
-        }
+            .btn-delete:hover {
+                background: rgba(255, 77, 77, 0.2);
+            }
 
         .btn-view {
             background: rgba(214, 138, 138, 0.1);
@@ -338,10 +372,9 @@
             border: 1px solid rgba(214, 138, 138, 0.3);
         }
 
-        .btn-view:hover {
-            background: rgba(214, 138, 138, 0.2);
-            transform: translateY(-2px);
-        }
+            .btn-view:hover {
+                background: rgba(214, 138, 138, 0.2);
+            }
 
         /* Search and Filter Bar */
         .search-filter-bar {
@@ -360,30 +393,30 @@
             max-width: 400px;
         }
 
-        .search-box input {
-            width: 100%;
-            padding: 12px 20px 12px 45px;
-            background: var(--dark-bg);
-            border: 1px solid #333;
-            border-radius: 8px;
-            color: var(--text-light);
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
-        }
+            .search-box input {
+                width: 100%;
+                padding: 12px 20px 12px 45px;
+                background: var(--dark-bg);
+                border: 1px solid #333;
+                border-radius: 8px;
+                color: var(--text-light);
+                font-size: 0.95rem;
+                transition: all 0.3s ease;
+            }
 
-        .search-box input:focus {
-            outline: none;
-            border-color: var(--primary-pink);
-            box-shadow: 0 0 0 3px rgba(214, 138, 138, 0.1);
-        }
+                .search-box input:focus {
+                    outline: none;
+                    border-color: var(--primary-pink);
+                    box-shadow: 0 0 0 3px rgba(214, 138, 138, 0.1);
+                }
 
-        .search-box i {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-        }
+            .search-box i {
+                position: absolute;
+                left: 15px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: var(--text-muted);
+            }
 
         /* Pagination */
         .pagination-container {
@@ -408,46 +441,46 @@
             padding: 0;
         }
 
-        .pagination .page-item {
-            margin: 0;
-        }
+            .pagination .page-item {
+                margin: 0;
+            }
 
-        .pagination .page-item .page-link {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 40px;
-            height: 40px;
-            padding: 0 15px;
-            background: var(--input-bg);
-            border: 1px solid #333;
-            border-radius: 8px;
-            color: var(--text-light);
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-        }
+                .pagination .page-item .page-link {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    min-width: 40px;
+                    height: 40px;
+                    padding: 0 15px;
+                    background: var(--input-bg);
+                    border: 1px solid #333;
+                    border-radius: 8px;
+                    color: var(--text-light);
+                    text-decoration: none;
+                    font-weight: 600;
+                    font-size: 0.9rem;
+                    transition: all 0.3s ease;
+                }
 
-        .pagination .page-item .page-link:hover {
-            background: rgba(214, 138, 138, 0.1);
-            border-color: var(--primary-pink);
-            transform: translateY(-2px);
-        }
+                    .pagination .page-item .page-link:hover {
+                        background: rgba(214, 138, 138, 0.1);
+                        border-color: var(--primary-pink);
+                        transform: translateY(-2px);
+                    }
 
-        .pagination .page-item.active .page-link {
-            background: var(--primary-pink);
-            border-color: var(--primary-pink);
-            color: white;
-        }
+                .pagination .page-item.active .page-link {
+                    background: var(--primary-pink);
+                    border-color: var(--primary-pink);
+                    color: white;
+                }
 
-        .pagination .page-item.disabled .page-link {
-            background: var(--dark-bg);
-            border-color: #333;
-            color: #666;
-            cursor: not-allowed;
-            transform: none;
-        }
+                .pagination .page-item.disabled .page-link {
+                    background: var(--dark-bg);
+                    border-color: #333;
+                    color: #666;
+                    cursor: not-allowed;
+                    transform: none;
+                }
 
         /* Empty State */
         .empty-state {
@@ -455,24 +488,24 @@
             text-align: center;
         }
 
-        .empty-state i {
-            font-size: 4rem;
-            color: var(--text-muted);
-            margin-bottom: 20px;
-            opacity: 0.5;
-        }
+            .empty-state i {
+                font-size: 4rem;
+                color: var(--text-muted);
+                margin-bottom: 20px;
+                opacity: 0.5;
+            }
 
-        .empty-state h3 {
-            color: var(--text-light);
-            font-size: 1.5rem;
-            margin-bottom: 10px;
-        }
+            .empty-state h3 {
+                color: var(--text-light);
+                font-size: 1.5rem;
+                margin-bottom: 10px;
+            }
 
-        .empty-state p {
-            color: var(--text-muted);
-            font-size: 1rem;
-            margin-bottom: 30px;
-        }
+            .empty-state p {
+                color: var(--text-muted);
+                font-size: 1rem;
+                margin-bottom: 30px;
+            }
 
         /* Modal Styles */
         .modal-overlay {
@@ -500,8 +533,15 @@
         }
 
         @@keyframes modalSlideIn {
-            from { opacity: 0; transform: translateY(-50px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .modal-header {
@@ -511,11 +551,11 @@
             margin-bottom: 20px;
         }
 
-        .modal-header h3 {
-            font-size: 1.5rem;
-            color: var(--text-light);
-            margin: 0;
-        }
+            .modal-header h3 {
+                font-size: 1.5rem;
+                color: var(--text-light);
+                margin: 0;
+            }
 
         .modal-close {
             background: none;
@@ -533,21 +573,21 @@
             transition: all 0.3s ease;
         }
 
-        .modal-close:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-light);
-        }
+            .modal-close:hover {
+                background: rgba(255, 255, 255, 0.1);
+                color: var(--text-light);
+            }
 
         .modal-body {
             margin-bottom: 30px;
         }
 
-        .modal-body p {
-            color: var(--text-muted);
-            font-size: 1.1rem;
-            line-height: 1.6;
-            margin: 0;
-        }
+            .modal-body p {
+                color: var(--text-muted);
+                font-size: 1.1rem;
+                line-height: 1.6;
+                margin: 0;
+            }
 
         .modal-footer {
             display: flex;
@@ -566,9 +606,9 @@
             transition: all 0.3s ease;
         }
 
-        .btn-cancel:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
+            .btn-cancel:hover {
+                background: rgba(255, 255, 255, 0.1);
+            }
 
         .btn-confirm-delete {
             background: rgba(255, 77, 77, 0.1);
@@ -581,9 +621,9 @@
             transition: all 0.3s ease;
         }
 
-        .btn-confirm-delete:hover {
-            background: rgba(255, 77, 77, 0.2);
-        }
+            .btn-confirm-delete:hover {
+                background: rgba(255, 77, 77, 0.2);
+            }
 
         /* Toast Notification */
         .custom-toast {
@@ -663,6 +703,14 @@
 </div>
 
 <div class="container py-5">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Orders Management</li>
+        </ol>
+    </nav>
+
     <!-- Page Header -->
     <div class="page-header">
         <h1 class="page-title">Orders Management</h1>
@@ -683,11 +731,11 @@
             <div class="search-box">
                 <i class="bi bi-search"></i>
                 <form method="get" asp-action="GetAllOrders" id="searchForm">
-                    <input type="text" name="search" placeholder="Search by email..." value="@Context.Request.Query["search"]" 
+                    <input type="text" name="search" placeholder="Search by email..." value="@Context.Request.Query["search"]"
                            onkeypress="if(event.keyCode==13) document.getElementById('searchForm').submit();">
                 </form>
             </div>
-            
+
             <div class="pagination-info">
                 Showing @((Model.PageNumber - 1) * Model.PageSize + 1) - @(Math.Min(Model.PageNumber * Model.PageSize, Model.TotalCount)) of @Model.TotalCount orders
             </div>
@@ -762,21 +810,25 @@
                                                 _ => "status-pending"
                                             };
                                         }
-                                        <span class="status-badge @statusClass has-dropdown" 
-                                              data-order-id="@order.orderid" 
+                                        <span class="status-badge @statusClass has-dropdown"
+                                              data-order-id="@order.orderid"
                                               data-current-status="@order.status">
                                             <i class="bi bi-circle-fill" style="font-size: 0.5rem;"></i>
                                             <span class="status-text">@order.status</span>
                                         </span>
-                                        
+
                                         <div class="status-dropdown" id="dropdown-@order.orderid"></div>
                                     </div>
                                 </td>
                                 <td data-label="Actions">
                                     <div class="action-buttons">
-                                        <a href="@Url.Action("GetOrderbyid", "Order", new { id = order.orderid })" class="btn-action btn-view">
+                                        <a href="@Url.Action("GetOrderbyid", "Order", new { orderid = order.orderid })" class="btn-action btn-view">
                                             <i class="bi bi-eye"></i>
                                             <span>View</span>
+                                        </a>
+                                        <a href="@Url.Action("EditStatus", "Order", new { orderId = order.orderid })" class="btn-action">
+                                            <i class="bi bi-pencil"></i>
+                                            <span>Status</span>
                                         </a>
                                         <button class="btn-action btn-delete" onclick="openDeleteModal(@order.orderid)">
                                             <i class="bi bi-trash"></i>
@@ -844,7 +896,7 @@
 @section Scripts {
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     <script>
         // ========== المتغيرات العامة ==========
         let orderIdToDelete = null;
@@ -929,9 +981,9 @@
                 if (!dropdown) return;
 
                 const currentStatus = badge.getAttribute('data-current-status');
-                
+
                 // تصفية الحالات: استبعاد الحالة الحالية
-                const availableStatuses = orderStatuses.filter(s => 
+                const availableStatuses = orderStatuses.filter(s =>
                     s.name.toLowerCase() !== currentStatus?.toLowerCase()
                 );
 
@@ -963,21 +1015,21 @@
                     e.stopPropagation();
                     const orderId = this.getAttribute('data-order-id');
                     const dropdown = document.getElementById(`dropdown-${orderId}`);
-                    
+
                     // إغلاق أي قائمة مفتوحة حالياً
                     if (currentOpenDropdown && currentOpenDropdown !== dropdown) {
                         currentOpenDropdown.classList.remove('show');
                         const otherBadge = currentOpenDropdown.previousElementSibling;
                         if (otherBadge) otherBadge.classList.remove('dropdown-open');
                     }
-                    
+
                     // تبديل عرض القائمة الحالية
                     dropdown.classList.toggle('show');
                     this.classList.toggle('dropdown-open');
-                    
+
                     if (dropdown.classList.contains('show')) {
                         currentOpenDropdown = dropdown;
-                        
+
                         // إغلاق القائمة عند النقر خارجها
                         setTimeout(() => {
                             document.addEventListener('click', function closeHandler(ev) {
@@ -1013,7 +1065,7 @@
                 const badge = document.querySelector(`.status-badge[data-order-id="${orderId}"]`);
                 const originalText = badge.querySelector('.status-text').textContent;
                 badge.querySelector('.status-text').innerHTML = '<i class="bi bi-hourglass-split"></i> Updating...';
-                
+
                 // الحصول على AntiForgery token
                 const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
                 if (!token) {
@@ -1045,11 +1097,11 @@
                     // تحديث واجهة المستخدم
                     badge.setAttribute('data-current-status', newStatusName);
                     badge.querySelector('.status-text').textContent = newStatusName;
-                    
+
                     // تحديث كلاس البادج
                     badge.className = badge.className.replace(/status-\w+/g, '');
                     badge.classList.add(getStatusColorClass(newStatusName), 'status-badge', 'has-dropdown');
-                    
+
                     // تحديث القائمة المنسدلة (إزالة الحالة الجديدة من الخيارات)
                     const dropdown = document.getElementById(`dropdown-${orderId}`);
                     const availableStatuses = orderStatuses.filter(s => s.value !== newStatusValue);
@@ -1144,7 +1196,7 @@
                 confirmDeleteBtn.disabled = true;
 
                 const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
-                
+
                 const formData = new FormData();
                 formData.append('orderid', orderIdToDelete);
 
@@ -1161,7 +1213,7 @@
 
                 if (result.success) {
                     showToast('Success', result.message, 'success');
-                    
+
                     const row = document.querySelector(`tr[data-order-id="${orderIdToDelete}"]`);
                     if (row) {
                         row.style.backgroundColor = 'rgba(255, 77, 77, 0.1)';
@@ -1232,13 +1284,13 @@
         function sortTable(column) {
             const currentSortBy = '@Context.Request.Query["sortBy"]' || 'id';
             const currentSortDir = '@Context.Request.Query["sortDir"]' || 'desc';
-            
+
             let newSortDir = 'asc';
             if (currentSortBy === column && currentSortDir === 'asc') {
                 newSortDir = 'desc';
             }
-            
-            window.location.href = '@Url.Action("GetAllOrders")' + 
+
+            window.location.href = '@Url.Action("GetAllOrders")' +
                 `?sortBy=${column}&sortDir=${newSortDir}&pageIndex=1&pageSize=${@Model.PageSize}&search=${encodeURIComponent('@Context.Request.Query["search"]')}`;
         }
 
@@ -1246,7 +1298,7 @@
         document.addEventListener('DOMContentLoaded', async function() {
             // تحميل حالات الطلب
             await loadOrderStatuses();
-            
+
             // تهيئة القوائم المنسدلة
             initDropdowns();
 

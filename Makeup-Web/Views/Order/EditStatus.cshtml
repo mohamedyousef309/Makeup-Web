@@ -1,0 +1,250 @@
+﻿@using Domain_Layer.ViewModels.Order
+@using Domain_Layer.Entites.Order
+@model UpdateOrderStatusViewModle
+
+@{
+    ViewData["Title"] = "Update Order Status";
+    var order = ViewBag.Order as Domain_Layer.DTOs.OrderDTOs.OrderToReturnDto;
+}
+
+@section Styles {
+    <style>
+        :root {
+            --primary-pink: #d68a8a;
+            --dark-bg: #0f0f0f;
+            --card-bg: #1a1a1a;
+            --border-color: #2a2a2a;
+            --text-light: #ffffff;
+            --text-muted: #b0b0b0;
+        }
+
+        .status-update-container {
+            padding: 50px 0;
+        }
+
+        .status-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .card-header-pink {
+            background: linear-gradient(45deg, var(--primary-pink), #c27676);
+            padding: 30px;
+            text-align: center;
+        }
+
+            .card-header-pink h2 {
+                font-family: 'Playfair Display', serif;
+                color: white;
+                margin: 0;
+                font-size: 2rem;
+            }
+
+        .order-summary {
+            padding: 25px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            color: var(--text-muted);
+        }
+
+            .summary-item strong {
+                color: var(--text-light);
+            }
+
+        .form-container {
+            padding: 30px;
+        }
+
+        .form-label {
+            color: var(--primary-pink);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .form-select-custom {
+            background: #252525;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 15px 20px;
+            color: white;
+            font-size: 1rem;
+            width: 100%;
+            margin-bottom: 25px;
+            transition: all 0.3s;
+        }
+
+            .form-select-custom:focus {
+                border-color: var(--primary-pink);
+                box-shadow: 0 0 0 3px rgba(214, 138, 138, 0.1);
+                outline: none;
+            }
+
+        .btn-update {
+            background: var(--primary-pink);
+            border: none;
+            border-radius: 12px;
+            padding: 15px 30px;
+            color: white;
+            font-weight: 700;
+            text-transform: uppercase;
+            width: 100%;
+            transition: 0.3s;
+        }
+
+            .btn-update:hover {
+                background: #c27676;
+                transform: translateY(-3px);
+            }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-muted);
+            text-decoration: none;
+            margin-bottom: 20px;
+        }
+
+            .btn-back:hover {
+                color: var(--primary-pink);
+            }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+            .status-badge.pending {
+                background: rgba(255, 167, 38, 0.15);
+                color: #FFA726;
+                border: 1px solid #FFA726;
+            }
+
+            .status-badge.shipped {
+                background: rgba(102, 187, 106, 0.15);
+                color: #66BB6A;
+                border: 1px solid #66BB6A;
+            }
+
+            .status-badge.delivered {
+                background: rgba(38, 166, 154, 0.15);
+                color: #26A69A;
+                border: 1px solid #26A69A;
+            }
+
+            .status-badge.cancelled {
+                background: rgba(239, 83, 80, 0.15);
+                color: #EF5350;
+                border: 1px solid #EF5350;
+            }
+
+            .status-badge.processing {
+                background: rgba(23, 162, 184, 0.15);
+                color: #17a2b8;
+                border: 1px solid #17a2b8;
+            }
+
+            .status-badge.completed {
+                background: rgba(40, 167, 69, 0.15);
+                color: #28a745;
+                border: 1px solid #28a745;
+            }
+
+            .status-badge.refunded {
+                background: rgba(108, 117, 125, 0.15);
+                color: #adb5bd;
+                border: 1px solid #adb5bd;
+            }
+
+        .text-danger {
+            color: #ff6b6b;
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+    </style>
+}
+
+<div class="container status-update-container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <a href="@Url.Action("GetOrderbyid", new { orderid = Model.Orderid })" class="btn-back">
+                <i class="bi bi-arrow-left"></i> Back to Order Details
+            </a>
+
+            <div class="status-card">
+                <div class="card-header-pink">
+                    <h2>Update Status</h2>
+                    <p class="mb-0 opacity-75">Order #@Model.Orderid</p>
+                </div>
+
+                @if (order != null)
+                {
+                    <div class="order-summary">
+                        <div class="summary-item">
+                            <span>Current Status:</span>
+                            <strong>
+                                <span class="status-badge @order.status.ToLower()">
+                                    @order.status
+                                </span>
+                            </strong>
+                        </div>
+                        <div class="summary-item">
+                            <span>Order Date:</span>
+                            <strong>@order.orderDate.ToString("dd MMM yyyy HH:mm")</strong>
+                        </div>
+                        <div class="summary-item">
+                            <span>Customer:</span>
+                            <strong>@order.BuyerEmail</strong>
+                        </div>
+                    </div>
+                }
+
+                <div class="form-container">
+                    <form asp-action="EditStatus" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="Orderid" />
+
+                        <div class="mb-4">
+                            <label asp-for="OrderStatus" class="form-label">New Status</label>
+                            <select asp-for="OrderStatus" asp-items="Html.GetEnumSelectList<OrderStatus>()"
+                                    class="form-select-custom">
+                                <option value="">-- Select Status --</option>
+                            </select>
+                            <span asp-validation-for="OrderStatus" class="text-danger"></span>
+                        </div>
+
+                        <button type="submit" class="btn-update">
+                            <i class="bi bi-check2-circle me-2"></i> Update Status
+                        </button>
+                    </form>
+
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger mt-4" style="background: rgba(220,53,69,0.1); border: 1px solid rgba(220,53,69,0.3); color: #ff9e9e;">
+                            @Html.ValidationSummary(false)
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
