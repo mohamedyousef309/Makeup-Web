@@ -6,6 +6,7 @@ using Domain_Layer.Interfaces.ServiceInterfaces;
 using Domain_Layer.Respones;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,11 +24,13 @@ namespace Application_Layer.CQRS.Products.Commands.UpdateProduct
     {
         private readonly IGenaricRepository<Product> _productRepo;
         private readonly IAttachmentService attachmentService;
+        private readonly IMemoryCache memoryCache;
 
-        public UpdateProductHandler(IGenaricRepository<Product> productRepo,IAttachmentService attachmentService)
+        public UpdateProductHandler(IGenaricRepository<Product> productRepo,IAttachmentService attachmentService,IMemoryCache memoryCache)
         {
             _productRepo = productRepo;
             this.attachmentService = attachmentService;
+            this.memoryCache = memoryCache;
         }
 
         public async Task<RequestRespones<bool>> Handle(UpdateProductCommand request,CancellationToken cancellationToken)
@@ -40,10 +43,11 @@ namespace Application_Layer.CQRS.Products.Commands.UpdateProduct
                 return RequestRespones<bool>
                     .Fail("Product not found", 404);
 
+            string cacheKey = $"ProductDetails_{product.Id}";
+
+
             product.Name = dto.Name;
             product.Description = dto.Description;
-            //product.Price = dto.Price;
-            //product.Stock = dto.Stock;
             product.CategoryId = dto.CategoryId;
             product.IsActive = dto.IsActive;
 
@@ -69,6 +73,8 @@ namespace Application_Layer.CQRS.Products.Commands.UpdateProduct
 
             _productRepo.SaveInclude(product);
             await _productRepo.SaveChanges();
+
+            memoryCache.Remove(cacheKey);
 
             return RequestRespones<bool>.Success(true, 200, "Product updated successfully");
         }

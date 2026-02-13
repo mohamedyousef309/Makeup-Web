@@ -3,12 +3,13 @@ using Domain_Layer.Interfaces.Abstraction;
 using Domain_Layer.Interfaces.Repositryinterfaces;
 using Domain_Layer.Respones;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 
 namespace Application_Layer.CQRS.Caegories.Commands.DeleteCategory
 {
@@ -18,10 +19,13 @@ namespace Application_Layer.CQRS.Caegories.Commands.DeleteCategory
     : IRequestHandler<DeleteCategoryCommand, RequestRespones<bool>>
     {
         private readonly IGenaricRepository<Category> _categoryRepo;
-
-        public DeleteCategoryHandler(IGenaricRepository<Category> categoryRepo)
+        private readonly IMemoryCache memoryCache;
+        const string cacheKey = "Categories_All_Default";
+        public DeleteCategoryHandler(IGenaricRepository<Category> categoryRepo, IMemoryCache memoryCache
+)
         {
             _categoryRepo = categoryRepo;
+            this.memoryCache = memoryCache;
         }
 
         public async Task<RequestRespones<bool>> Handle(DeleteCategoryCommand request, CancellationToken cancellationToken)
@@ -39,7 +43,9 @@ namespace Application_Layer.CQRS.Caegories.Commands.DeleteCategory
            
                 await _categoryRepo.SaveChanges();
 
-                return RequestRespones<bool>.Success(true, 200, "Category deleted successfully.");
+            memoryCache.Remove(cacheKey);
+
+            return RequestRespones<bool>.Success(true, 200, "Category deleted successfully.");
             
             
         }

@@ -18,22 +18,16 @@ namespace Application_Layer.CQRS.Attributes.Quries.GetAttributeWithValueByid
     public class GetAttributeWithValueByidQueryHandler:IRequestHandler<GetAttributeWithValueByidQuery,RequestRespones<AttributeWithValueDTo>>
     {
         private readonly IGenaricRepository<Domain_Layer.Entites.Attribute> genaricRepository;
-        private readonly IMemoryCache memoryCache;
 
-        private const string AttributeCacheKeyPrefix = "AttributeDetail_";
         public GetAttributeWithValueByidQueryHandler(IGenaricRepository<Domain_Layer.Entites.Attribute> genaricRepository,IMemoryCache memoryCache)
         {
             this.genaricRepository = genaricRepository;
-            this.memoryCache = memoryCache;
         }
         public async Task<RequestRespones<AttributeWithValueDTo>> Handle(GetAttributeWithValueByidQuery request, CancellationToken cancellationToken)
         {
-            string cacheKey = $"{AttributeCacheKeyPrefix}{request.Attributeid}";
 
-            if (!memoryCache.TryGetValue(cacheKey, out AttributeWithValueDTo? attribute))
-            {
-                // 2. لو مش موجود في الكاش، هاته من الداتابيز
-                attribute = await genaricRepository.GetByCriteriaQueryable(x => x.Id == request.Attributeid)
+            
+                var attribute = await genaricRepository.GetByCriteriaQueryable(x => x.Id == request.Attributeid)
                     .Select(x => new AttributeWithValueDTo
                     {
                         Attributeid = x.Id,
@@ -46,16 +40,8 @@ namespace Application_Layer.CQRS.Attributes.Quries.GetAttributeWithValueByid
                         }).ToList()
                     }).FirstOrDefaultAsync(cancellationToken);
 
-                if (attribute != null)
-                {
-                    var cacheOptions = new MemoryCacheEntryOptions()
-                        .SetSlidingExpiration(TimeSpan.FromMinutes(30)) 
-                        .SetAbsoluteExpiration(TimeSpan.FromMinutes(45))   
-                        .SetPriority(CacheItemPriority.Low); 
-
-                    memoryCache.Set(cacheKey, attribute, cacheOptions);
-                }
-            }
+               
+            
 
             if (attribute == null)
             {

@@ -3,6 +3,7 @@ using Domain_Layer.Interfaces.Abstraction;
 using Domain_Layer.Interfaces.Repositryinterfaces;
 using Domain_Layer.Respones;
 using MediatR;
+using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,10 +17,15 @@ namespace Application_Layer.CQRS.Attributes.Commands.addAttribute
     public class addAttributeCommandHandler : IRequestHandler<addAttributeCommand, RequestRespones<bool>>
     {
         private readonly IGenaricRepository<Domain_Layer.Entites.Attribute> genaricRepository;
+        private readonly IMemoryCache memoryCache;
+        private const string AttributesCacheKey1 = "AllAttributesList";
+        private const string AttributesCacheKey2 = "Attributes_List_Key";
 
-        public addAttributeCommandHandler(IGenaricRepository<Domain_Layer.Entites.Attribute> genaricRepository)
+
+        public addAttributeCommandHandler(IGenaricRepository<Domain_Layer.Entites.Attribute> genaricRepository,IMemoryCache memoryCache)
         {
             this.genaricRepository = genaricRepository;
+            this.memoryCache = memoryCache;
         }
         public async Task<RequestRespones<bool>> Handle(addAttributeCommand request, CancellationToken cancellationToken)
         {
@@ -37,6 +43,9 @@ namespace Application_Layer.CQRS.Attributes.Commands.addAttribute
                 await genaricRepository.addAsync(Attribute);
 
                 await genaricRepository.SaveChanges();
+
+                memoryCache.Remove(AttributesCacheKey1);
+                memoryCache.Remove(AttributesCacheKey2);
 
                 return RequestRespones<bool>.Success(true, 200, "Attribute added successfully");
             }

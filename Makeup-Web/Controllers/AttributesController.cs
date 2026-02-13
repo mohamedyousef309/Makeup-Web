@@ -1,5 +1,5 @@
 ﻿using Application_Layer.CQRS.Attributes.Commands.addAttribute;
-using Application_Layer.CQRS.Attributes.Commands.AddAttributesWithValues;
+using Application_Layer.CQRS.Attributes.Commands;
 using Application_Layer.CQRS.Attributes.Commands.AddValuesToAttribute;
 using Application_Layer.CQRS.Attributes.Commands.deleteAttribute;
 using Application_Layer.CQRS.Attributes.Commands.DeleteAttributeValue;

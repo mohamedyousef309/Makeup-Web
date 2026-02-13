@@ -5,6 +5,7 @@ using Domain_Layer.Interfaces.Repositryinterfaces;
 using Domain_Layer.Respones;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -18,7 +19,8 @@ namespace Application_Layer.CQRS.Products.Queries
         int PageIndex = 1,
         string? SortBy = "id",
         string? SortDir = "desc",
-        string? SearchTerm = null
+        string? SearchTerm = null,
+        int? CategoryId=null
     ) : IRequest<RequestRespones<PaginatedListDto<GetAllProductsDto>>>;
 
     
@@ -26,10 +28,12 @@ namespace Application_Layer.CQRS.Products.Queries
         IRequestHandler<GetAllProductsQuery, RequestRespones<PaginatedListDto<GetAllProductsDto>>>
     {
         private readonly IGenaricRepository<Product> _productRepo;
+        private readonly IMemoryCache memoryCache;
 
-        public GetAllProductsHandler(IGenaricRepository<Product> productRepo)
+        public GetAllProductsHandler(IGenaricRepository<Product> productRepo,IMemoryCache memoryCache)
         {
             _productRepo = productRepo;
+            this.memoryCache = memoryCache;
         }
 
         public async Task<RequestRespones<PaginatedListDto<GetAllProductsDto>>> Handle(
@@ -37,7 +41,22 @@ namespace Application_Layer.CQRS.Products.Queries
             CancellationToken cancellationToken)
         {
 
+            bool isCachable = string.IsNullOrEmpty(request.SearchTerm) && request.PageIndex <= 5;
+
+            string cacheKey = $"Products_Default_P{request.CategoryId??0}{request.PageIndex}_{request.PageSize}";
+
+            if (isCachable&& memoryCache.TryGetValue(cacheKey, out PaginatedListDto<GetAllProductsDto>? cachedResult))
+            {
+                return RequestRespones<PaginatedListDto<GetAllProductsDto>>.Success(
+                    cachedResult!, 200, "Products retrieved from cache.");
+            }
+
             var query = _productRepo.GetAll();
+
+            if (request.CategoryId.HasValue && request.CategoryId.Value > 0)
+            {
+                query = query.Where(x => x.CategoryId == request.CategoryId.Value);
+            }
 
             if (!string.IsNullOrEmpty(request.SearchTerm))
             {
@@ -52,13 +71,10 @@ namespace Application_Layer.CQRS.Products.Queries
 
             query = ApplySorting(query, request.SortBy, request.SortDir, sortColumns);
 
-            // ✅ 1. العدد الكلي الحقيقي (قبل Pagination)
             var totalCount = await query.CountAsync(cancellationToken);
 
-            // ✅ 2. تطبيق Pagination
             query = ApplayPagination(query, request.PageIndex, request.PageSize);
 
-            // ✅ 3. جلب العناصر الخاصة بالصفحة الحالية
             var items = await query
                 .Select(p => new GetAllProductsDto
                 {
@@ -76,6 +92,19 @@ namespace Application_Layer.CQRS.Products.Queries
                 PageSize = request.PageSize,
                 TotalCount = totalCount  
             };
+
+            if (isCachable)
+            {
+                var cacheOptions = new MemoryCacheEntryOptions()
+                    .SetSlidingExpiration(TimeSpan.FromMinutes(10)) 
+                    .SetAbsoluteExpiration(TimeSpan.FromHours(1))   
+                    .SetPriority(CacheItemPriority.Normal)
+                    .SetSize(1); 
+
+                memoryCache.Set(cacheKey, result, cacheOptions);
+
+
+            }
 
             return RequestRespones<PaginatedListDto<GetAllProductsDto>>.Success(
                 result,

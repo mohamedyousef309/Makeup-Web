@@ -18,7 +18,7 @@ namespace Application_Layer.CQRS.Products.Commands.AddAttrputeToVariant
     {
         private readonly IGenaricRepository<VariantAttributeValue> genaricRepository;
 
-        public AddAttrputeToVariantCommandHandler(IGenaricRepository<Domain_Layer.Entites.VariantAttributeValue> genaricRepository)
+        public AddAttrputeToVariantCommandHandler(IGenaricRepository<VariantAttributeValue> genaricRepository)
         {
             this.genaricRepository = genaricRepository;
         }

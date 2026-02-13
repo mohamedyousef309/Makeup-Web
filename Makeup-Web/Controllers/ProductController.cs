@@ -41,8 +41,12 @@ namespace Makeup_Web.Controllers
             return View();
         }
 
-        public async Task<IActionResult> GetAllProducts(int pageIndex = 1, int pageSize = 10, string? sortBy = "id", string? sortDir = "desc", string? search = null)
+        public async Task<IActionResult> GetAllProducts(int pageIndex = 1, int pageSize = 10, string? sortBy = "id", string? sortDir = "desc", string? search = null, int? CategoryId = null)
         {
+            var categoiresList = await _mediator.Send(new GetCategoryLookupQuery());
+
+            ViewBag.Categories = categoiresList.IsSuccess ? categoiresList.Data : new List<CategoryLookupDto>();
+
             var result = await _mediator.Send(new GetAllProductsQuery(pageSize, pageIndex, sortBy, sortDir, search));
 
             if (!result.IsSuccess)
@@ -64,7 +68,6 @@ namespace Makeup_Web.Controllers
             if (!result.IsSuccess)
             {
                 TempData["ErrorMessage"] = result.Message;
-                // You can return an empty list or redirect depending on your UI preference
                 return View("GetAllProducts", new PaginatedListDto<ProductWithVariantsDto> { Items = new List<ProductWithVariantsDto>() });
             }
 

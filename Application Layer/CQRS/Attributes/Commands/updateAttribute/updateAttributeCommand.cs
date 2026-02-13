@@ -5,6 +5,7 @@ using Domain_Layer.Interfaces.Repositryinterfaces;
 using Domain_Layer.Respones;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,10 +18,13 @@ namespace Application_Layer.CQRS.Attributes.Commands.updateAttribute
     public class updateAttributeCommandHandler : IRequestHandler<updateAttributeCommand, RequestRespones<bool>>
     {
         private readonly IGenaricRepository<Domain_Layer.Entites.Attribute> _attributeRepository;
-
-        public updateAttributeCommandHandler(IGenaricRepository<Domain_Layer.Entites.Attribute> attributeRepository)
+        private readonly IMemoryCache memoryCache;
+        private const string AttributesCacheKey1 = "AllAttributesList";
+        private const string AttributesCacheKey2 = "Attributes_List_Key";
+        public updateAttributeCommandHandler(IGenaricRepository<Domain_Layer.Entites.Attribute> attributeRepository,IMemoryCache memoryCache)
         {
             _attributeRepository = attributeRepository;
+            this.memoryCache = memoryCache;
         }
 
         public async Task<RequestRespones<bool>> Handle(updateAttributeCommand request, CancellationToken cancellationToken)
@@ -54,6 +58,9 @@ namespace Application_Layer.CQRS.Attributes.Commands.updateAttribute
 
                 
                 await _attributeRepository.SaveChanges();
+
+                memoryCache.Remove(AttributesCacheKey1);
+                memoryCache.Remove(AttributesCacheKey2);
 
                 return RequestRespones<bool>.Success(true, 200, "Updated successfully using SaveInclude");
             }

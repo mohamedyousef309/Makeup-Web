@@ -45,14 +45,12 @@ namespace Application_Layer.CQRS.Products.Queries
            
             if (!string.IsNullOrEmpty(request.SearchTerm))
             {
-                //query = ApplySearch(query, request.SearchTerm, v => v.VariantName);
+                query = ApplySearch(query, request.SearchTerm, v => v.VariantName);
             }
 
             var sortColumns = new Dictionary<string, System.Linq.Expressions.Expression<System.Func<ProductVariant, object>>>
             {
                 { "id", v => v.Id },
-                //{ "variantname", v => v.VariantName },
-                //{ "variantvalue", v => v.VariantValue },
                 { "stock", v => v.Stock }
             };
 

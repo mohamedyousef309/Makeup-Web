@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Application_Layer.CQRS.Attributes.Commands.DeleteAttributeValue
 {
@@ -17,9 +18,13 @@ namespace Application_Layer.CQRS.Attributes.Commands.DeleteAttributeValue
     {
         private readonly IGenaricRepository<AttributeValue> _repository;
 
-        public DeleteAttributeValueHandler(IGenaricRepository<AttributeValue> repository)
+        private const string AttributesWithValuesCacheKey = "AttributesWithValues_List";
+        private readonly IMemoryCache memoryCache;
+
+        public DeleteAttributeValueHandler(IGenaricRepository<AttributeValue> repository,IMemoryCache memoryCache)
         {
             _repository = repository;
+            this.memoryCache = memoryCache;
         }
 
         public async Task<RequestRespones<bool>> Handle(DeleteAttributeValueCommand request, CancellationToken cancellationToken)
@@ -36,6 +41,7 @@ namespace Application_Layer.CQRS.Attributes.Commands.DeleteAttributeValue
                 _repository.Delete(attrValue);
                 await _repository.SaveChanges();
 
+                memoryCache.Remove(AttributesWithValuesCacheKey);
                 return RequestRespones<bool>.Success(true, 200, "Value deleted successfully");
             }
             catch (Exception ex)

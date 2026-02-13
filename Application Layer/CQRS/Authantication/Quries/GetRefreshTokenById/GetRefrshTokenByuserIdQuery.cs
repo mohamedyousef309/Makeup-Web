@@ -53,7 +53,9 @@ namespace Application_Layer.CQRS.Authantication.Quries.GetRefreshToken
                                 : TimeSpan.FromHours(1);
 
             var cacheOptions = new MemoryCacheEntryOptions()
-                .SetSlidingExpiration(TimeSpan.FromMinutes(35)) 
+                .SetSlidingExpiration(TimeSpan.FromMinutes(35))
+                .SetAbsoluteExpiration(DateTime.UtcNow.AddHours(1))
+
                 .SetAbsoluteExpiration(cacheDuration)          
                 .SetPriority(CacheItemPriority.High);          
 

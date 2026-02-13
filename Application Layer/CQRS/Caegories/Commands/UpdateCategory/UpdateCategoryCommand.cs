@@ -5,6 +5,7 @@ using Domain_Layer.Interfaces.Repositryinterfaces;
 using Domain_Layer.Respones;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,10 +20,13 @@ namespace Application_Layer.CQRS.Caegories.Commands.UpdateCategory
     : IRequestHandler<UpdateCategoryCommand, RequestRespones<bool>>
     {
         private readonly IGenaricRepository<Category> _categoryRepo;
+        private readonly IMemoryCache memoryCache;
+        const string cacheKey = "Categories_All_Default";
 
-        public UpdateCategoryHandler(IGenaricRepository<Category> categoryRepo)
+        public UpdateCategoryHandler(IGenaricRepository<Category> categoryRepo, IMemoryCache memoryCache)
         {
             _categoryRepo = categoryRepo;
+            this.memoryCache = memoryCache;
         }
 
         public async Task<RequestRespones<bool>> Handle(UpdateCategoryCommand request, CancellationToken cancellationToken)
@@ -41,9 +45,11 @@ namespace Application_Layer.CQRS.Caegories.Commands.UpdateCategory
                 _categoryRepo.SaveInclude(category,nameof(category.Description),nameof(category.Name));
                 await _categoryRepo.SaveChanges();
 
-             
+                  memoryCache.Remove(cacheKey);
 
-                return RequestRespones<bool>.Success(true, 200, "Category updated successfully.");
+
+
+            return RequestRespones<bool>.Success(true, 200, "Category updated successfully.");
             
            
         }

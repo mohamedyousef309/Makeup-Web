@@ -51,8 +51,8 @@ namespace Application_Layer.CQRS.Attributes.Quries.GetAttributesWithValues
                 if (attributes != null && attributes.Any())
                 {
                     var cacheOptions = new MemoryCacheEntryOptions()
-                        .SetSlidingExpiration(TimeSpan.FromMinutes(20))
-                        .SetAbsoluteExpiration(TimeSpan.FromMinutes(30))
+                        .SetSlidingExpiration(TimeSpan.FromMinutes(12))
+                        .SetAbsoluteExpiration(TimeSpan.FromMinutes(45))
                         .SetPriority(CacheItemPriority.Normal);
 
                     memoryCache.Set(AttributesWithValuesCacheKey, attributes, cacheOptions);

@@ -39,7 +39,7 @@ namespace Application_Layer.CQRS.Attributes.Quries.GetAttributesLookup
                     .ToListAsync(cancellationToken);
 
                 var cacheOptions = new MemoryCacheEntryOptions()
-                                    .SetSlidingExpiration(TimeSpan.FromMinutes(30))
+                                    .SetSlidingExpiration(TimeSpan.FromMinutes(15))
                                     .SetAbsoluteExpiration(TimeSpan.FromMinutes(45))
                                     .SetPriority(CacheItemPriority.Normal);
 

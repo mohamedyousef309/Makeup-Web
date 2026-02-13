@@ -6,6 +6,7 @@ using Domain_Layer.Interfaces.Repositryinterfaces;
 using Domain_Layer.Respones;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,18 +19,27 @@ namespace Application_Layer.CQRS.Products.Queries
     public class GetProductByIdHandler : IRequestHandler<GetProductWithVarintsByIdQuery, RequestRespones<ProductDetailsDto>>
     {
         private readonly IGenaricRepository<Product> _productRepo;
+        private readonly IMemoryCache memoryCache;
 
-        public GetProductByIdHandler(IGenaricRepository<Product> productRepo)
+        public GetProductByIdHandler(IGenaricRepository<Product> productRepo,IMemoryCache memoryCache)
         {
             _productRepo = productRepo;
+            this.memoryCache = memoryCache;
         }
 
         public async Task<RequestRespones<ProductDetailsDto>> Handle(GetProductWithVarintsByIdQuery request, CancellationToken cancellationToken)
         {
             try
             {
-               
-                var product = await _productRepo.GetByCriteriaQueryable(p => p.Id == request.Id).Select(p => new ProductDetailsDto
+                string cacheKey = $"ProductDetails_{request.Id}";
+
+                if (memoryCache.TryGetValue(cacheKey,out ProductDetailsDto? product))
+                {
+                    return RequestRespones<ProductDetailsDto>.Success(product, 200, "Product retrieved successfully.");
+
+                }
+
+                product = await _productRepo.GetByCriteriaQueryable(p => p.Id == request.Id).Select(p => new ProductDetailsDto
                 {
                     Id = p.Id,
                     Name = p.Name,
@@ -80,6 +90,13 @@ namespace Application_Layer.CQRS.Products.Queries
 
                 if (product == null)
                     return RequestRespones<ProductDetailsDto>.Fail($"Product with Id {request.Id} not found.", 404);
+
+                var cacheOptions = new MemoryCacheEntryOptions()
+                    .SetSlidingExpiration(TimeSpan.FromMinutes(10))
+                    .SetPriority(CacheItemPriority.Normal)
+                    .SetSize(1);
+
+                memoryCache.Set(cacheKey, product);
 
                 return RequestRespones<ProductDetailsDto>.Success(product, 200, "Product retrieved successfully.");
             }

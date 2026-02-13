@@ -41,7 +41,10 @@ namespace Application_Layer.CQRS.Authantication.Commads.Login
                 return RequestRespones<AuthModleDto>.Fail(user.Message, 404);
             }
 
-           
+            if (user.Data.IsBlocked)
+            {
+                return RequestRespones<AuthModleDto>.Fail("Your account is blocked. Please contact the administrator.", 403);
+            }
 
             var isPasswordValid = passwordHasher.Verify(user.Data, request.UserPassword);
 

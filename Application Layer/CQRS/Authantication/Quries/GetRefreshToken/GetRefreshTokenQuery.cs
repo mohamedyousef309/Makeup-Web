@@ -83,7 +83,9 @@ namespace Application_Layer.CQRS.Authantication.Quries.GetRefreshToken
 
                 var cacheOptions = new MemoryCacheEntryOptions()
                     .SetAbsoluteExpiration(cacheDuration) 
-                    .SetSlidingExpiration(TimeSpan.FromMinutes(35)) 
+                    .SetSlidingExpiration(TimeSpan.FromMinutes(35))
+                    .SetAbsoluteExpiration(DateTime.UtcNow.AddHours(1))
+
                     .SetPriority(CacheItemPriority.High);
 
                 _memoryCache.Set(cacheKey, token, cacheOptions);

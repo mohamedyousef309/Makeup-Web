@@ -4,6 +4,7 @@ using Domain_Layer.Interfaces.Abstraction;
 using Domain_Layer.Interfaces.Repositryinterfaces;
 using Domain_Layer.Respones;
 using MediatR;
+using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,10 +18,13 @@ namespace Application_Layer.CQRS.Attributes.Commands.AddValuesToAttribute
     public class AddValuesToAttributeHandler : IRequestHandler<AddValuesToAttributeCommand, RequestRespones<bool>>
     {
         private readonly IGenaricRepository<AttributeValue> _valueRepo;
+        private readonly IMemoryCache memoryCache;
+        private const string AttributesWithValuesCacheKey = "AttributesWithValues_List";
 
-        public AddValuesToAttributeHandler(IGenaricRepository<AttributeValue> valueRepo)
+        public AddValuesToAttributeHandler(IGenaricRepository<AttributeValue> valueRepo,IMemoryCache memoryCache)
         {
             _valueRepo = valueRepo;
+            this.memoryCache = memoryCache;
         }
 
         public async Task<RequestRespones<bool>> Handle(AddValuesToAttributeCommand request, CancellationToken cancellationToken)
@@ -45,6 +49,7 @@ namespace Application_Layer.CQRS.Attributes.Commands.AddValuesToAttribute
                 await _valueRepo.AddRangeAsync(newValues);
                 await _valueRepo.SaveChanges();
 
+                memoryCache.Remove(AttributesWithValuesCacheKey);
                 return RequestRespones<bool>.Success(true, 200, "New values added to attribute successfully.");
             }
             catch (Exception ex)

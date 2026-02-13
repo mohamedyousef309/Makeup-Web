@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Application_Layer.CQRS.Attributes.Commands.UpdateAttributeValue
 {
@@ -19,10 +20,13 @@ namespace Application_Layer.CQRS.Attributes.Commands.UpdateAttributeValue
     public class UpdateAttributeValueHandler : IRequestHandler<UpdateAttributeValueCommand, RequestRespones<bool>>
     {
         private readonly IGenaricRepository<AttributeValue> _valueRepo;
+        private readonly IMemoryCache memoryCache;
+        private const string AttributesWithValuesCacheKey = "AttributesWithValues_List";
 
-        public UpdateAttributeValueHandler(IGenaricRepository<AttributeValue> valueRepo)
+        public UpdateAttributeValueHandler(IGenaricRepository<AttributeValue> valueRepo,IMemoryCache memoryCache)
         {
             _valueRepo = valueRepo;
+            this.memoryCache = memoryCache;
         }
 
         public async Task<RequestRespones<bool>> Handle(UpdateAttributeValueCommand request, CancellationToken cancellationToken)
@@ -45,6 +49,8 @@ namespace Application_Layer.CQRS.Attributes.Commands.UpdateAttributeValue
                
                 _valueRepo.SaveInclude(existingValue);
                 await _valueRepo.SaveChanges();
+
+                memoryCache.Remove(AttributesWithValuesCacheKey);
 
                 return RequestRespones<bool>.Success(true, 200, "Attribute value updated successfully.");
             }

@@ -1,5 +1,6 @@
 ﻿@using Domain_Layer.DTOs
 @using Domain_Layer.DTOs.ProductDtos
+@using Domain_Layer.DTOs._ِCategoryDtos
 @model PaginatedListDto<GetAllProductsDto>
 
 @{
@@ -7,10 +8,12 @@
     var searchTerm = Context.Request.Query["search"];
     var sortBy = Context.Request.Query["sortBy"];
     var sortDir = Context.Request.Query["sortDir"];
+    var categoryId = Context.Request.Query["categoryId"];
 }
 
 @section Styles {
     <style>
+        /* (نفس الـ Styles الموجودة في السؤال الأول) */
         :root {
             --primary-pink: #d68a8a;
             --dark-bg: #0f0f0f;
@@ -174,7 +177,6 @@
             gap: 0;
         }
 
-        /* تنسيق أزرار الأدمن */
         .admin-actions {
             display: flex;
             gap: 10px;
@@ -224,7 +226,6 @@
                 color: white;
             }
 
-        /* زر التفاصيل المعدل */
         .btn-details {
             background: transparent;
             color: var(--text-light);
@@ -250,7 +251,6 @@
                 box-shadow: 0 10px 20px rgba(214, 138, 138, 0.2);
             }
 
-        /* Empty State */
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -263,7 +263,6 @@
             opacity: 0.5;
         }
 
-        /* Pagination */
         .pagination {
             margin-top: 50px;
             justify-content: center;
@@ -296,7 +295,6 @@
             color: #666;
         }
 
-        /* SweetAlert Custom Styling */
         .swal2-popup {
             background: #1a1a1a !important;
             border: 1px solid #252525 !important;
@@ -326,7 +324,6 @@
             border-radius: 8px !important;
         }
 
-        /* Animations for deletion */
         .product-card.removing {
             animation: slideOut 0.5s ease forwards;
         }
@@ -347,7 +344,6 @@
             }
         }
 
-        /* Toast Notification */
         .custom-toast {
             position: fixed;
             top: 30px;
@@ -387,7 +383,6 @@
             font-size: 0.9rem;
         }
 
-        /* Responsive Design */
         @@media (max-width: 768px) {
             .shop-title {
                 font-size: 2rem;
@@ -444,7 +439,8 @@
     <!-- Filter Section -->
     <div class="filter-section">
         <form id="filterForm" method="get" asp-action="GetAllProducts" class="row g-3">
-            <div class="col-12 col-lg-6">
+            <!-- حقل البحث -->
+            <div class="col-12 col-lg-4">
                 <div class="input-group">
                     <span class="input-group-text">
                         <i class="bi bi-search"></i>
@@ -457,17 +453,32 @@
                            aria-label="Search products">
                 </div>
             </div>
-            <div class="col-6 col-lg-3">
-                <select name="sortBy" class="form-select form-control-custom auto-submit">
-                    <option value="id" selected="@(sortBy == "id")">Newest First</option>
-                    <option value="name" selected="@(sortBy == "name")">Name (A to Z)</option>
+
+            <!-- Dropdown التصنيفات (Categories) -->
+            <div class="col-12 col-lg-3">
+                <select name="categoryId" class="form-select form-control-custom" onchange="this.form.submit()">
+                    <option value="">All Categories</option>
+                    @if (ViewBag.Categories != null)
+                    {
+                        foreach (var cat in ViewBag.Categories)
+                        {
+                            <option value="@cat.Id" selected="@(categoryId == cat.Id.ToString())">
+                                @cat.Name
+                            </option>
+                        }
+                    }
                 </select>
             </div>
-            <div class="col-6 col-lg-3">
-                <select name="sortDir" class="form-select form-control-custom auto-submit">
-                    <option value="asc" selected="@(sortDir == "asc")">Ascending</option>
-                    <option value="desc" selected="@(sortDir == "desc")">Descending</option>
+
+            <!-- القائمة المدمجة للترتيب -->
+            <div class="col-12 col-lg-3">
+                <select id="sortSelect" class="form-select form-control-custom">
+                    <option value="newest" selected="@(sortBy == "id" && sortDir == "desc")">Newest First</option>
+                    <option value="nameAsc" selected="@(sortBy == "name" && sortDir == "asc")">Name (A to Z)</option>
                 </select>
+                <!-- حقول مخفية تحمل قيم sortBy و sortDir الفعلية -->
+                <input type="hidden" name="sortBy" id="sortByHidden" value="@sortBy" />
+                <input type="hidden" name="sortDir" id="sortDirHidden" value="@sortDir" />
             </div>
         </form>
     </div>
@@ -513,7 +524,6 @@
                                         <span>Edit</span>
                                     </a>
 
-                                    <!-- زر Delete المعدل -->
                                     <button type="button"
                                             class="btn-admin btn-delete delete-product-btn"
                                             data-product-id="@product.Id"
@@ -550,7 +560,6 @@
 
                             <!-- Product Actions -->
                             <div class="product-actions">
-                                <!-- زر View Details المعدل -->
                                 <a asp-action="Details"
                                    asp-route-id="@product.Id"
                                    class="btn-details">
@@ -582,11 +591,11 @@
                             <span>There are currently no products available in our luxury collection.</span>
                         }
                     </p>
-                    @if (!string.IsNullOrEmpty(searchTerm))
+                    @if (!string.IsNullOrEmpty(searchTerm) || !string.IsNullOrEmpty(categoryId))
                     {
                         <a asp-action="GetAllProducts" class="btn btn-outline-primary">
                             <i class="bi bi-arrow-left me-2"></i>
-                            Clear Search
+                            Clear Filters
                         </a>
                     }
                 </div>
@@ -607,6 +616,7 @@
                        asp-route-search="@searchTerm"
                        asp-route-sortBy="@sortBy"
                        asp-route-sortDir="@sortDir"
+                       asp-route-categoryId="@categoryId"
                        aria-label="Previous">
                         <i class="bi bi-chevron-left"></i>
                     </a>
@@ -623,7 +633,8 @@
                                asp-route-pageIndex="@i"
                                asp-route-search="@searchTerm"
                                asp-route-sortBy="@sortBy"
-                               asp-route-sortDir="@sortDir">
+                               asp-route-sortDir="@sortDir"
+                               asp-route-categoryId="@categoryId">
                                 @i
                             </a>
                         </li>
@@ -644,6 +655,7 @@
                        asp-route-search="@searchTerm"
                        asp-route-sortBy="@sortBy"
                        asp-route-sortDir="@sortDir"
+                       asp-route-categoryId="@categoryId"
                        aria-label="Next">
                         <i class="bi bi-chevron-right"></i>
                     </a>
@@ -656,7 +668,7 @@
                 @if (Model.Items != null && Model.Items.Any())
                 {
                     <span class="mx-2">•</span>
-                    <span>@@Model.Items.Count items</span>
+                    <span>@Model.Items.Count() items</span>
                 }
             </div>
         </nav>
@@ -664,17 +676,13 @@
 </div>
 
 @section Scripts {
-    <!-- SweetAlert Library -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         // دالة عرض Toast
         function showToast(message, type = 'success') {
-            // إزالة أي toast موجود
             const existingToast = document.querySelector('.custom-toast:not(#errorToast)');
-            if (existingToast) {
-                existingToast.remove();
-            }
+            if (existingToast) existingToast.remove();
 
             const toast = document.createElement('div');
             toast.className = 'custom-toast';
@@ -691,7 +699,6 @@
             `;
 
             document.body.appendChild(toast);
-
             setTimeout(() => toast.classList.add('toast-show'), 100);
             setTimeout(() => {
                 toast.classList.remove('toast-show');
@@ -715,44 +722,31 @@
             if (!result.isConfirmed) return;
 
             try {
-                // الحصول على anti-forgery token
                 const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
-
-                // إرسال الطلب باستخدام FormData
                 const formData = new FormData();
                 formData.append('id', productId);
 
                 const response = await fetch('@Url.Action("Delete", "Products")', {
                     method: 'POST',
-                    headers: {
-                        'RequestVerificationToken': token
-                    },
+                    headers: { 'RequestVerificationToken': token },
                     body: formData
                 });
 
                 const data = await response.json();
 
                 if (data.success) {
-                    // إخفاء البطاقة بسلاسة
                     const productElement = document.getElementById(`product-${productId}`);
                     if (productElement) {
                         const card = productElement.querySelector('.product-card');
                         card.classList.add('removing');
-
                         setTimeout(() => {
                             productElement.remove();
-
-                            // التحقق إذا لم تعد هناك منتجات لعرض الحالة الفارغة
-                            const remainingProducts = document.querySelectorAll('.product-card');
-                            if (remainingProducts.length === 0) {
+                            if (document.querySelectorAll('.product-card').length === 0) {
                                 window.location.reload();
                             }
                         }, 500);
                     }
-
-                    // إظهار رسالة النجاح
                     showToast(data.message || 'Luxury product deleted successfully!', 'success');
-
                 } else {
                     showToast(data.message || 'Failed to delete product.', 'error');
                 }
@@ -762,11 +756,17 @@
             }
         }
 
-        // Auto-submit filter form when selects change
-        document.querySelectorAll('.auto-submit').forEach(select => {
-            select.addEventListener('change', () => {
-                document.getElementById('filterForm').submit();
-            });
+        // معالجة تغيير القائمة المدمجة للترتيب
+        document.getElementById('sortSelect').addEventListener('change', function() {
+            const value = this.value;
+            if (value === 'newest') {
+                document.getElementById('sortByHidden').value = 'id';
+                document.getElementById('sortDirHidden').value = 'desc';
+            } else if (value === 'nameAsc') {
+                document.getElementById('sortByHidden').value = 'name';
+                document.getElementById('sortDirHidden').value = 'asc';
+            }
+            document.getElementById('filterForm').submit();
         });
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -782,7 +782,6 @@
 
             // Lazy loading animation for product cards
             const productCards = document.querySelectorAll('.product-card');
-
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
@@ -790,9 +789,7 @@
                         entry.target.style.transform = 'translateY(0)';
                     }
                 });
-            }, {
-                threshold: 0.1
-            });
+            }, { threshold: 0.1 });
 
             productCards.forEach(card => {
                 card.style.opacity = '0';
@@ -801,18 +798,14 @@
                 observer.observe(card);
             });
 
-            // إضافة event listener لجميع أزرار حذف المنتجات
+            // Add delete event listeners
             document.querySelectorAll('.delete-product-btn').forEach(button => {
                 button.addEventListener('click', function() {
-                    const productId = this.getAttribute('data-product-id');
-                    const productName = this.getAttribute('data-product-name');
-                    deleteProduct(productId, productName);
+                    deleteProduct(this.dataset.productId, this.dataset.productName);
                 });
             });
 
             // Lazy loading images
-            const lazyImages = document.querySelectorAll('.product-img');
-
             const imageObserver = new IntersectionObserver((entries, observer) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
@@ -823,10 +816,8 @@
                 });
             });
 
-            lazyImages.forEach(img => {
-                if (!img.complete) {
-                    imageObserver.observe(img);
-                }
+            document.querySelectorAll('.product-img').forEach(img => {
+                if (!img.complete) imageObserver.observe(img);
             });
         });
     </script>

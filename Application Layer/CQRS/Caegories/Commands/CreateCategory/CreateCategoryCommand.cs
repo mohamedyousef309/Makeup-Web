@@ -4,6 +4,7 @@ using Domain_Layer.Interfaces.Abstraction;
 using Domain_Layer.Interfaces.Repositryinterfaces;
 using Domain_Layer.Respones;
 using MediatR;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Application_Layer.CQRS.Caegories.Commands.CreateCategory
 {
@@ -14,10 +15,13 @@ namespace Application_Layer.CQRS.Caegories.Commands.CreateCategory
         : IRequestHandler<CreateCategoryCommand, RequestRespones<bool>>
     {
         private readonly IGenaricRepository<Category> _categoryRepo;
+        private readonly IMemoryCache memoryCache;
+        const string cacheKey = "Categories_All_Default";
 
-        public CreateCategoryHandler(IGenaricRepository<Category> categoryRepo)
+        public CreateCategoryHandler(IGenaricRepository<Category> categoryRepo,IMemoryCache memoryCache)
         {
             _categoryRepo = categoryRepo;
+            this.memoryCache = memoryCache;
         }
 
         public async Task<RequestRespones<bool>> Handle(CreateCategoryCommand request, CancellationToken cancellationToken)
@@ -36,7 +40,9 @@ namespace Application_Layer.CQRS.Caegories.Commands.CreateCategory
                 await _categoryRepo.addAsync(category);
                 await _categoryRepo.SaveChanges();
 
-                
+               memoryCache.Remove(cacheKey);
+
+
                 var resultDto = new CategoryDto
                 {
                     Id = category.Id,
