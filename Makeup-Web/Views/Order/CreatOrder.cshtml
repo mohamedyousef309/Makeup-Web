@@ -33,7 +33,6 @@
             text-align: center;
         }
 
-        /* تنسيق التنبيه (Note) */
         .note-alert {
             background-color: var(--info-light);
             border: none;
@@ -92,7 +91,6 @@
 
                 <div class="card-body p-4 p-md-5">
 
-                    @* رسالة التنبيه بالإنجليزية *@
                     <div class="alert note-alert mb-4 shadow-sm">
                         <div class="d-flex">
                             <i class="bi bi-info-circle-fill me-3 fs-4" style="color: var(--dark-pink);"></i>
@@ -107,8 +105,6 @@
                     </div>
 
                     <form asp-controller="Order" asp-action="CreatOrder" method="post">
-
-                        @* الحقول المخفية *@
 
                         <div class="mb-4">
                             <label asp-for="BuyerEmail" class="form-label fw-bold text-muted">Email Address</label>
@@ -148,4 +144,37 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    @* إضافة مكتبة SweetAlert2 *@
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // التحقق من وجود رسالة نجاح مبعوتة من الكنترولر
+            var successMessage = '@TempData["SuccessMessage"]';
+
+            if (successMessage) {
+                Swal.fire({
+                    title: 'Success!',
+                    text: successMessage + " We will contact you soon.",
+                    icon: 'success',
+                    confirmButtonColor: '#df9191', // متناسق مع لون الزرار بتاعك
+                    confirmButtonText: 'Done',
+                    timer: 5000,
+                    timerProgressBar: true
+                });
+            }
+
+            // التحقق من وجود رسالة خطأ (لو الدفع فشل أو المخزن نقص)
+            var errorMessage = '@TempData["ErrorMessage"]';
+            if (errorMessage) {
+                Swal.fire({
+                    title: 'Oops!',
+                    text: errorMessage,
+                    icon: 'error',
+                    confirmButtonColor: '#dc3545'
+                });
+            }
+        });
+    </script>
 }

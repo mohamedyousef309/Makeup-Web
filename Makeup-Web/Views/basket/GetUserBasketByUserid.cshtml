@@ -2,7 +2,7 @@
 @model CustomerBasketDto
 
 @{
-    ViewData["Title"] = "Luxury Basket - Pro Makeup Studio";
+    ViewData["Title"] = "Luxury Basket -Shop Store";
     decimal subTotal = Model?.items?.Sum(i => i.Price * i.Quantity) ?? 0;
     decimal shipping = 0;
     decimal total = subTotal + shipping;
