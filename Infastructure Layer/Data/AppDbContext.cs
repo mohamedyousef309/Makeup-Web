@@ -22,6 +22,10 @@ namespace Infastructure_Layer.Data
         public DbSet<Category> Categories { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<ProductVariant> ProductVariants { get; set; }
+        public DbSet<Domain_Layer.Entites.Attribute> Attributes { get; set; }
+        public DbSet<Domain_Layer.Entites.AttributeValue> AttributeValues { get; set; }
+        public DbSet<Domain_Layer.Entites.VariantAttributeValue> VariantAttributeValue { get; set; }
+
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItems> OrderItems { get; set; }
 

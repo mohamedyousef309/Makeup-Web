@@ -8,6 +8,7 @@ using Domain_Layer.Interfaces.ServiceInterfaces;
 using Domain_Layer.Respones;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,11 +23,15 @@ namespace Application_Layer.CQRS.Products.Commands.CreateProduct
     {
         private readonly IGenaricRepository<Product> _productRepo;
         private readonly IAttachmentService attachmentService;
+        private readonly IMemoryCache memoryCache;
+        string AllProducts_cacheKey = "AllProducts";
 
-        public CreateProductHandler(IGenaricRepository<Product> productRepo,IAttachmentService attachmentService)
+
+        public CreateProductHandler(IGenaricRepository<Product> productRepo,IAttachmentService attachmentService,IMemoryCache memoryCache)
         {
             _productRepo = productRepo;
             this.attachmentService = attachmentService;
+            this.memoryCache = memoryCache;
         }
 
         public async Task<RequestRespones<ProductWithVariantsDto>> Handle(CreateProductCommand request,CancellationToken cancellationToken)
@@ -75,6 +80,7 @@ namespace Application_Layer.CQRS.Products.Commands.CreateProduct
 
                 await _productRepo.SaveChanges();
 
+            memoryCache.Remove(AllProducts_cacheKey);
 
             var resultDto = new ProductWithVariantsDto
             {

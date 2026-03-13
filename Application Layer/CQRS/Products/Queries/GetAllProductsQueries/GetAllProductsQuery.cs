@@ -6,6 +6,7 @@ using Domain_Layer.Respones;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using Org.BouncyCastle.Asn1.Ocsp;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -29,6 +30,8 @@ namespace Application_Layer.CQRS.Products.Queries
     {
         private readonly IGenaricRepository<Product> _productRepo;
         private readonly IMemoryCache memoryCache;
+        string cacheKey = "Products_Default";
+
 
         public GetAllProductsHandler(IGenaricRepository<Product> productRepo,IMemoryCache memoryCache)
         {
@@ -41,15 +44,13 @@ namespace Application_Layer.CQRS.Products.Queries
             CancellationToken cancellationToken)
         {
 
-            bool isCachable = string.IsNullOrEmpty(request.SearchTerm) && request.PageIndex <= 5;
 
-            string cacheKey = $"Products_Default_P{request.CategoryId??0}{request.PageIndex}_{request.PageSize}";
 
-            if (isCachable&& memoryCache.TryGetValue(cacheKey, out PaginatedListDto<GetAllProductsDto>? cachedResult))
-            {
-                return RequestRespones<PaginatedListDto<GetAllProductsDto>>.Success(
-                    cachedResult!, 200, "Products retrieved from cache.");
-            }
+            //if ( memoryCache.TryGetValue(cacheKey, out PaginatedListDto<GetAllProductsDto>? cachedResult))
+            //{
+            //    return RequestRespones<PaginatedListDto<GetAllProductsDto>>.Success(
+            //        cachedResult!, 200, "Products retrieved from cache.");
+            //}
 
             var query = _productRepo.GetAll();
 
@@ -93,18 +94,17 @@ namespace Application_Layer.CQRS.Products.Queries
                 TotalCount = totalCount  
             };
 
-            if (isCachable)
-            {
-                var cacheOptions = new MemoryCacheEntryOptions()
-                    .SetSlidingExpiration(TimeSpan.FromMinutes(10)) 
-                    .SetAbsoluteExpiration(TimeSpan.FromHours(1))   
-                    .SetPriority(CacheItemPriority.Normal)
-                    .SetSize(1); 
+          
+                //var cacheOptions = new MemoryCacheEntryOptions()
+                //    .SetSlidingExpiration(TimeSpan.FromMinutes(10)) 
+                //    .SetAbsoluteExpiration(TimeSpan.FromMinutes(30))   
+                //    .SetPriority(CacheItemPriority.Normal)
+                //    .SetSize(1); 
 
-                memoryCache.Set(cacheKey, result, cacheOptions);
+                //memoryCache.Set(cacheKey, result, cacheOptions);
 
 
-            }
+            
 
             return RequestRespones<PaginatedListDto<GetAllProductsDto>>.Success(
                 result,

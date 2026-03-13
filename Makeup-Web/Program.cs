@@ -138,6 +138,8 @@ namespace Makeup_Web
                 _dbcontext.Database.Migrate();
                 await DataSeeder.SeedAsync(_dbcontext);
 
+                await DbSeeder.SeedDataAsync(_dbcontext);
+
             }
             catch (Exception ex)
             {

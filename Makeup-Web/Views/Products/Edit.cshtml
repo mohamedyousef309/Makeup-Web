@@ -692,7 +692,7 @@
                 </div>
             </div>
 
-            <!-- Right Column: Image & Preview -->
+            <!-- Right Column: Image & Preview (تم التعديل هنا) -->
             <div class="form-card">
                 <h3 class="card-title">
                     <i class="bi bi-image"></i>
@@ -712,11 +712,13 @@
 
                 <div class="form-group">
                     <label class="form-label">Upload New Image</label>
-                    <input type="file" name="ImageFile" class="form-control-custom" accept="image/*" />
+                    <!-- تم تغيير name إلى ImageUrl ليتوافق مع UpdateProductViewModel -->
+                    <input type="file" name="ImageUrl" class="form-control-custom" accept="image/*" />
                     <small class="text-muted" style="color: var(--text-muted); display: block; margin-top: 8px;">
                         Leave empty to keep current image. Allowed formats: JPG, PNG, GIF.
                     </small>
-                    <input type="hidden" asp-for="ImageUrl" />
+                    <!-- حقل مخفي يحمل رابط الصورة الحالية ليتم إرساله كـ ExistingImageUrl -->
+                    <input type="hidden" name="ExistingImageUrl" value="@Model.ImageUrl" />
                 </div>
 
                 <div class="form-group" id="newImagePreviewContainer" style="display: none;">
@@ -729,21 +731,12 @@
             </div>
         </div>
 
-        <!-- Variants Section -->
+        <!-- Variants Section (بعد التعديل: تم حذف الزر العلوي) -->
         <div class="form-card variants-table-container animate-up" style="animation-delay: 0.2s">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-                <h3 class="card-title" style="margin: 0;">
-                    <i class="bi bi-layers"></i>
-                    Product Variants
-                </h3>
-                <a asp-action="AddVariantToProduct"
-                   asp-controller="ProductVariant"
-                   asp-route-productId="@Model.Id"
-                   class="add-variant-btn">
-                    <i class="bi bi-plus-circle"></i>
-                    Add New Variant
-                </a>
-            </div>
+            <h3 class="card-title" style="margin-bottom: 25px;">
+                <i class="bi bi-layers"></i>
+                Product Variants
+            </h3>
 
             @if (Model.VariantsDto != null && Model.VariantsDto.Any())
             {
@@ -829,7 +822,7 @@
                     <h4>No Variants Added Yet</h4>
                     <p>This product doesn't have any variants configured yet.</p>
                     <a asp-action="AddVariantToProduct"
-                       asp-controller="Products"
+                       asp-controller="ProductVariant"
                        asp-route-productId="@Model.Id"
                        class="add-variant-btn">
                         <i class="bi bi-plus-circle"></i>
@@ -935,7 +928,7 @@
         let currentVariantId = null;
 
         // معاينة الصورة الجديدة
-        document.querySelector('input[name="ImageFile"]')?.addEventListener('change', function(e) {
+        document.querySelector('input[name="ImageUrl"]')?.addEventListener('change', function(e) {
             const file = e.target.files[0];
             const previewContainer = document.getElementById('newImagePreviewContainer');
             const preview = document.getElementById('newImagePreview');

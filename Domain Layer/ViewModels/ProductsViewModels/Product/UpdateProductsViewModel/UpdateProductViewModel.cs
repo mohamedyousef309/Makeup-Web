@@ -29,6 +29,9 @@ namespace Domain_Layer.ViewModels.ProductsViewModels.Product.UpdateProductsViewM
         public IFormFile? ImageUrl { get; set; }
 
 
+        public string? ExistingImageUrl { get; set; }
+
+
     }
 
 }

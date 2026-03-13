@@ -9,8 +9,11 @@
 
   <ItemGroup>
     <Compile Remove="CQRS\Category\**" />
+    <Compile Remove="CQRS\Products\Orchestrator\**" />
     <EmbeddedResource Remove="CQRS\Category\**" />
+    <EmbeddedResource Remove="CQRS\Products\Orchestrator\**" />
     <None Remove="CQRS\Category\**" />
+    <None Remove="CQRS\Products\Orchestrator\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -26,7 +29,6 @@
   <ItemGroup>
     <Folder Include="CQRS\Caegories\Orchestrator\" />
     <Folder Include="CQRS\Orders\Quries\GetOrderStatuses\" />
-    <Folder Include="CQRS\Products\Orchestrator\" />
   </ItemGroup>
 
 </Project>

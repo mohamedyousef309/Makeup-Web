@@ -89,6 +89,7 @@ namespace Infastructure_Layer.Data.Seeders
                 }
             };
 
+            
             await Context.Users.AddRangeAsync(users);
 
             await Context.SaveChangesAsync();

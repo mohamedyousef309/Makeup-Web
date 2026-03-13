@@ -44,6 +44,7 @@ namespace Application_Layer.CQRS.Products.Commands.UpdateProduct
                     .Fail("Product not found", 404);
 
             string cacheKey = $"ProductDetails_{product.Id}";
+            string AllProducts_cacheKey = "AllProducts";
 
 
             product.Name = dto.Name;
@@ -51,30 +52,41 @@ namespace Application_Layer.CQRS.Products.Commands.UpdateProduct
             product.CategoryId = dto.CategoryId;
             product.IsActive = dto.IsActive;
 
-            if (dto.ImageFile!=null)
+            if (request.Dto.ImageFile != null)
             {
-                var newImageUrl = attachmentService.UploadImage(dto.ImageFile, "Images");
+                string? imageUrl = null;
 
-                if (!string.IsNullOrEmpty(newImageUrl))
+                var originalFileName = Path.GetFileName(request.Dto.ImageFile.FileName);
+
+                var existingPath = await _productRepo.GetAll()
+                    .Where(p => p.ImageUrl != null && p.ImageUrl.EndsWith("_" + originalFileName))
+                    .Select(p => p.ImageUrl)
+                    .FirstOrDefaultAsync(cancellationToken);
+
+                if (existingPath != null)
                 {
-                    var oldImageUrl = product.ImageUrl;
-
-                    product.ImageUrl = newImageUrl;
-
-
-                    if (!string.IsNullOrEmpty(oldImageUrl))
+                    var fullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", existingPath.TrimStart('/'));
+                    if (File.Exists(fullPath))
                     {
-                        attachmentService.DeleteImage(oldImageUrl);
+                        imageUrl = existingPath;
                     }
                 }
 
+                if (imageUrl == null)
+                {
+                    imageUrl = attachmentService.UploadImage(request.Dto.ImageFile, "Images/ProductImages");
+                }
+
+                product.ImageUrl = imageUrl; 
 
             }
+
 
             _productRepo.SaveInclude(product);
             await _productRepo.SaveChanges();
 
             memoryCache.Remove(cacheKey);
+            memoryCache.Remove(AllProducts_cacheKey);
 
             return RequestRespones<bool>.Success(true, 200, "Product updated successfully");
         }
