@@ -37,7 +37,7 @@ namespace Infastructure_Layer
             string key = RedisKeys.BasketKey(basket.Id);
             var jsonbasket = JsonSerializer.Serialize(basket);
 
-            var isCreated = await _DbContext.StringSetAsync(key, jsonbasket, TimeSpan.FromDays(10));
+            var isCreated = await _DbContext.StringSetAsync(key, jsonbasket, TimeSpan.FromDays(2));
             if (isCreated)
             {
                 return await GetCustomerBasket(basket.Id);
