@@ -223,38 +223,55 @@
                 transform: none !important;
             }
 
-        /* Variant Options Styling */
+        /* Variant Options Styling - مع صورة */
         .variant-option {
             min-width: 180px;
-            text-align: center;
-            padding: 15px;
+            padding: 12px;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .variant-option .variant-thumb {
+            width: 50px;
+            height: 50px;
+            border-radius: 6px;
+            object-fit: cover;
+            background: #333;
+            flex-shrink: 0;
+        }
+
+        .variant-option .variant-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
         }
 
         .variant-option .option-name {
             font-weight: bold;
-            font-size: 1.1rem;
-            margin-bottom: 8px;
+            font-size: 1rem;
             color: var(--text-light);
         }
 
         .variant-option .option-details {
             color: var(--text-muted);
-            font-size: 0.9rem;
-            margin-bottom: 8px;
+            font-size: 0.8rem;
         }
 
         .variant-option .option-price {
             color: var(--accent-gold);
             font-weight: bold;
-            font-size: 1.2rem;
+            font-size: 1rem;
         }
 
         /* Highlight selected variant */
         .variant-option.selected {
             background: rgba(214, 138, 138, 0.2) !important;
             border-color: var(--primary-pink) !important;
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(214, 138, 138, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(214, 138, 138, 0.3);
         }
 
         /* Stock Info */
@@ -552,70 +569,203 @@
             display: none;
         }
 
-        /* Responsive */
+        /* ========== تحسينات الموبايل الشاملة ========== */
         @@media (max-width: 768px) {
+            /* تقليل الحواف الجانبية للاستفادة من المساحة */
             .product-container {
-                padding: 20px 15px;
+                padding: 20px 12px 90px;
             }
 
+            /* تصغير حجم الصورة */
+            .product-image-container {
+                height: 250px;
+                padding: 8px;
+            }
+
+            /* تصغير النصوص */
             .product-title {
-                font-size: 2rem;
+                font-size: 1.6rem;
+                margin-bottom: 6px;
             }
 
             .product-price {
-                font-size: 1.6rem;
+                font-size: 1.3rem;
+                margin-bottom: 10px;
             }
 
-            .product-image-container {
-                height: 400px;
-            }
-
-            .option-value {
-                padding: 10px 15px;
+            .product-description {
                 font-size: 0.9rem;
-                min-width: 70px;
+                margin-bottom: 15px;
+                padding-bottom: 12px;
+            }
+
+            /* تقليل المسافات بين مجموعات الخيارات */
+            .option-group {
+                margin-bottom: 12px;
+            }
+
+            .option-title {
+                font-size: 0.95rem;
+                margin-bottom: 6px;
+            }
+
+            /* خيارات عادية - أصغر حجماً */
+            .option-value {
+                padding: 6px 10px;
+                font-size: 0.8rem;
+                min-width: 50px;
+                border-width: 1px;
+            }
+
+            /* خيارات "Choose Directly" - شبكة 3 أعمدة إذا أمكن */
+            .option-values:has(.variant-option) {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
             }
 
             .variant-option {
-                min-width: 150px;
+                min-width: unset;
+                padding: 8px;
+                gap: 6px;
             }
 
+            .variant-option .variant-thumb {
+                width: 40px;
+                height: 40px;
+            }
+
+            .variant-option .option-name {
+                font-size: 0.85rem;
+            }
+
+            .variant-option .option-details {
+                font-size: 0.7rem;
+            }
+
+            .variant-option .option-price {
+                font-size: 0.8rem;
+            }
+
+            /* شريط الإجراءات - ثابت وواضح جداً */
             .actions-section {
-                flex-direction: column;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: #1a1a1a;
+                padding: 12px 16px;
+                margin: 0;
+                border-top: 4px solid var(--primary-pink);
+                z-index: 1000;
+                display: flex;
+                gap: 12px;
+                box-shadow: 0 -5px 25px rgba(0,0,0,0.8);
+            }
+
+            .btn-add-to-cart {
+                padding: 16px 20px;
+                font-size: 1.2rem;
+                font-weight: 800;
+                letter-spacing: 1px;
+                border-radius: 12px;
+                background: linear-gradient(145deg, #ffb6b6, #f5b041);
+                border: 2px solid rgba(255,255,255,0.3);
+                box-shadow: 0 0 25px var(--primary-pink);
+                transition: all 0.2s ease;
+            }
+
+            .btn-add-to-cart:active {
+                transform: scale(0.98);
+                box-shadow: 0 0 35px var(--primary-pink);
             }
 
             .btn-wishlist {
-                width: 100%;
-                height: 50px;
+                width: 58px;
+                height: 58px;
+                font-size: 1.4rem;
+                border-radius: 12px;
+                background: #333;
+                border: 2px solid #666;
+            }
+
+            /* قائمة الفاريانت المتاحة - شبكة عمودين */
+            .variants-list {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
             }
 
             .variant-item {
+                padding: 10px;
                 flex-direction: column;
                 align-items: flex-start;
-                gap: 10px;
+                gap: 4px;
+            }
+
+            .variant-item-name {
+                font-size: 0.9rem;
+            }
+
+            .variant-item-attribute {
+                font-size: 0.65rem;
+                padding: 2px 5px;
             }
 
             .variant-item-price {
+                font-size: 0.9rem;
                 text-align: left;
                 min-width: auto;
+            }
+
+            /* الملخص المحدد */
+            .selected-options-summary {
+                margin-top: 20px;
+                padding: 12px;
+            }
+
+            .summary-title {
+                font-size: 1rem;
+            }
+
+            .attribute-badge {
+                font-size: 0.75rem;
+                padding: 4px 8px;
+            }
+        }
+
+        /* تحسينات إضافية للشاشات الصغيرة جداً */
+        @@media (max-width: 560px) {
+            .option-values:has(.variant-option) {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
 
         @@media (max-width: 480px) {
-            .product-title {
-                font-size: 1.6rem;
-            }
-
-            .product-price {
-                font-size: 1.4rem;
+            .product-container {
+                padding: 15px 10px 100px;
             }
 
             .product-image-container {
-                height: 300px;
+                height: 200px;
             }
 
-            .option-values {
-                justify-content: center;
+            .option-values:has(.variant-option) {
+                grid-template-columns: 1fr;
+            }
+
+            .variants-list {
+                grid-template-columns: 1fr;
+            }
+
+            .btn-add-to-cart {
+                padding: 14px 16px;
+                font-size: 1.1rem;
+            }
+
+            .btn-wishlist {
+                width: 52px;
+                height: 52px;
             }
         }
     </style>
@@ -737,7 +887,7 @@
                         </div>
                     }
 
-                    <!-- Available Variants as Options -->
+                    <!-- Available Variants as Options with Thumbnails -->
                     @if (Model.Variants != null && Model.Variants.Any())
                     {
                         <div class="option-group animate-fade">
@@ -755,16 +905,30 @@
                                          data-variant-price="@variant.Price"
                                          data-variant-stock="@variant.Stock"
                                          onclick="selectVariantDirect('@variant.Id', '@variant.VariantName', '@variant.VariantImage', @variant.Price, @variant.Stock, this)">
-                                        <div style="text-align: left;">
-                                            <strong>@variant.VariantName</strong><br>
+                                        
+                                        <!-- الصورة المصغرة -->
+                                        <img class="variant-thumb" 
+                                             src="@(string.IsNullOrEmpty(variant.VariantImage) ? "/images/placeholder.jpg" : variant.VariantImage)" 
+                                             alt="@variant.VariantName"
+                                             onerror="this.src='/images/placeholder.jpg';" />
+                                        
+                                        <!-- معلومات الفاريانت -->
+                                        <div class="variant-info">
+                                            <div class="option-name">@variant.VariantName</div>
                                             @if (variant.SelectedAttributes != null && variant.SelectedAttributes.Any())
                                             {
-                                                @foreach (var attr in variant.SelectedAttributes)
-                                                {
-                                                    <small>@attr.AttributeName: @attr.Value</small><br>
-                                                }
+                                                <div class="option-details">
+                                                    @foreach (var attr in variant.SelectedAttributes)
+                                                    {
+                                                        <span>@attr.AttributeName: @attr.Value</span>
+                                                        @if (attr != variant.SelectedAttributes.Last())
+                                                        {
+                                                            <span>, </span>
+                                                        }
+                                                    }
+                                                </div>
                                             }
-                                            <span style="color: var(--accent-gold); font-weight: bold;">@variant.Price.ToString("C")</span>
+                                            <div class="option-price">@variant.Price.ToString("C")</div>
                                         </div>
                                     </div>
                                 }
@@ -994,7 +1158,7 @@
                 document.getElementById('formProductVariantId').value = variantId;
                 document.getElementById('formVariantImageUrl').value = variantImage;
                 
-                // Update image
+                // Update image with the variant's image (thumbnail will be used for main image)
                 if (variantImage) {
                     switchImage('variant', variantImage);
                 } else {

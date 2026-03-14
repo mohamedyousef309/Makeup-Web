@@ -30,7 +30,7 @@ namespace Application_Layer.CQRS.Products.Queries
     {
         private readonly IGenaricRepository<Product> _productRepo;
         private readonly IMemoryCache memoryCache;
-        string cacheKey = "Products_Default";
+        string cacheKey = "AllProducts";
 
 
         public GetAllProductsHandler(IGenaricRepository<Product> productRepo,IMemoryCache memoryCache)
@@ -46,11 +46,11 @@ namespace Application_Layer.CQRS.Products.Queries
 
 
 
-            //if ( memoryCache.TryGetValue(cacheKey, out PaginatedListDto<GetAllProductsDto>? cachedResult))
-            //{
-            //    return RequestRespones<PaginatedListDto<GetAllProductsDto>>.Success(
-            //        cachedResult!, 200, "Products retrieved from cache.");
-            //}
+            if (memoryCache.TryGetValue(cacheKey, out PaginatedListDto<GetAllProductsDto>? cachedResult))
+            {
+                return RequestRespones<PaginatedListDto<GetAllProductsDto>>.Success(
+                    cachedResult!, 200, "Products retrieved from cache.");
+            }
 
             var query = _productRepo.GetAll();
 
@@ -94,17 +94,17 @@ namespace Application_Layer.CQRS.Products.Queries
                 TotalCount = totalCount  
             };
 
-          
-                //var cacheOptions = new MemoryCacheEntryOptions()
-                //    .SetSlidingExpiration(TimeSpan.FromMinutes(10)) 
-                //    .SetAbsoluteExpiration(TimeSpan.FromMinutes(30))   
-                //    .SetPriority(CacheItemPriority.Normal)
-                //    .SetSize(1); 
 
-                //memoryCache.Set(cacheKey, result, cacheOptions);
+            var cacheOptions = new MemoryCacheEntryOptions()
+                .SetSlidingExpiration(TimeSpan.FromMinutes(10))
+                .SetAbsoluteExpiration(TimeSpan.FromMinutes(30))
+                .SetPriority(CacheItemPriority.Normal)
+                .SetSize(1);
+
+            memoryCache.Set(cacheKey, result, cacheOptions);
 
 
-            
+
 
             return RequestRespones<PaginatedListDto<GetAllProductsDto>>.Success(
                 result,

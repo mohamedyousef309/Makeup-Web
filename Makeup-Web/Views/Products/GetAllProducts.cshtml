@@ -30,39 +30,14 @@
             background-color: var(--dark-bg);
             color: var(--text-light);
             font-family: 'Inter', sans-serif;
-        }
-
-        .shop-header {
-            padding: 60px 0 30px;
-            text-align: center;
-            background: linear-gradient(to bottom, #1a1a1a 0%, #0f0f0f 100%);
-            margin-bottom: 30px;
-            border-bottom: 1px solid #222;
-        }
-
-        .shop-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 2.8rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            background: linear-gradient(45deg, #fff 30%, var(--primary-pink) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: 2px;
-        }
-
-        .shop-subtitle {
-            color: var(--text-muted);
-            font-size: 1.1rem;
-            margin-top: 10px;
-            font-weight: 300;
+            padding-top: 20px;
         }
 
         .filter-section {
             background: var(--card-bg);
-            border-radius: 16px;
-            padding: 25px;
-            margin-bottom: 30px;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 25px;
             border: 1px solid #252525;
         }
 
@@ -70,9 +45,9 @@
             background: var(--input-bg) !important;
             border: 1px solid #333 !important;
             color: var(--text-light) !important;
-            border-radius: 12px;
-            padding: 12px 16px;
-            font-size: 1rem;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 0.9rem;
             transition: all 0.3s ease;
         }
 
@@ -85,7 +60,8 @@
             background: var(--input-bg) !important;
             border: 1px solid #333 !important;
             color: var(--text-muted) !important;
-            border-radius: 12px 0 0 12px !important;
+            border-radius: 8px 0 0 8px !important;
+            font-size: 0.9rem;
         }
 
         .product-card {
@@ -97,17 +73,19 @@
             height: 100%;
             display: flex;
             flex-direction: column;
+            max-width: 350px;
+            margin: 0 auto;
         }
 
             .product-card:hover {
-                transform: translateY(-10px);
+                transform: translateY(-5px);
                 border-color: var(--primary-pink);
-                box-shadow: 0 20px 40px rgba(214, 138, 138, 0.1);
+                box-shadow: 0 15px 30px rgba(214, 138, 138, 0.15);
             }
 
         .img-wrapper {
             aspect-ratio: 1/1;
-            background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
+            background: #0a0a0a; /* لون داكن موحد بدون تدرج */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -118,7 +96,7 @@
         .product-img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: cover; /* تغطية كاملة بدون فراغات */
             transition: transform 0.5s ease;
         }
 
@@ -127,30 +105,29 @@
         }
 
         .product-info {
-            padding: 20px;
+            padding: 18px 15px 15px;
             flex: 1;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
         }
 
         .product-category {
             color: var(--primary-pink);
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
         }
 
         .product-name {
             font-family: 'Playfair Display', serif;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             font-weight: 600;
             color: var(--text-light);
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             line-height: 1.3;
-            height: 60px;
+            height: 55px;
             overflow: hidden;
             display: -webkit-box;
             -webkit-line-clamp: 2;
@@ -159,11 +136,11 @@
 
         .product-description {
             color: var(--text-muted);
-            font-size: 0.95rem;
-            line-height: 1.6;
-            margin-bottom: 20px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 18px;
             flex: 1;
-            height: 80px;
+            height: 65px;
             overflow: hidden;
             display: -webkit-box;
             -webkit-line-clamp: 3;
@@ -171,7 +148,7 @@
         }
 
         .product-actions {
-            margin-top: 25px;
+            margin-top: 15px;
             display: flex;
             flex-direction: column;
             gap: 0;
@@ -179,25 +156,25 @@
 
         .admin-actions {
             display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-            padding-bottom: 15px;
+            gap: 8px;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
             border-bottom: 1px solid #333;
         }
 
         .btn-admin {
             flex: 1;
-            padding: 8px 12px;
-            border-radius: 8px;
+            padding: 6px 10px;
+            border-radius: 6px;
             text-align: center;
             text-decoration: none;
             font-weight: 600;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
+            gap: 5px;
             cursor: pointer;
             border: none;
         }
@@ -230,8 +207,8 @@
             background: transparent;
             color: var(--text-light);
             border: 2px solid var(--primary-pink);
-            border-radius: 12px;
-            padding: 15px;
+            border-radius: 10px;
+            padding: 12px;
             font-weight: 600;
             text-align: center;
             text-decoration: none;
@@ -239,32 +216,32 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
             width: 100%;
-            font-size: 1rem;
+            font-size: 0.95rem;
         }
 
             .btn-details:hover {
                 background: var(--primary-pink);
                 color: white;
-                transform: translateY(-3px);
-                box-shadow: 0 10px 20px rgba(214, 138, 138, 0.2);
+                transform: translateY(-2px);
+                box-shadow: 0 8px 15px rgba(214, 138, 138, 0.2);
             }
 
         .empty-state {
             text-align: center;
-            padding: 60px 20px;
+            padding: 50px 20px;
         }
 
         .empty-state-icon {
-            font-size: 4rem;
+            font-size: 3.5rem;
             color: var(--primary-pink);
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             opacity: 0.5;
         }
 
         .pagination {
-            margin-top: 50px;
+            margin-top: 40px;
             justify-content: center;
         }
 
@@ -272,9 +249,9 @@
             background: var(--card-bg);
             border: 1px solid #333;
             color: var(--text-light);
-            padding: 10px 18px;
-            margin: 0 5px;
-            border-radius: 10px;
+            padding: 8px 15px;
+            margin: 0 4px;
+            border-radius: 8px;
             transition: all 0.3s ease;
         }
 
@@ -346,21 +323,21 @@
 
         .custom-toast {
             position: fixed;
-            top: 30px;
-            right: 30px;
+            top: 20px;
+            right: 20px;
             background: var(--card-bg);
             color: white;
-            padding: 20px 25px;
-            border-radius: 12px;
+            padding: 15px 20px;
+            border-radius: 10px;
             border-left: 4px solid var(--danger-red);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
             z-index: 99999;
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
             transform: translateX(150%);
             transition: transform 0.4s ease;
-            max-width: 400px;
+            max-width: 350px;
         }
 
         .toast-show {
@@ -369,27 +346,23 @@
 
         .toast-icon {
             color: var(--danger-red);
-            font-size: 1.5rem;
+            font-size: 1.3rem;
         }
 
         .toast-content h4 {
-            margin: 0 0 5px 0;
-            font-size: 1.1rem;
+            margin: 0 0 3px 0;
+            font-size: 1rem;
         }
 
         .toast-content p {
             margin: 0;
             color: var(--text-muted);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
 
         @@media (max-width: 768px) {
-            .shop-title {
-                font-size: 2rem;
-            }
-
             .filter-section {
-                padding: 20px;
+                padding: 12px;
             }
 
             .product-name {
@@ -398,13 +371,24 @@
             }
 
             .product-description {
-                height: 70px;
-                font-size: 0.9rem;
+                height: 60px;
+                font-size: 0.85rem;
             }
 
             .btn-details {
-                padding: 12px;
-                font-size: 0.95rem;
+                padding: 10px;
+                font-size: 0.9rem;
+            }
+
+            .img-wrapper {
+                aspect-ratio: 1/1;
+            }
+        }
+
+        /* تحسين عرض الصور على الشاشات الصغيرة */
+        @@media (max-width: 576px) {
+            .product-card {
+                max-width: 100%;
             }
         }
     </style>
@@ -428,19 +412,12 @@
     </div>
 }
 
-<div class="shop-header">
-    <div class="container">
-        <h1 class="shop-title">Pro Makeup Studio Collection</h1>
-        <p class="shop-subtitle">Discover our luxurious selection of professional makeup products</p>
-    </div>
-</div>
-
 <div class="container">
     <!-- Filter Section -->
     <div class="filter-section">
-        <form id="filterForm" method="get" asp-action="GetAllProducts" class="row g-3">
+        <form id="filterForm" method="get" asp-action="GetAllProducts" class="row g-2 align-items-center">
             <!-- حقل البحث -->
-            <div class="col-12 col-lg-4">
+            <div class="col-12 col-md-5 col-lg-4">
                 <div class="input-group">
                     <span class="input-group-text">
                         <i class="bi bi-search"></i>
@@ -449,13 +426,13 @@
                            name="search"
                            value="@searchTerm"
                            class="form-control form-control-custom"
-                           placeholder="Search for luxury products..."
+                           placeholder="Search products..."
                            aria-label="Search products">
                 </div>
             </div>
 
             <!-- Dropdown التصنيفات (Categories) -->
-            <div class="col-12 col-lg-3">
+            <div class="col-6 col-md-3 col-lg-3">
                 <select name="categoryId" class="form-select form-control-custom" onchange="this.form.submit()">
                     <option value="">All Categories</option>
                     @if (ViewBag.Categories != null)
@@ -471,7 +448,7 @@
             </div>
 
             <!-- القائمة المدمجة للترتيب -->
-            <div class="col-12 col-lg-3">
+            <div class="col-6 col-md-4 col-lg-3">
                 <select id="sortSelect" class="form-select form-control-custom">
                     <option value="newest" selected="@(sortBy == "id" && sortDir == "desc")">Newest First</option>
                     <option value="nameAsc" selected="@(sortBy == "name" && sortDir == "asc")">Name (A to Z)</option>

@@ -1,30 +1,35 @@
-﻿@model IEnumerable<Domain_Layer.Entites.Product>
+﻿@model List<string>
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewData["Title"] = "Shop Store";
+    ViewData["Title"] = "Fashion Store";
 
-    var featuredProduct = Model?.FirstOrDefault();
-    var description = featuredProduct?.Description ??
-        "Experience the art of beauty with our professional makeup services and high-quality products tailored for your unique style.";
+    // التأكد من وجود صورتين على الأقل، وإلا استخدام صور افتراضية
+    var images = Model != null && Model.Count >= 2
+        ? Model
+        : new List<string> { "~/Files/Images/lipstick.png", "~/Files/Images/powder.png" };
 }
 
 @section Styles {
     <style>
+        /* -------------------- الألوان والأساسيات -------------------- */
         .full-page {
             min-height: 100vh;
             display: flex;
             align-items: center;
-            position: relative;
+            background-color: #000; /* خلفية سوداء */
+            overflow-x: hidden;
+            padding: 20px 0;
         }
 
         .hero-title {
-            font-size: clamp(3.5rem, 10vw, 7rem);
             font-weight: 800;
-            line-height: 0.85;
+            line-height: 0.9;
             letter-spacing: -2px;
             text-transform: uppercase;
             font-family: 'Playfair Display', serif;
+            color: #fff;
+            font-size: clamp(3rem, 8vw, 5.5rem);
         }
 
         .pink-text {
@@ -35,15 +40,15 @@
         .tagline {
             color: #df9191;
             font-style: italic;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             margin-top: 15px;
             font-family: 'Playfair Display', serif;
         }
 
         .description {
-            color: #777;
+            color: #aaa;
             max-width: 450px;
-            margin-top: 25px;
+            margin-top: 20px;
             font-size: 0.95rem;
             line-height: 1.6;
         }
@@ -55,7 +60,7 @@
             padding: 12px 40px;
             border-radius: 30px;
             font-weight: 500;
-            margin-top: 35px;
+            margin-top: 30px;
             transition: 0.4s ease;
             position: relative;
             overflow: hidden;
@@ -87,133 +92,306 @@
                     left: 100%;
                 }
 
+        /* -------------------- حاوية الصور -------------------- */
         .visuals-area {
             position: relative;
-            height: 90vh;
+            height: 500px; /* ارتفاع ثابت لمنطقة الصور */
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .floating-product {
             position: absolute;
             filter: drop-shadow(0 15px 35px rgba(0,0,0,0.8));
-            transition: transform 0.5s ease-in-out;
-            image-rendering: -webkit-optimize-contrast;
-            will-change: transform;
+            transition: opacity 1s ease-in-out;
+            object-fit: cover;
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 15px;
         }
 
-        .img-brushes {
+        /* -------------------- تحسينات الموبايل (أقل من 992px) - بحجم أكبر وأوضح -------------------- */
+        @@media (max-width: 991px) {
+            .full-page
+
+        {
+            padding: 20px 10px;
+        }
+
+        .row {
+            flex-direction: row;
+            align-items: center;
+        }
+
+        .col-lg-6 {
+            flex: 0 0 50%;
+            max-width: 50%;
+        }
+
+        .visuals-area {
+            height: 400px; /* زيادة ارتفاع منطقة الصور */
+        }
+
+        .content-wrapper {
+            text-align: right;
+            padding-right: 15px;
+        }
+
+        /* تكبير حجم الخطوط */
+        .hero-title {
+            font-size: 3.2rem; /* أكبر من السابق */
+        }
+
+        .tagline {
+            font-size: 1.4rem;
+            margin-top: 15px;
+        }
+
+        .description {
+            font-size: 1rem;
+            max-width: 100%;
+            margin-left: auto;
+            margin-right: 0;
+            line-height: 1.5;
+        }
+
+        .btn-view {
+            padding: 10px 35px;
+            font-size: 1rem;
+            margin-top: 25px;
+        }
+
+        /* تكبير الصور قليلاً وتعديل مواضعها لمنع التداخل */
+        .img-main {
+            width: 85%; /* أكبر من 75% */
+            left: 0;
             top: 5%;
-            left: 10%;
-            width: 55%;
             z-index: 5;
         }
 
-        .img-lipstick {
-            top: 48%;
-            left: 5%;
-            width: 35%;
-            z-index: 6;
+        .img-secondary {
+            width: 70%; /* أكبر من 60% */
+            right: 0;
+            bottom: 5%;
+            z-index: 4;
         }
 
-        .img-smear {
-            top: 35%;
-            left: 50%;
-            width: 25%;
-            z-index: 3;
-            opacity: 0.9;
         }
 
-        .img-powder {
+        /* للشاشات الصغيرة جداً (أقل من 768px) */
+        @@media (max-width: 768px) {
+            .col-lg-6
+
+        {
+            flex: 0 0 40%;
+            max-width: 40%;
+        }
+
+        .visuals-area {
+            height: 350px;
+        }
+
+        .hero-title {
+            font-size: 2.8rem;
+        }
+
+        .tagline {
+            font-size: 1.2rem;
+        }
+
+        .description {
+            font-size: 0.9rem;
+        }
+
+        .btn-view {
+            padding: 8px 30px;
+            font-size: 0.9rem;
+        }
+
+        .img-main {
+            width: 90%;
+            left: -5%;
+            top: 5%;
+        }
+
+        .img-secondary {
+            width: 75%;
+            right: -5%;
+            bottom: 5%;
+        }
+
+        }
+
+        @@media (max-width: 576px) {
+            .col-lg-6
+
+        {
+            flex: 0 0 35%;
+            max-width: 35%;
+        }
+
+        .visuals-area {
+            height: 300px;
+        }
+
+        .hero-title {
+            font-size: 2.4rem;
+        }
+
+        .tagline {
+            font-size: 1rem;
+            margin-top: 10px;
+        }
+
+        .description {
+            font-size: 0.8rem;
+            margin-top: 15px;
+        }
+
+        .btn-view {
+            padding: 6px 25px;
+            font-size: 0.8rem;
+            margin-top: 20px;
+        }
+
+        }
+
+        @@media (max-width: 400px) {
+            .col-lg-6
+
+        {
+            flex: 0 0 30%;
+            max-width: 30%;
+        }
+
+        .visuals-area {
+            height: 250px;
+        }
+
+        .hero-title {
+            font-size: 2rem;
+        }
+
+        .description {
+            font-size: 0.7rem;
+        }
+
+        .btn-view {
+            padding: 5px 20px;
+            font-size: 0.7rem;
+        }
+
+        }
+
+        /* -------------------- تعديلات الشاشات الكبيرة (Desktop) -------------------- */
+        @@media (min-width: 992px) {
+            .visuals-area
+
+        {
+            height: 600px;
+        }
+
+        /* تحديد أحجام الصور ثابتة بالبكسل */
+        .img-main {
+            width: 320px;
+            height: 400px;
+            left: 10%;
+            top: 5%;
+            z-index: 5;
+            transform: rotate(-5deg);
+        }
+
+        .img-secondary {
+            width: 280px;
+            height: 350px;
+            right: 5%;
             bottom: 10%;
-            left: 30%;
-            width: 45%;
-            z-index: 2;
+            z-index: 4;
+            transform: rotate(5deg);
         }
 
-        .scroll-indicator {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: #df9191;
-            animation: bounce 2s infinite;
-            display: none;
+        .content-wrapper {
+            text-align: left;
+            padding-left: 20px;
         }
 
-        @@keyframes bounce {
-            0%, 20%, 50%, 80%, 100% {
-                transform: translateX(-50%) translateY(0);
-            }
-
-            40% {
-                transform: translateX(-50%) translateY(-10px);
-            }
-
-            60% {
-                transform: translateX(-50%) translateY(-5px);
-            }
+        .hero-title {
+            font-size: 5.5rem;
+            display: block;
         }
 
-        @@media (max-width: 991px) {
-            .full-page {
-                text-align: center;
-                padding-top: 100px;
-            }
-
-            .visuals-area {
-                height: 450px;
-                order: 2;
-                margin-top: 50px;
-            }
-
-            .hero-title {
-                font-size: 4rem;
-            }
-
-            .img-brushes {
-                width: 70%;
-                left: 15%;
-            }
-
-            .scroll-indicator {
-                display: block;
-            }
+        .description {
+            font-size: 1.1rem;
+            max-width: 500px;
         }
 
-        @@media (min-width: 1600px) {
-            .container-fluid {
-                max-width: 1600px;
-                margin: 0 auto;
-            }
+        .btn-view {
+            padding: 14px 50px;
+            font-size: 1.2rem;
+            margin-top: 40px;
+        }
+
+        }
+
+        /* شاشات كبيرة جداً (1400px فأكثر) */
+        @@media (min-width: 1400px) {
+            .container
+
+        {
+            max-width: 1400px;
+        }
+
+        .img-main {
+            width: 350px;
+            height: 430px;
+            left: 15%;
+        }
+
+        .img-secondary {
+            width: 300px;
+            height: 380px;
+            right: 10%;
+        }
+
+        .content-wrapper {
+            padding-left: 3rem;
+        }
+
+        .hero-title {
+            font-size: 6rem;
+        }
+
         }
     </style>
 }
 
 <div class="container-fluid full-page">
-    <div class="scroll-indicator d-lg-none">
-        <i class="bi bi-chevron-down" style="font-size: 1.5rem;"></i>
-    </div>
+    <div class="container">
+        <div class="row align-items-center">
+            <!-- الصور على اليسار -->
+            <div class="col-lg-6 col-6 visuals-area">
+                <img id="mainImage" src="" class="floating-product img-main" alt="Fashion item">
+                <img id="secondaryImage" src="" class="floating-product img-secondary" alt="Fashion accessory">
+            </div>
 
-    <div class="row w-100 align-items-center">
-        <div class="col-lg-6 visuals-area">
-            <img src="~/Files/Images/Lip-glass.png" class="floating-product img-brushes" data-speed="0.3">
-            <img src="~/Files/Images/lipstick.png" class="floating-product img-lipstick" data-speed="0.5">
-            <img src="~/Files/Images/smear.png" class="floating-product img-smear" data-speed="0.4">
-            <img src="~/Files/Images/powder.png" class="floating-product img-powder" data-speed="0.2">
-        </div>
+            <!-- النص على اليمين -->
+            <div class="col-lg-6 col-6">
+                <div class="content-wrapper">
+                    <h1 class="hero-title m-0">FASHION</h1>
+                    <h1 class="hero-title m-0">STORE</h1>
+                    <h1 class="hero-title pink-text m-0">TRENDS</h1>
+                    <p class="tagline">style & comfort</p>
+                    <p class="description">
+                        Discover the latest fashion trends with our exclusive collection of stylish clothing
+                        designed for your unique look. Enjoy top quality and modern designs.
+                    </p>
 
-        <div class="col-lg-5 offset-lg-1 px-5">
-            <div class="content-wrapper">
-                <h1 class="hero-title m-0">PRO</h1>
-                <h1 class="hero-title m-0">MAKEUP</h1>
-                <h1 class="hero-title pink-text m-0">STUDIO</h1>
-                <p class="tagline">creativity & professional</p>
-                <p class="description">@description</p>
-
-                <a asp-controller="Products"
-                   asp-action="GetAllProducts"
-                   class="btn btn-view">
-                    VIEW PROJECT
-                </a>
+                    <a asp-controller="Products"
+                       asp-action="GetAllProducts"
+                       class="btn btn-view">
+                        Shop Now
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -221,42 +399,56 @@
 
 @section Scripts {
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const floatingImages = document.querySelectorAll('.floating-product');
+        // قائمة الصور من الـ Model
+        const imageList = @Html.Raw(Json.Serialize(images));
 
-            window.addEventListener('scroll', () => {
-                floatingImages.forEach(img => {
-                    const speed = parseFloat(img.getAttribute('data-speed')) || 0.5;
-                    const yOffset = window.pageYOffset * speed;
-                    img.style.transform = `translateY(${yOffset}px)`;
-                });
-            });
+        // التأكد من وجود صورتين على الأقل
+        while (imageList.length < 2) {
+            imageList.push(imageList[0]);
+        }
 
-            floatingImages.forEach(img => {
-                img.addEventListener('mouseenter', () => {
-                    img.style.transform = 'scale(1.05) rotate(2deg)';
-                    img.style.filter = 'drop-shadow(0 20px 40px rgba(0,0,0,0.9)) brightness(1.1)';
-                });
+        const mainImg = document.getElementById('mainImage');
+        const secondaryImg = document.getElementById('secondaryImage');
 
-                img.addEventListener('mouseleave', () => {
-                    const speed = parseFloat(img.getAttribute('data-speed')) || 0.5;
-                    const yOffset = window.pageYOffset * speed;
-                    img.style.transform = `translateY(${yOffset}px) scale(1) rotate(0deg)`;
-                    img.style.filter = 'drop-shadow(0 15px 35px rgba(0,0,0,0.8))';
-                });
-            });
-
-            const viewButton = document.querySelector('.btn-view');
-            if (viewButton) {
-                viewButton.addEventListener('click', function () {
-                    this.style.transform = 'scale(0.95)';
-                    setTimeout(() => { this.style.transform = 'scale(1)'; }, 150);
-                });
+        // دالة لاختيار صورتين عشوائيتين مختلفتين
+        function getRandomTwoImages() {
+            if (imageList.length === 1) {
+                return [imageList[0], imageList[0]];
             }
+            let firstIndex = Math.floor(Math.random() * imageList.length);
+            let secondIndex;
+            do {
+                secondIndex = Math.floor(Math.random() * imageList.length);
+            } while (secondIndex === firstIndex && imageList.length > 1);
+            return [imageList[firstIndex], imageList[secondIndex]];
+        }
+
+        // دالة تغيير الصور مع تأثير Fade
+        function swapImages() {
+            const [src1, src2] = getRandomTwoImages();
+
+            mainImg.style.opacity = '0';
+            secondaryImg.style.opacity = '0';
 
             setTimeout(() => {
-                document.body.style.opacity = 1;
-            }, 100);
-        });
+                // إزالة ~/ من مسار الصور إذا لزم الأمر
+                mainImg.src = src1.replace('~/', '/');
+                secondaryImg.src = src2.replace('~/', '/');
+                mainImg.style.opacity = '1';
+                secondaryImg.style.opacity = '1';
+            }, 500);
+        }
+
+        // تعيين الصور الأولية
+        (function initImages() {
+            const [src1, src2] = getRandomTwoImages();
+            mainImg.src = src1.replace('~/', '/');
+            secondaryImg.src = src2.replace('~/', '/');
+            mainImg.style.opacity = '1';
+            secondaryImg.style.opacity = '1';
+        })();
+
+        // تغيير الصور كل 4 ثواني
+        setInterval(swapImages, 4000);
     </script>
 }

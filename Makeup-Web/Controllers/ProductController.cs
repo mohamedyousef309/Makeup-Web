@@ -9,6 +9,7 @@ using Application_Layer.CQRS.Products.Queries;
 using Application_Layer.CQRS.Products.Queries.GetProductByid;
 using Application_Layer.CQRS.Products.Queries.GetProductsByCategory; // Added Namespace
 using Application_Layer.CQRS.Products.Queries.GetProductsByIds;
+using Application_Layer.CQRS.Products.Queries.GetRandomImages;
 using Domain_Layer.DTOs;
 using Domain_Layer.DTOs._ِCategoryDtos;
 using Domain_Layer.DTOs.Attribute;
@@ -20,6 +21,7 @@ using Domain_Layer.ViewModels.ProductsViewModels.Product.ProductsListItemViewMod
 using Domain_Layer.ViewModels.ProductsViewModels.Product.UpdateProductsViewModel;
 using Infastructure_Layer.DynamicRBASystem;
 using MediatR;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
@@ -36,9 +38,14 @@ namespace Makeup_Web.Controllers
 
         #region Queries (Read Operations)
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var result = await _mediator.Send(new GetRandomImagesQuery());
+            if (result.IsSuccess && result.Data != null && result.Data.Count >= 2)
+            {
+                return View(result.Data);
+            }
+            return View(new List<string> { "~/Files/Images/lipstick.png", "~/Files/Images/powder.png" });
         }
 
         public async Task<IActionResult> GetAllProducts(int pageIndex = 1, int pageSize = 10, string? sortBy = "id", string? sortDir = "desc", string? search = null, int? CategoryId = null)
